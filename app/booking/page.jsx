@@ -15,14 +15,16 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function BookingPage() {
   const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [date, setDate] = useState()
   const [bookingId, setBookingId] = useState("")
-
   const [isSubmitting, setIsSubmitting] = useState(false)
-   const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState({
     serviceType: "courier",
     name: "",
     email: "",
@@ -43,23 +45,23 @@ export default function BookingPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-   const handleSelectChange = (name, value) => {
+  const handleSelectChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-   const handleServiceTypeChange = (value) => {
+  const handleServiceTypeChange = (value) => {
     setFormData((prev) => ({ ...prev, serviceType: value }))
   }
 
-   const handleNext = () => {
+  const handleNext = () => {
     setStep((prev) => prev + 1)
   }
 
-   const handleBack = () => {
+  const handleBack = () => {
     setStep((prev) => prev - 1)
   }
 
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
 
@@ -93,22 +95,21 @@ export default function BookingPage() {
     }
 
     try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
+      const res = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       })
 
       const data = await res.json()
-    if (data.success) {
-  setBookingId(data?.data?.bookingId || "")   // <-- store bookingId
-  toast({
-    title: "Booking Confirmed",
-    description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`,
-  })
-  setStep(3)
-}
- else {
+      if (data.success) {
+        setBookingId(data?.data?.bookingId || "")
+        toast({
+          title: "Booking Confirmed",
+          description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`
+        })
+        setStep(3)
+      } else {
         toast({ title: "Error", description: data.message || "Something went wrong" })
       }
     } catch (err) {
