@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { Search, XCircle, CheckCircle } from "lucide-react"
-import { Button } from "@/components/ui/button";
-
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,20 +23,18 @@ export default function TrackOrderPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${trackingId}`)
 
-
       if (!res.ok) {
         throw new Error("Order not found")
       }
 
       const data = await res.json()
-      setOrder(data)
+      setOrder(data.data) // ✅ Fix: use `data.data`
     } catch (err) {
       setError(err.message || "Something went wrong")
     } finally {
       setIsLoading(false)
     }
   }
-  console.log("API URL →", `${process.env.NEXT_PUBLIC_API_URL}/api/bookings/${trackingId}`);
 
   return (
     <div>
@@ -89,10 +86,10 @@ export default function TrackOrderPage() {
                       <div>
                         <h3 className="text-lg font-semibold text-green-800 mb-2">Order Found</h3>
                         <p className="text-sm text-gray-700">
-                          <strong>Sender:</strong> {order.senderName}<br />
-                          <strong>Recipient:</strong> {order.recipientName}<br />
-                          <strong>Origin:</strong> {order.pickupPincode}<br />
-                          <strong>Destination:</strong> {order.deliveryPincode}<br />
+                          <strong>Sender:</strong> {order.senderDetails?.name}<br />
+                          <strong>Recipient:</strong> {order.receiverDetails?.name}<br />
+                          <strong>Origin:</strong> {order.senderDetails?.pincode}<br />
+                          <strong>Destination:</strong> {order.receiverDetails?.pincode}<br />
                           <strong>Status:</strong> {order.status || "In Transit"}
                         </p>
                       </div>
@@ -105,7 +102,5 @@ export default function TrackOrderPage() {
         </div>
       </section>
     </div>
-
-)
-
+  )
 }
