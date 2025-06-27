@@ -59,6 +59,12 @@ export default function Navbar() {
             >
               Pincode Checker
             </Link>
+              <Link
+              href="/track-order"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+            >
+             Track Order
+            </Link>
           </div>
 
           {/* Mobile menu button */}
