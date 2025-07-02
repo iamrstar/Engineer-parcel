@@ -25,7 +25,11 @@ export default function BookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [formData, setFormData] = useState({
+    
+  pickupPincode:"",
     serviceType: "courier",
+    pickupLandmark: "",
+deliveryLandmark: "",
     name: "",
     email: "",
     phone: "",
@@ -306,6 +310,20 @@ export default function BookingPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      
+<div>
+  <Label htmlFor="pickupPincode">Pickup Pincode</Label>
+  <input
+    type="text"
+    id="pickupPincode"
+    name="pickupPincode"
+    value={formData.pickupPincode}
+    onChange={handleChange}
+    placeholder="Enter pickup pincode"
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+    required
+  />
+</div>
                       <div>
                         <Label htmlFor="pickupAddress">Pickup Address</Label>
                         <Textarea
@@ -319,6 +337,33 @@ export default function BookingPage() {
                         />
                       </div>
                       <div>
+  <Label htmlFor="pickupLandmark">Pickup Landmark</Label>
+  <input
+    type="text"
+    id="pickupLandmark"
+    name="pickupLandmark"
+    value={formData.pickupLandmark}
+    onChange={handleChange}
+    placeholder="Enter nearby pickup landmark"
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+  />
+</div>
+
+<div>
+  <Label htmlFor="deliveryPincode">Delivery Pincode</Label>
+  <input
+    type="text"
+    id="deliveryPincode"
+    name="deliveryPincode"
+    value={formData.deliveryPincode}
+    onChange={handleChange}
+    placeholder="Enter delivery pincode"
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+    required
+  />
+</div>
+
+                      <div>
                         <Label htmlFor="deliveryAddress">Delivery Address</Label>
                         <Textarea
                           id="deliveryAddress"
@@ -330,6 +375,19 @@ export default function BookingPage() {
                           required
                         />
                       </div>
+                      <div>
+  <Label htmlFor="deliveryLandmark">Delivery Landmark</Label>
+  <input
+    type="text"
+    id="deliveryLandmark"
+    name="deliveryLandmark"
+    value={formData.deliveryLandmark}
+    onChange={handleChange}
+    placeholder="Enter nearby delivery landmark"
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+  />
+</div>
+
                     </div>
  
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
