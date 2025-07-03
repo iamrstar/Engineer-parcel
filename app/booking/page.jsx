@@ -23,6 +23,7 @@ export default function BookingPage() {
   const [date, setDate] = useState()
   const [bookingId, setBookingId] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [priceDetails, setPriceDetails] = useState(null)
 
   const [formData, setFormData] = useState({
     
@@ -108,6 +109,7 @@ deliveryLandmark: "",
       const data = await res.json()
       if (data.success) {
         setBookingId(data?.data?.bookingId || "")
+        setPriceDetails(data?.data?.pricing || null) 
         toast({
           title: "Booking Confirmed",
           description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`
@@ -581,41 +583,59 @@ deliveryLandmark: "",
               )}
 
               {step === 3 && (
-                <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-4">
-                    <CheckCircle className="h-8 w-8" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
-                  <p className="text-gray-600 mb-6">
-                    Your booking has been successfully submitted. We'll contact you shortly to confirm the details.
-                  </p>
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">Booking Summary</h3>
-                    <ul className="space-y-1 text-sm text-gray-600">
-                      <li className="flex justify-between">
-                        <span>Service Type:</span>
-                        <span className="font-medium">
-                          {formData.serviceType.charAt(0).toUpperCase() + formData.serviceType.slice(1)}
-                        </span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Pickup Date:</span>
-                        <span className="font-medium">{date ? format(date, "PPP") : "Not specified"}</span>
-                      </li>
-                   <li className="flex justify-between">
-  <span>Booking Reference:</span>
-  <span className="font-medium">
-    {bookingId || "N/A"}
-  </span>
-</li>
+  <div className="text-center py-8">
+    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-4">
+      <CheckCircle className="h-8 w-8" />
+    </div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
+    <p className="text-gray-600 mb-6">
+      Your booking has been successfully submitted. We'll contact you shortly to confirm the details.
+    </p>
+    
+    {/* Booking Summary */}
+    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-6">
+      <h3 className="font-semibold text-gray-900 mb-2">Booking Summary</h3>
+      <ul className="space-y-1 text-sm text-gray-600">
+        <li className="flex justify-between">
+          <span>Service Type:</span>
+          <span className="font-medium">
+            {formData.serviceType.charAt(0).toUpperCase() + formData.serviceType.slice(1)}
+          </span>
+        </li>
+        <li className="flex justify-between">
+          <span>Pickup Date:</span>
+          <span className="font-medium">{date ? format(date, "PPP") : "Not specified"}</span>
+        </li>
+        <li className="flex justify-between">
+          <span>Booking Reference:</span>
+          <span className="font-medium">{bookingId || "N/A"}</span>
+        </li>
 
-                    </ul>
-                  </div>
-                  <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                    <a href="/">Return to Home</a>
-                  </Button>
-                </div>
-              )}
+        {priceDetails && (
+          <>
+            <li className="flex justify-between">
+              <span>Base Price:</span>
+              <span className="font-medium">₹{priceDetails.basePrice}</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Tax (18% GST):</span>
+              <span className="font-medium">₹{priceDetails.tax}</span>
+            </li>
+            <li className="flex justify-between text-orange-600 font-semibold">
+              <span>Total Amount:</span>
+              <span className="font-medium">₹{priceDetails.totalAmount}</span>
+            </li>
+          </>
+        )}
+      </ul>
+    </div>
+
+    <Button asChild className="bg-orange-600 hover:bg-orange-700">
+      <a href="/">Return to Home</a>
+    </Button>
+  </div>
+)}
+
             </CardContent>
           </Card>
         </div>
