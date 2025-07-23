@@ -38,7 +38,7 @@ function HomePage() {
                 height={400}
               />
             </div>
-          </div>
+          </div> 
         </div>
       </section>
 
