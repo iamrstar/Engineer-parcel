@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
+import Image from "next/image"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -17,7 +18,14 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-orange-600">EngineersParcel</span>
+              <Image
+                src="/logo.png" // Place your logo.jpg in the /public folder
+                alt="EngineersParcel Logo"
+                width={120}       // Adjust size as needed
+                height={40}
+                className="mr-2"
+              />
+            
             </Link>
           </div>
 
