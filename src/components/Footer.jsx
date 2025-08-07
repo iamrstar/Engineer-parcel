@@ -1,26 +1,26 @@
 import Link from "next/link"
 import { Mail, MapPin, Phone } from "lucide-react"
-import Image from 'next/image';
-function Footer() {
+import Image from "next/image"
+
+export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and Description */}
-         <div>
-    <Image
+          <div>
+             <Image
       src="/logo.png" // Make sure logo.png is inside the /public folder
       alt="EngineersParcel Logo"
       width={120}      // Adjust width as needed
       height={40}
       className="mb-4"
     />
-    <h2 className="text-xl font-bold text-orange-500 mb-4">EngineersParcel</h2>
-    <p className="text-gray-300 text-sm">
-      EngineersParcel offers great value for the price. The movers were friendly and very efficient.
-      They managed to pack and move everything without any issues.
-    </p>
-  </div>
+            <p className="text-gray-300 text-sm">
+              EngineersParcel offers great value for the price. The movers were friendly and very efficient. They
+              managed to pack and move everything without any issues.
+            </p>
+          </div>
 
           {/* Our Services */}
           <div>
@@ -125,5 +125,3 @@ function Footer() {
     </footer>
   )
 }
-
-export default Footer
