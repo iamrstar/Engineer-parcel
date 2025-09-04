@@ -80,8 +80,10 @@ const normalizeBooking = (b = {}) => {
   const history = hist.map((h) => ({
     status: h.status || h.event || "-",
     date: h.timestamp || h.date || h.createdAt || null,
-    event: h.description || h.details || h.message || [h.location, h.remark].filter(Boolean).join(" - ") || h.status || "-",
+    event: h.description || h.details || h.message || "-",
+    location: h.location || h.city || "-", // <--- Add this line
   }))
+
   const currentStatus = normalizeStatus(
     b.status || history[history.length - 1]?.status || ""
   )
@@ -176,7 +178,10 @@ function StatusTable({ rows = [] }) {
                   </span>
 
                   <div className="mt-1 text-sm font-medium text-gray-700">
-                    {r.event || r.location || "-"}
+                    <span className="font-semibold">Event:</span> {r.event || "-"}
+                  </div>
+                  <div className="mt-1 text-sm text-gray-700">
+                    <span className="font-semibold">Location:</span> {r.location || "-"}
                   </div>
 
                   <div className="text-xs text-gray-500">{fmtDate(r.date)}</div>
