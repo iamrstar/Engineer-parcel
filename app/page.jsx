@@ -20,7 +20,7 @@ export default function Home() {
                   <Link href="/booking">Book Now</Link>
                 </Button>
                 <Button  className="text-orange-600 bg-white hover:bg-slate-50">
-                  <Link href="/pincode-checker">Check Pincode</Link>
+                  <Link href="/track-order">Track Order</Link>
                 </Button>
               </div>
             </div>
