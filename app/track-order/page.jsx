@@ -5,7 +5,7 @@ import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Package, Truck, Building2, MapPin, CheckCircle2, Check } from "lucide-react"
+import { Package, Truck, Building2, MapPin, CheckCircle2, Check, Search } from "lucide-react"
 
 const PRIMARY = "#eb5a0c"
 const API = process.env.NEXT_PUBLIC_API_URL
@@ -305,18 +305,30 @@ export default function TrackPage() {
   return (
     <main className="min-h-dvh w-full flex justify-center py-8 px-4">
       <div className="w-full max-w-4xl space-y-4">
+        <section className="text-center mb-12 bg-orange-600 w-full text-white">
+        <h1 className="text-2xl font-semibold mb-2">Track Your Order</h1>
+        <p className="text-sm max-w-3xl mx-auto">Enter your tracking ID or mobile number to check parcel status and delivery info</p>
+      </section>
         {/* ==== Form ==== */}
         {step === "form" && (
-          <Card><CardContent className="space-y-4">
+          <Card><CardContent className="space-y-4  ">
             <Segmented value={mode} onChange={(v) => { setMode(v); setOtpSent(false); setStep("form") }}
               options={[{ value: "id", label: "Tracking ID" }, { value: "phone", label: "Mobile" }]} />
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
-              <Input className="uppercase" value={mode === "id" ? bookingId : phone}
+            <div className="flex w gap-0 mt-2">
+              <Input
+                className="flex-1  rounded-r-none border border-gray-300 focus:ring-2 focus:ring-orange-400 focus:outline-none focus:border-orange-400"
+                value={mode === "id" ? bookingId : phone}
                 onChange={(e) => mode === "id" ? setBookingId(e.target.value.toUpperCase()) : setPhone(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && onTrack()}
-                placeholder={mode === "id" ? "ENTER TRACKING ID" : "Enter Mobile Number"} />
-              <Button style={{ backgroundColor: PRIMARY, borderColor: PRIMARY }} className="text-white w-full" onClick={onTrack}>
-                {isValidating ? (mode === "id" ? "Tracking..." : "Sending OTP...") : (mode === "id" ? "TRACK" : "GET OTP & TRACK")}
+                placeholder={mode === "id" ? "Enter Tracking ID" : "Enter Mobile Number"}
+              />
+              <Button
+                className="bg-orange-600 hover:bg-orange-700 text-white rounded-l-none flex items-center justify-center px-4"
+                onClick={onTrack}
+                disabled={isValidating || (mode === "id" ? bookingId.length < 4 : phone.length < 10)}
+              >
+                {isValidating ? (mode === "id" ? "Tracking..." : "Sending OTP...") : (mode === "id" ? "Track" : "Get OTP")}
+                {mode === "id" && <Search className="ml-2 h-4 w-4" />}
               </Button>
             </div>
           </CardContent></Card>
