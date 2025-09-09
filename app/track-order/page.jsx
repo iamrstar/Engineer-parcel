@@ -210,7 +210,7 @@ const Stepper = ({ current = "IN_TRANSIT", dates = {} }) => {
   }, [])
 
   const steps = [
-    { key: "CONFIRMED", label: "CONFIRMED", icon: Package },
+    { key: "CONFIRMED", label: "BOOKED", icon: Package },
     { key: "IN_TRANSIT", label: "IN TRANSIT", icon: Truck },
     { key: "ARRIVED_AT_DESTINATION", label: "ARRIVED AT DESTINATION", icon: Building2 },
     { key: "OUT_FOR_DELIVERY", label: "OUT FOR DELIVERY", icon: MapPin },
