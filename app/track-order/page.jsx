@@ -87,7 +87,8 @@ const normalizeBooking = (b = {}) => {
   const currentStatus = normalizeStatus(
     b.status || history[history.length - 1]?.status || ""
   )
-  return { id: waybill, waybill, origin, destination, currentStatus, history }
+   const etd = b.estimatedDelivery || "Updated Shortly"
+  return { id: waybill, waybill, origin, destination, currentStatus, history,etd }
 }
 
 // ===== UI Components =====
@@ -359,6 +360,7 @@ export default function TrackPage() {
                   <SummaryChip label="WAYBILL NUMBER" value={b.waybill} />
                   <SummaryChip label="ORIGIN" value={b.origin} />
                   <SummaryChip label="DESTINATION" value={b.destination} />
+                  <SummaryChip label="ESTIMATED DELIVERY" value={b.etd} />
                 </div>
                 <div className="px-4 pb-2"><Stepper current={b.currentStatus} dates={datesByStep(b)} /></div>
                 <div className="px-4 pb-4"><StatusTable rows={b.history} /></div>
