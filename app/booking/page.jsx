@@ -589,8 +589,7 @@ deliveryLandmark: "",
     </div>
     <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
     <p className="text-gray-600 mb-6">
-      Your booking has been successfully submitted. We'll contact you shortly to confirm the details.
-    </p>
+ Your booking has been successfully submitted. We'll update you shortly to confirm the details and Estimated Time of delivery .    </p>
     
     {/* Booking Summary */}
     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-6">
