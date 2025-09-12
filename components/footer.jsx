@@ -115,7 +115,7 @@ export default function Footer() {
               <Link href="/faqs" className="text-sm text-gray-400 hover:text-orange-500">
                 FAQs
               </Link>
-              <Link href="/support" className="text-sm text-gray-400 hover:text-orange-500">
+              <Link href="/contact" className="text-sm text-gray-400 hover:text-orange-500">
                 Support
               </Link>
             </div>
