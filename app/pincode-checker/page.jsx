@@ -2476,7 +2476,7 @@ export default function PincodeCheckerPage() {
               </div>
             </div>
           </div>
-
+<br />
           {/* FAQ Section */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
