@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { CalendarIcon, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";   
+import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";   
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -134,7 +134,7 @@ export default function BookingPage() {
           title: "Booking Confirmed",
           description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`,
         });
-        setStep(3);
+        setStep(4);
       } else {
         toast({
           title: "Error",
@@ -180,6 +180,8 @@ export default function BookingPage() {
                 <span className="text-sm mt-1">Service Details</span>
               </div>
 
+              
+
               <div className={cn("flex-1 h-1 mx-4", step >= 1 ? "bg-orange-600" : "bg-gray-300")}></div>
 
               {/* Step 2 */}
@@ -190,20 +192,34 @@ export default function BookingPage() {
                 )}>
                   2
                 </div>
-                <span className="text-sm mt-1">Contact Information</span>
+                <span className="text-sm mt-1">Pickup and Delivery Details</span>
               </div>
 
               <div className={cn("flex-1 h-1 mx-4", step >= 2 ? "bg-orange-600" : "bg-gray-300")}></div>
 
-              {/* Step 3 */}
-              <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
+             {/* Step 3 */}
+
+               <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
                 <div className={cn(
                   "h-8 w-8 rounded-full flex items-center justify-center border-2",
                   step >= 2 ? "border-orange-600 bg-orange-50" : "border-gray-300"
                 )}>
                   3
                 </div>
-                <span className="text-sm mt-1">Confirmation</span>
+                <span className="text-sm mt-1">Contact information</span>
+              </div>
+
+
+
+              {/* Step 4 */}
+              <div className={cn("flex flex-col items-center", step >= 3 ? "text-orange-600" : "text-gray-400")}>
+                <div className={cn(
+                  "h-8 w-8 rounded-full flex items-center justify-center border-2",
+                  step >= 3 ? "border-orange-600 bg-orange-50" : "border-gray-300"
+                )}>
+                  4
+                </div>
+                <span className="text-sm mt-1">Checkout</span>
               </div>
             </div>
           </div>
@@ -609,108 +625,169 @@ export default function BookingPage() {
               )}
 
               {step === 2 && (
-                <form onSubmit={handleSubmit}>
-                  <div className="space-y-6">
-                    <div>
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Your full name"
-                        required
-                      />
-                    </div>
+  <div className="space-y-6">
+    <div>
+      <Label htmlFor="name">Full Name</Label>
+      <Input
+        id="name"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Your full name"
+        required
+      />
+    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="Your email address"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="Your phone number"
-                          required
-                        />
-                      </div>
-                    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <Label htmlFor="email">Email Address</Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Your email address"
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="phone">Phone Number</Label>
+        <Input
+          id="phone"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Your phone number"
+          required
+        />
+      </div>
+    </div>
 
-                    {/* Receiver Section */}
-                    <div className="border-t pt-4">
-                      <h3 className="text-lg font-semibold mb-2">
-                        Receiver Details
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="receiverName">Receiver Name</Label>
-                          <Input
-                            id="receiverName"
-                            name="receiverName"
-                            value={formData.receiverName}
-                            onChange={handleChange}
-                            placeholder="Receiver's full name"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="receiverEmail">Receiver Email</Label>
-                          <Input
-                            id="receiverEmail"
-                            name="receiverEmail"
-                            value={formData.receiverEmail}
-                            onChange={handleChange}
-                            placeholder="Receiver's email"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="receiverPhone">Receiver Phone</Label>
-                          <Input
-                            id="receiverPhone"
-                            name="receiverPhone"
-                            value={formData.receiverPhone}
-                            onChange={handleChange}
-                            placeholder="Receiver's phone"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
+    {/* Receiver Section */}
+    <div className="border-t pt-4">
+      <h3 className="text-lg font-semibold mb-2">Receiver Details</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="receiverName">Receiver Name</Label>
+          <Input
+            id="receiverName"
+            name="receiverName"
+            value={formData.receiverName}
+            onChange={handleChange}
+            placeholder="Receiver's full name"
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="receiverEmail">Receiver Email</Label>
+          <Input
+            id="receiverEmail"
+            name="receiverEmail"
+            value={formData.receiverEmail}
+            onChange={handleChange}
+            placeholder="Receiver's email"
+          />
+        </div>
+        <div>
+          <Label htmlFor="receiverPhone">Receiver Phone</Label>
+          <Input
+            id="receiverPhone"
+            name="receiverPhone"
+            value={formData.receiverPhone}
+            onChange={handleChange}
+            placeholder="Receiver's phone"
+            required
+          />
+        </div>
+      </div>
+    </div>
 
-                    <div className="flex justify-between">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleBack}
-                      >
-                        Back
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="bg-orange-600 hover:bg-orange-700"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Processing..." : "Submit Booking"}
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              )}
+    <div className="flex justify-between">
+      <Button type="button" variant="outline" onClick={handleBack}>
+        Back
+      </Button>
+      <Button
+        type="button"
+        className="bg-orange-600 hover:bg-orange-700"
+        onClick={handleNext}
+      >
+        Proceed to Checkout
+      </Button>
+    </div>
+  </div>
+)}
 
-              {step === 3 && (
+{step === 3 && (
+  <form onSubmit={handleSubmit} className="space-y-6">
+    <h2 className="text-lg font-semibold mb-4">Review Your Booking</h2>
+
+    {/* Summary Section */}
+    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left space-y-2">
+      <div className="flex justify-between">
+        <span>Service Type:</span>
+        <span className="font-medium">{formData.serviceType}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Pickup Address:</span>
+        <span className="font-medium">{formData.pickupAddress}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Delivery Address:</span>
+        <span className="font-medium">{formData.deliveryAddress}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Pickup Date:</span>
+        <span className="font-medium">
+          {date ? format(date, "PPP") : "Not selected"}
+        </span>
+      </div>
+      <div className="flex justify-between">
+        <span>Parcel Weight:</span>
+        <span className="font-medium">{formData.parcelWeight}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Parcel Contents:</span>
+        <span className="font-medium">{formData.parcelContents}</span>
+      </div>
+
+      {priceDetails && (
+        <>
+          <div className="flex justify-between">
+            <span>Base Price:</span>
+            <span>₹{priceDetails.basePrice}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Tax (18% GST):</span>
+            <span>₹{priceDetails.tax}</span>
+          </div>
+          <div className="flex justify-between font-semibold text-orange-600">
+            <span>Total Amount:</span>
+            <span>₹{priceDetails.totalAmount}</span>
+          </div>
+        </>
+      )}
+    </div>
+
+    <div className="flex justify-between mt-4">
+      <Button type="button" variant="outline" onClick={handleBack}>
+        Back
+      </Button>
+      <Button
+        type="submit"
+        className="bg-orange-600 hover:bg-orange-700"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Submitting..." : " Proceed to Payment"}
+      </Button>
+    </div>
+  </form>
+)}
+
+
+
+
+              {step === 4 && (
                 <div className="text-center py-8">
                   <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-4">
                     <CheckCircle className="h-8 w-8" />
