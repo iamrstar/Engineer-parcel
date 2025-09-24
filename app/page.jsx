@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
      
 export default function Home() {
   return (
-    <div>
+    <div> 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
