@@ -719,70 +719,156 @@ export default function BookingPage() {
 )}
 
 {step === 3 && (
-  <form onSubmit={handleSubmit} className="space-y-6">
-    <h2 className="text-lg font-semibold mb-4">Review Your Booking</h2>
+  <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto px-4">
+    <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 text-center">
+      Review Your Booking
+    </h2>
 
-    {/* Summary Section */}
-    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left space-y-2">
-      <div className="flex justify-between">
-        <span>Service Type:</span>
-        <span className="font-medium">{formData.serviceType}</span>
-      </div>
-      <div className="flex justify-between">
-        <span>Pickup Address:</span>
-        <span className="font-medium">{formData.pickupAddress}</span>
-      </div>
-      <div className="flex justify-between">
-        <span>Delivery Address:</span>
-        <span className="font-medium">{formData.deliveryAddress}</span>
-      </div>
-      <div className="flex justify-between">
-        <span>Pickup Date:</span>
-        <span className="font-medium">
-          {date ? format(date, "PPP") : "Not selected"}
-        </span>
-      </div>
-      <div className="flex justify-between">
-        <span>Parcel Weight:</span>
-        <span className="font-medium">{formData.parcelWeight}</span>
-      </div>
-      <div className="flex justify-between">
-        <span>Parcel Contents:</span>
-        <span className="font-medium">{formData.parcelContents}</span>
+    <div className="space-y-4">
+
+      {/* Service & Pickup */}
+      <div className="bg-orange-50/20 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-orange-100">
+        <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+          Service & Pickup
+        </h3>
+<div className="flex justify-between text-gray-700 mb-1">
+          <span>Service Type:</span>
+          <span className="font-medium capitalize">{formData.serviceType}</span>
+          <br />
+        </div>
+        <br />
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words mb-1">
+          <span>Pickup Address:</span>
+          <span className="font-medium max-w-full">{formData.pickupAddress}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Landmark:</span>
+          <span className="font-medium">{formData.pickupLandmark || "-"}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Pincode:</span>
+          <span className="font-medium">{formData.pickupPincode}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Date:</span>
+          <span className="font-medium">{date ? format(date, "PPP") : "Not selected"}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700">
+          <span>Time Slot:</span>
+          <span className="font-medium">{formData.pickupTime || "Not selected"}</span>
+        </div>
       </div>
 
+      {/* Delivery */}
+      <div className="bg-gray-50 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
+        <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+          Delivery Details
+        </h3>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words mb-1">
+          <span>Address:</span>
+          <span className="font-medium max-w-full">{formData.deliveryAddress}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Landmark:</span>
+          <span className="font-medium">{formData.deliveryLandmark || "-"}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700">
+          <span>Pincode:</span>
+          <span className="font-medium">{formData.deliveryPincode}</span>
+        </div>
+      </div>
+
+      {/* Sender */}
+      <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200">
+        <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+          Sender Details
+        </h3>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Name:</span>
+          <span className="font-medium">{formData.name}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Email:</span>
+          <span className="font-medium">{formData.email || "-"}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700">
+          <span>Phone:</span>
+          <span className="font-medium">{formData.phone}</span>
+        </div>
+      </div>
+
+      {/* Receiver */}
+      <div className="bg-orange-50/20 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-orange-100">
+        <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+          Receiver Details
+        </h3>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Name:</span>
+          <span className="font-medium">{formData.receiverName}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Email:</span>
+          <span className="font-medium">{formData.receiverEmail || "-"}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700">
+          <span>Phone:</span>
+          <span className="font-medium">{formData.receiverPhone}</span>
+        </div>
+      </div>
+
+      {/* Parcel */}
+      <div className="bg-gray-50 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
+        <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+          Parcel Details
+        </h3>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          <span>Weight:</span>
+          <span className="font-medium">{formData.parcelWeight}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words mb-1">
+          <span>Contents:</span>
+          <span className="font-medium max-w-full">{formData.parcelContents}</span>
+        </div>
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words">
+          <span>Special Instructions:</span>
+          <span className="font-medium max-w-full">{formData.specialInstructions || "-"}</span>
+        </div>
+      </div>
+
+      {/* Pricing */}
       {priceDetails && (
-        <>
-          <div className="flex justify-between">
+        <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200">
+          <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+            Pricing Summary
+          </h3>
+          <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
             <span>Base Price:</span>
-            <span>₹{priceDetails.basePrice}</span>
+            <span className="font-medium">₹{priceDetails.basePrice}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
             <span>Tax (18% GST):</span>
-            <span>₹{priceDetails.tax}</span>
+            <span className="font-medium">₹{priceDetails.tax}</span>
           </div>
-          <div className="flex justify-between font-semibold text-orange-600">
+          <div className="flex flex-col md:flex-row justify-between text-orange-600 font-semibold">
             <span>Total Amount:</span>
             <span>₹{priceDetails.totalAmount}</span>
           </div>
-        </>
+        </div>
       )}
+
     </div>
 
-    <div className="flex justify-between mt-4">
-      <Button type="button" variant="outline" onClick={handleBack}>
+    <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
+      <Button type="button" variant="outline" className="w-full md:w-auto" onClick={handleBack}>
         Back
       </Button>
-      <Button
-        type="submit"
-        className="bg-orange-600 hover:bg-orange-700"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Submitting..." : " Proceed to Payment"}
+      <Button type="submit" className="w-full md:w-auto bg-orange-600 hover:bg-orange-700" disabled={isSubmitting}>
+        {isSubmitting ? "Submitting..." : "Proceed to Payment"}
       </Button>
     </div>
   </form>
 )}
+
 
 
 
