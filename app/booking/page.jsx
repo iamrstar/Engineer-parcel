@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarIcon, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -35,7 +35,6 @@ export default function BookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
 
-
   const [formData, setFormData] = useState({
     pickupPincode: "",
     serviceType: "",
@@ -54,7 +53,52 @@ export default function BookingPage() {
     receiverEmail: "",
     receiverPhone: "",
   });
+useEffect(() => {
+  if (step === 3) {
+    fetchPrice();
+  }
+}, [step, formData.serviceType, formData.parcelWeight]);
 
+  const fetchPrice = async () => {
+  if (!formData.parcelWeight || !formData.serviceType) return;
+
+  const payload = {
+    serviceType: formData.serviceType, // "surface" or "air"
+    weight:
+      formData.parcelWeight === "under1"
+        ? 1
+        : formData.parcelWeight === "1to5"
+        ? 5
+        : formData.parcelWeight === "5to10"
+        ? 10
+        : formData.parcelWeight === "10to20"
+        ? 20
+        : 25,
+    paymentMethod: "cod", // ya formData.paymentMethod agar dynamic
+  };
+
+  try {
+    const res = await fetch("http://localhost:5000/api/calculate-price", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    console.log("Price API Response:", data);
+    if (data.success) {
+      setPriceDetails(data.data);
+    } else {
+      setPriceDetails(null);
+    }
+  } catch (err) {
+    console.error("Price fetch error:", err);
+    setPriceDetails(null);
+  }
+};
+
+  
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -148,6 +192,8 @@ export default function BookingPage() {
 
     setIsSubmitting(false);
   };
+// BookingPage ke andar
+
 
   return (
     <div>
@@ -719,7 +765,8 @@ export default function BookingPage() {
 )}
 
 {step === 3 && (
-  <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto px-4">
+  
+  <div className="space-y-6 max-w-md mx-auto px-4">
     <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 text-center">
       Review Your Booking
     </h2>
@@ -731,13 +778,11 @@ export default function BookingPage() {
         <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
           Service & Pickup
         </h3>
-<div className="flex justify-between text-gray-700 mb-1">
+        <div className="flex justify-between text-gray-700 mb-1">
           <span>Service Type:</span>
           <span className="font-medium capitalize">{formData.serviceType}</span>
-          <br />
         </div>
-        <br />
-        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words mb-1">
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
           <span>Pickup Address:</span>
           <span className="font-medium max-w-full">{formData.pickupAddress}</span>
         </div>
@@ -764,7 +809,7 @@ export default function BookingPage() {
         <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
           Delivery Details
         </h3>
-        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words mb-1">
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
           <span>Address:</span>
           <span className="font-medium max-w-full">{formData.deliveryAddress}</span>
         </div>
@@ -825,49 +870,69 @@ export default function BookingPage() {
           <span>Weight:</span>
           <span className="font-medium">{formData.parcelWeight}</span>
         </div>
-        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words mb-1">
+        <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
           <span>Contents:</span>
           <span className="font-medium max-w-full">{formData.parcelContents}</span>
         </div>
-        <div className="flex flex-col md:flex-row justify-between text-gray-700 break-words">
+        <div className="flex flex-col md:flex-row justify-between text-gray-700">
           <span>Special Instructions:</span>
           <span className="font-medium max-w-full">{formData.specialInstructions || "-"}</span>
         </div>
       </div>
 
       {/* Pricing */}
-      {priceDetails && (
-        <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200">
-          <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-            Pricing Summary
-          </h3>
-          <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+       {priceDetails ? (
+      <div className="bg-green-50 p-4 rounded-xl border border-green-100 shadow-sm">
+        <h3 className="text-md md:text-lg font-semibold text-green-600 border-b border-green-200 pb-2 mb-2">
+          Pricing
+        </h3>
+        <ul className="space-y-1">
+          <li className="flex justify-between">
             <span>Base Price:</span>
             <span className="font-medium">₹{priceDetails.basePrice}</span>
-          </div>
-          <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+          </li>
+          <li className="flex justify-between">
+            <span>COD Charges:</span>
+            <span className="font-medium">₹{priceDetails.codCharges}</span>
+          </li>
+          <li className="flex justify-between">
             <span>Tax (18% GST):</span>
             <span className="font-medium">₹{priceDetails.tax}</span>
-          </div>
-          <div className="flex flex-col md:flex-row justify-between text-orange-600 font-semibold">
+          </li>
+          <li className="flex justify-between text-orange-600 font-semibold">
             <span>Total Amount:</span>
-            <span>₹{priceDetails.totalAmount}</span>
-          </div>
-        </div>
-      )}
+            <span className="font-medium">₹{priceDetails.totalAmount}</span>
+          </li>
+        </ul>
+      </div>
+    ) : (
+      <p className="text-gray-500 text-center mt-2">Calculating price...</p>
+    )}
 
     </div>
 
     <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
-      <Button type="button" variant="outline" className="w-full md:w-auto" onClick={handleBack}>
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full md:w-auto"
+        onClick={handleBack}
+      >
         Back
       </Button>
-      <Button type="submit" className="w-full md:w-auto bg-orange-600 hover:bg-orange-700" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+        disabled={isSubmitting}
+        onClick={handleSubmit}
+      >
         {isSubmitting ? "Submitting..." : "Proceed to Payment"}
       </Button>
     </div>
-  </form>
+  </div>
 )}
+
+
 
 
 
