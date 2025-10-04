@@ -49,7 +49,7 @@ const [date, setDate] = useState(null);
   deliveryAddress: "",
   weight: "",        // numeric weight
   weightUnit: "kg",  // kg / g
-  length: "",
+  lengths: "",
   width: "",
   height: "",
   value: "",
@@ -72,7 +72,7 @@ useEffect(() => {
             serviceType: formData.serviceType,
             weight: parseFloat(formData.weight),
             weightUnit: "kg",
-            length: formData.length || 0,
+            lengths: formData.lengths || 0,
             width: formData.width || 0,
             height: formData.height || 0,
             distance: formData.distance || 0,
@@ -948,22 +948,31 @@ const handleInputChange = (field, value) => {
 
                     {/* Parcel */}
                     <div className="bg-gray-50 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
-                      <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-                        Parcel Details
-                      </h3>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Weight:</span>
-                        <span className="font-medium">{formData.parcelWeight}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
-                        <span>Contents:</span>
-                        <span className="font-medium max-w-full">{formData.parcelContents}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700">
-                        <span>Special Instructions:</span>
-                        <span className="font-medium max-w-full">{formData.specialInstructions || "-"}</span>
-                      </div>
-                    </div>
+  <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
+    Parcel Details
+  </h3>
+  <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
+    <span>Weight:</span>
+    <span className="font-medium">{formData.weight} {formData.packageDetails?.weightUnit || "kg"}</span>
+  </div>
+  <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
+    <span>Contents:</span>
+    <span className="font-medium max-w-full">{formData.parcelContents || "-"}</span>
+  </div>
+  <div className="flex flex-col md:flex-row justify-between text-gray-700">
+    <span>Special Instructions:</span>
+    <span className="font-medium max-w-full">{formData.specialInstructions || "-"}</span>
+  </div>
+  <div className="flex flex-col md:flex-row justify-between text-gray-700 mt-1">
+    <span>Dimensions:</span>
+    <span className="font-medium max-w-full">
+      {formData.packageDetails?.dimensions
+        ? `${formData.packageDetails.dimensions.length} x ${formData.packageDetails.dimensions.width} x ${formData.packageDetails.dimensions.height} cm`
+        : "-"}
+    </span>
+  </div>
+</div>
+
 
                     {/* Pricing */}
                     {priceDetails ? (
