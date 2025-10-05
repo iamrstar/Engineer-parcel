@@ -7,7 +7,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {axios} from "axios"
 import {
   Popover,
   PopoverContent,
@@ -31,36 +30,30 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function BookingPage() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
-const [date, setDate] = useState(null);
+  const [date, setDate] = useState();
   const [bookingId, setBookingId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
 
-
   const [formData, setFormData] = useState({
-  pickupPincode: "",
-  serviceType: "",
-  pickupLandmark: "",
-  deliveryLandmark: "",
-  name: "",
-  email: "",
-  phone: "",
-  pickupAddress: "",
-  deliveryAddress: "",
-  weight: "",        // numeric weight
-  weightUnit: "kg",  // kg / g
-  lengths: "",
-  width: "",
-  height: "",
-  value: "",
-  fragile: false,
-  parcelContents: "",
-  specialInstructions: "",
-  pickupTime: "",
-  receiverName: "",
-  receiverEmail: "",
-  receiverPhone: "",
-});
+    pickupPincode: "",
+    serviceType: "",
+    pickupLandmark: "",
+    deliveryLandmark: "",
+    name: "",
+    email: "",
+    phone: "",
+    pickupAddress: "",
+    deliveryAddress: "",
+    parcelWeight: "",
+    parcelContents: "",
+    specialInstructions: "",
+    pickupTime: "",
+    receiverName: "",
+    receiverEmail: "",
+    receiverPhone: "",
+  });
+
 useEffect(() => {
   if (formData.weight && formData.serviceType) {
     const fetchPrice = async () => {
@@ -100,8 +93,7 @@ useEffect(() => {
 
 console.log("Price details:", priceDetails);
 
- 
-  // 🧩 Handle text/number input changes
+  
 const handleInputChange = (field, value) => {
   setFormData((prev) => ({
     ...prev,
@@ -109,42 +101,51 @@ const handleInputChange = (field, value) => {
   }));
 };
 
-// 🧩 Handle dropdown/select changes
-
-
-
   const fetchPrice = async () => {
-   if (!formData.parcelWeight || !formData.serviceType) return;
+  if (!formData.parcelWeight || !formData.serviceType) return;
 
-    const payload = {
-      serviceType: formData.serviceType, // "surface" or "air"
-     weight: parseFloat(formData.weight) || 1,
-      paymentMethod: "cod", // ya formData.paymentMethod agar dynamic
-    };
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/price`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      console.log("Price API Response:", data);
-      if (data.success) {
-        setPriceDetails(data.data);
-      } else {
-        setPriceDetails(null);
-        console.error("Price fetch error:", data.message);
-      }
-    } catch (err) {
-      console.error("Price fetch error:", err);
-      setPriceDetails(null);
-    }
+  const payload = {
+      serviceType: formData.serviceType,
+      pickupDate: date?.toISOString(),
+      pickupSlot: formData.pickupTime || "afternoon",
+      paymentMethod: "COD",
+      packageDetails: {
+  weight: parseFloat(formData.weight) || 1,             // Actual weight input from user
+  weightUnit: formData.weightUnit || "kg",             // kg or g
+  dimensions: {
+    length: parseFloat(formData.length) || 0,
+    width: parseFloat(formData.width) || 0,
+    height: parseFloat(formData.height) || 0,
+  },
+  description: formData.parcelContents || "",
+  value: parseFloat(formData.value) || 0,
+  fragile: formData.fragile || false,
+},
+      notes: formData.specialInstructions || "", // ya formData.paymentMethod agar dynamic
   };
 
+  try {
+      const res = await fetch(`${API_BASE_URL}/api/calculate-price`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
+    const data = await res.json();
+    console.log("Price API Response:", data);
+    if (data.success) {
+      setPriceDetails(data.data);
+    } else {
+      setPriceDetails(null);
+    }
+  } catch (err) {
+    console.error("Price fetch error:", err);
+    setPriceDetails(null);
+  }
+};
 
+  
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -167,36 +168,32 @@ const handleInputChange = (field, value) => {
     setStep((prev) => prev - 1);
   };
 
-  
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    
-
     const payload = {
-      senderDetails: { 
+      senderDetails: {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         address: formData.pickupAddress,
-        pincode: formData.pickupPincode.match(/\b\d{6}\b/)?.[0] || "826004",
-      },
+        pincode: formData.pickupAddress.match(/\b\d{6}\b/)?.[0] || "826004",
+      },  
       receiverDetails: {
         name: formData.receiverName || "Receiver Name",
         email: formData.receiverEmail || "receiver@example.com",
         phone: formData.receiverPhone || "9123456780",
         address: formData.deliveryAddress,
-        pincode: formData.deliveryPincode.match(/\b\d{6}\b/)?.[0] || "700001",
+        pincode: formData.deliveryAddress.match(/\b\d{6}\b/)?.[0] || "700001",
       },
       serviceType: formData.serviceType,
       pickupDate: date?.toISOString(),
       pickupSlot: formData.pickupTime || "afternoon",
       paymentMethod: "COD",
       packageDetails: {
-  weight: parseFloat(formData.weight) || 1,             // Actual weight input from user
-  weightUnit: formData.weightUnit || "kg",             // kg or g
+  weight: parseFloat(formData.weight) || 1,
+  weightUnit: formData.weightUnit || "kg",
   dimensions: {
     length: parseFloat(formData.length) || 0,
     width: parseFloat(formData.width) || 0,
@@ -238,7 +235,7 @@ const handleInputChange = (field, value) => {
 
     setIsSubmitting(false);
   };
-  // BookingPage ke andar
+// BookingPage ke andar
 
 
   return (
@@ -272,7 +269,7 @@ const handleInputChange = (field, value) => {
                 <span className="text-sm mt-1">Service Details</span>
               </div>
 
-
+              
 
               <div className={cn("flex-1 h-1 mx-4", step >= 1 ? "bg-orange-600" : "bg-gray-300")}></div>
 
@@ -289,9 +286,9 @@ const handleInputChange = (field, value) => {
 
               <div className={cn("flex-1 h-1 mx-4", step >= 2 ? "bg-orange-600" : "bg-gray-300")}></div>
 
-              {/* Step 3 */}
+             {/* Step 3 */}
 
-              <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
+               <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
                 <div className={cn(
                   "h-8 w-8 rounded-full flex items-center justify-center border-2",
                   step >= 2 ? "border-orange-600 bg-orange-50" : "border-gray-300"
@@ -319,544 +316,527 @@ const handleInputChange = (field, value) => {
 
           <Card>
             <CardContent className="pt-6">
-              {step === 0 && (
-                <div>
-                  <Label className="text-base font-semibold">
-                    Select Service Type
-                  </Label>
-                  <RadioGroup
-                    value={formData.serviceType} // controlled value
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3"
-                    onValueChange={(value) => {
-                      setFormData({ ...formData, serviceType: value }); // update form data
-                      setStep(1); // go to step 1 automatically
-                    }}
-                  >
-                    <div>
-                      <RadioGroupItem
-                        value="courier"
-                        id="courier"
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor="courier"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                      >
-                        <div className="mb-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
-                          >
-                            <path d="M5 7.5V7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5" />
-                            <rect
-                              width="8"
-                              height="8"
-                              x="2"
-                              y="14"
-                              rx="2"
-                            />
-                          </svg>
-                        </div>
-                        <div className="text-center">
-                          <span className="font-semibold">
-                            Courier Service
-                          </span>
-                          <p className="text-sm text-muted-foreground">
-                            Document & parcel delivery
-                          </p>
-                        </div>
-                      </Label>
-                    </div>
-                    <div>
-                      <RadioGroupItem
-                        value="shifting"
-                        id="shifting"
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor="shifting"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                      >
-                        <div className="mb-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
-                          >
-                            <path d="M3 8h18M9 8v8m6-8v8" />
-                            <rect
-                              width="18"
-                              height="12"
-                              x="3"
-                              y="4"
-                              rx="2"
-                            />
-                            <path d="M3 20h18" />
-                          </svg>
-                        </div>
-                        <div className="text-center">
-                          <span className="font-semibold">
-                            Shifting & Moving
-                          </span>
-                          <p className="text-sm text-muted-foreground">
-                            Home & office relocation
-                          </p>
-                        </div>
-                      </Label>
-                    </div>
-                    <div>
-                      <RadioGroupItem
-                        value="local"
-                        id="local"
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor="local"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                      >
-                        <div className="mb-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
-                          >
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-                          </svg>
-                        </div>
-                        <div className="text-center">
-                          <span className="font-semibold">
-                            Local Parcel
-                          </span>
-                          <p className="text-sm text-muted-foreground">
-                            Same-day local delivery
-                          </p>
-                        </div>
-                      </Label>
-                    </div>
-                    <div>
-                      <RadioGroupItem
-                        value="international"
-                        id="international"
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor="international"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                      >
-                        <div className="mb-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-6 w-6"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-                            <path d="M2 12h20" />
-                          </svg>
-                        </div>
-                        <div className="text-center">
-                          <span className="font-semibold">
-                            International
-                          </span>
-                          <p className="text-sm text-muted-foreground">
-                            Worldwide shipping
-                          </p>
-                        </div>
-                      </Label>
-                    </div>
-                  </RadioGroup>
+                {step === 0 && (
+                  <div>
+                    <Label className="text-base font-semibold">
+                      Select Service Type
+                    </Label>
+                    <RadioGroup
+                      value={formData.serviceType} // controlled value
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3"
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, serviceType: value }); // update form data
+                        setStep(1); // go to step 1 automatically
+                      }}
+                    >
+                      <div>
+                        <RadioGroupItem
+                          value="courier"
+                          id="courier"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="courier"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
+                        >
+                          <div className="mb-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-6 w-6"
+                            >
+                              <path d="M5 7.5V7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5" />
+                              <rect
+                                width="8"
+                                height="8"
+                                x="2"
+                                y="14"
+                                rx="2"
+                              />
+                            </svg>
+                          </div>
+                          <div className="text-center">
+                            <span className="font-semibold">
+                              Courier Service
+                            </span>
+                            <p className="text-sm text-muted-foreground">
+                              Document & parcel delivery
+                            </p>
+                          </div>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem
+                          value="shifting"
+                          id="shifting"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="shifting"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
+                        >
+                          <div className="mb-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-6 w-6"
+                            >
+                              <path d="M3 8h18M9 8v8m6-8v8" />
+                              <rect
+                                width="18"
+                                height="12"
+                                x="3"
+                                y="4"
+                                rx="2"
+                              />
+                              <path d="M3 20h18" />
+                            </svg>
+                          </div>
+                          <div className="text-center">
+                            <span className="font-semibold">
+                              Shifting & Moving
+                            </span>
+                            <p className="text-sm text-muted-foreground">
+                              Home & office relocation
+                            </p>
+                          </div>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem
+                          value="local"
+                          id="local"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="local"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
+                        >
+                          <div className="mb-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-6 w-6"
+                            >
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                            </svg>
+                          </div>
+                          <div className="text-center">
+                            <span className="font-semibold">
+                              Local Parcel
+                            </span>
+                            <p className="text-sm text-muted-foreground">
+                              Same-day local delivery
+                            </p>
+                          </div>
+                        </Label>
+                      </div>
+                      <div>
+                        <RadioGroupItem
+                          value="international"
+                          id="international"
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor="international"
+                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
+                        >
+                          <div className="mb-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-6 w-6"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                              <path d="M2 12h20" />
+                            </svg>
+                          </div>
+                          <div className="text-center">
+                            <span className="font-semibold">
+                              International
+                            </span>
+                            <p className="text-sm text-muted-foreground">
+                              Worldwide shipping
+                            </p>
+                          </div>
+                        </Label>
+                      </div>
+                    </RadioGroup>
 
-                </div>
+                  </div>
 
-              )}
+                )}
               {step === 1 && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleNext();
-                  }}
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      handleNext();
+    }}
+  >
+    <div className="space-y-6">
+      {/* =================== PICKUP DETAILS =================== */}
+      <div className="space-y-4 p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm">
+        <h3 className="text-lg font-semibold text-orange-500">🚚 Pickup Details</h3>
+
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="pickupPincode">Pickup Pincode</Label>
+            <Input
+              type="text"
+              id="pickupPincode"
+              name="pickupPincode"
+              value={formData.pickupPincode}
+              onChange={handleChange}
+              placeholder="Enter pickup pincode"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="pickupAddress">Pickup Address</Label>
+            <Textarea
+              id="pickupAddress"
+              name="pickupAddress"
+              value={formData.pickupAddress}
+              onChange={handleChange}
+              placeholder="Enter complete pickup address"
+              rows={3}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="pickupLandmark">Pickup Landmark</Label>
+            <Input
+              type="text"
+              id="pickupLandmark"
+              name="pickupLandmark"
+              value={formData.pickupLandmark}
+              onChange={handleChange}
+              placeholder="Enter nearby landmark"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* =================== DELIVERY DETAILS =================== */}
+      <div className="space-y-4 p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm">
+        <h3 className="text-lg font-semibold text-orange-500">📦 Delivery Details</h3>
+
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="deliveryPincode">Delivery Pincode</Label>
+            <Input
+              type="text"
+              id="deliveryPincode"
+              name="deliveryPincode"
+              value={formData.deliveryPincode}
+              onChange={handleChange}
+              placeholder="Enter delivery pincode"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="deliveryAddress">Delivery Address</Label>
+            <Textarea
+              id="deliveryAddress"
+              name="deliveryAddress"
+              value={formData.deliveryAddress}
+              onChange={handleChange}
+              placeholder="Enter complete delivery address"
+              rows={3}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="deliveryLandmark">Delivery Landmark</Label>
+            <Input
+              type="text"
+              id="deliveryLandmark"
+              name="deliveryLandmark"
+              value={formData.deliveryLandmark}
+              onChange={handleChange}
+              placeholder="Enter nearby landmark"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* =================== PICKUP DATE & TIME =================== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <Label htmlFor="pickupDate">Pickup Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Select date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div>
+          <Label htmlFor="pickupTime">Preferred Pickup Time</Label>
+          <Select onValueChange={(value) => handleSelectChange("pickupTime", value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select time slot" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="morning">Morning (9 AM - 12 PM)</SelectItem>
+              <SelectItem value="afternoon">Afternoon (12 PM - 3 PM)</SelectItem>
+              <SelectItem value="evening">Evening (3 PM - 6 PM)</SelectItem>
+              <SelectItem value="night">Night (6 PM - 9 PM)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* =================== PARCEL DETAILS =================== */}
+      {(formData.serviceType === "courier" ||
+        formData.serviceType === "local" ||
+        formData.serviceType === "international") && (
+        <div className="p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm space-y-6">
+          <h3 className="text-lg font-semibold text-orange-500">📏 Parcel Details</h3>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="weight">Actual Weight</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  id="weight"
+                  placeholder="Enter weight (max. 30kgs)"
+                  value={formData.weight || ""}
+                  onChange={(e) => handleInputChange("weight", e.target.value)}
+                  min="0"
+                  step="0.01"
+                />
+                <Select
+                  value={formData.weightUnit || "kg"}
+                  onValueChange={(v) => handleSelectChange("weightUnit", v)}
                 >
-                  <div className="space-y-8">
-  {/* =================== PICKUP & DELIVERY DETAILS =================== */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Pickup Details */}
-    <div className="space-y-4 p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm">
-      <h3 className="text-lg font-semibold text-orange-500">
-        🚚 Pickup Details
-      </h3>
+                  <SelectTrigger className="w-[100px]">
+                    <SelectValue placeholder="Unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="kg">kg</SelectItem>
+                    <SelectItem value="g">grams</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-xs text-gray-400">
+                Tip: 1000g = 1kg — For small parcels, choose grams.
+              </p>
+            </div>
 
-      <div className="space-y-3">
-        <div>
-          <Label htmlFor="pickupPincode">Pickup Pincode</Label>
-          <Input
-            type="text"
-            id="pickupPincode"
-            name="pickupPincode"
-            value={formData.pickupPincode}
-            onChange={handleChange}
-            placeholder="Enter pickup pincode"
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="pickupAddress">Pickup Address</Label>
-          <Textarea
-            id="pickupAddress"
-            name="pickupAddress"
-            value={formData.pickupAddress}
-            onChange={handleChange}
-            placeholder="Enter complete pickup address"
-            rows={3}
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="pickupLandmark">Pickup Landmark</Label>
-          <Input
-            type="text"
-            id="pickupLandmark"
-            name="pickupLandmark"
-            value={formData.pickupLandmark}
-            onChange={handleChange}
-            placeholder="Enter nearby landmark"
-          />
-        </div>
-      </div>
-    </div>
-
-    {/* Delivery Details */}
-    <div className="space-y-4 p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm">
-      <h3 className="text-lg font-semibold text-orange-500">
-        📦 Delivery Details
-      </h3>
-
-      <div className="space-y-3">
-        <div>
-          <Label htmlFor="deliveryPincode">Delivery Pincode</Label>
-          <Input
-            type="text"
-            id="deliveryPincode"
-            name="deliveryPincode"
-            value={formData.deliveryPincode}
-            onChange={handleChange}
-            placeholder="Enter delivery pincode"
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="deliveryAddress">Delivery Address</Label>
-          <Textarea
-            id="deliveryAddress"
-            name="deliveryAddress"
-            value={formData.deliveryAddress}
-            onChange={handleChange}
-            placeholder="Enter complete delivery address"
-            rows={3}
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="deliveryLandmark">Delivery Landmark</Label>
-          <Input
-            type="text"
-            id="deliveryLandmark"
-            name="deliveryLandmark"
-            value={formData.deliveryLandmark}
-            onChange={handleChange}
-            placeholder="Enter nearby landmark"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* =================== PICKUP DATE & TIME =================== */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    
-    <div>
-      <Label htmlFor="pickupDate">Pickup Date</Label>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, "PPP") : <span>Select date</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            initialFocus
-            disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
-
-    <div>
-      <Label htmlFor="pickupTime">Preferred Pickup Time</Label>
-      <Select
-        onValueChange={(value) => handleSelectChange("pickupTime", value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select time slot" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="morning">Morning (9 AM - 12 PM)</SelectItem>
-          <SelectItem value="afternoon">Afternoon (12 PM - 3 PM)</SelectItem>
-          <SelectItem value="evening">Evening (3 PM - 6 PM)</SelectItem>
-          <SelectItem value="night">Night (6 PM - 9 PM)</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  </div>
-
-  {/* =================== PARCEL DETAILS =================== */}
-  {(formData.serviceType === "courier" ||
-    formData.serviceType === "local" ||
-    formData.serviceType === "international") && (
-    <div className="p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm space-y-6">
-      <h3 className="text-lg font-semibold text-orange-500">
-        📏 Parcel Details
-      </h3>
-
-      {/* Parcel Weight / Dimensions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Actual Weight */}
-        <div className="space-y-2">
-          <Label htmlFor="weight">Actual Weight</Label>
-          <div className="flex items-center gap-3">
-            <Input
-              type="number"
-              id="weight"
-              placeholder="Enter weight (max. 30kgs)"
-              value={formData.weight || ""}
-              onChange={(e) => handleInputChange("weight", e.target.value)}
-              min="0"
-              step="0.01"
-            />
-            <Select
-              value={formData.weightUnit || "kg"}
-              onValueChange={(v) => handleSelectChange("weightUnit", v)}
-            >
-              <SelectTrigger className="w-[100px]">
-                <SelectValue placeholder="Unit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="kg">kg</SelectItem>
-                <SelectItem value="g">grams</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label>Dimensions (in cm)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  placeholder="Length"
+                  value={formData.length || ""}
+                  onChange={(e) => handleInputChange("length", e.target.value)}
+                  min="0"
+                />
+                <Input
+                  type="number"
+                  placeholder="Width"
+                  value={formData.width || ""}
+                  onChange={(e) => handleInputChange("width", e.target.value)}
+                  min="0"
+                />
+                <Input
+                  type="number"
+                  placeholder="Height"
+                  value={formData.height || ""}
+                  onChange={(e) => handleInputChange("height", e.target.value)}
+                  min="0"
+                />
+              </div>
+              <p className="text-xs text-gray-400">
+             ( LEAVE BLANK IF NOT APPLICABLE)              </p>
+            </div>
           </div>
-          <p className="text-xs text-gray-400">
-            Tip: 1000g = 1kg — For small parcels, choose grams.
-          </p>
-        </div>
 
-        {/* Dimensions */}
-        <div className="space-y-2">
-          <Label>Dimensions (in cm)</Label>
-          <div className="flex items-center gap-2">
+          <div>
+            <Label htmlFor="parcelContents">Parcel Contents</Label>
             <Input
-              type="number"
-              placeholder="Length"
-              value={formData.length || ""}
-              onChange={(e) => handleInputChange("length", e.target.value)}
-              min="0"
-            />
-            <Input
-              type="number"
-              placeholder="Width"
-              value={formData.width || ""}
-              onChange={(e) => handleInputChange("width", e.target.value)}
-              min="0"
-            />
-            <Input
-              type="number"
-              placeholder="Height"
-              value={formData.height || ""}
-              onChange={(e) => handleInputChange("height", e.target.value)}
-              min="0"
+              id="parcelContents"
+              name="parcelContents"
+              value={formData.parcelContents}
+              onChange={handleChange}
+              placeholder="Brief description of contents"
             />
           </div>
-          <p className="text-xs text-gray-400">
-            Used for volumetric weight: (L × W × H) / 5000
-          </p>
         </div>
-      </div>
+      )}
 
-      {/* Parcel Contents */}
+      {/* =================== SPECIAL INSTRUCTIONS =================== */}
       <div>
-        <Label htmlFor="parcelContents">Parcel Contents</Label>
-        <Input
-          id="parcelContents"
-          name="parcelContents"
-          value={formData.parcelContents}
+        <Label htmlFor="specialInstructions">Special Instructions (Optional)</Label>
+        <Textarea
+          id="specialInstructions"
+          name="specialInstructions"
+          value={formData.specialInstructions}
           onChange={handleChange}
-          placeholder="Brief description of contents"
+          placeholder="Any special handling instructions or requirements"
+          rows={3}
+        />
+      </div>
+
+      {/* =================== NEXT BUTTON =================== */}
+      <div className="flex justify-end">
+        <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
+          Next Step
+        </Button>
+      </div>
+    </div>
+  </form>
+)}
+
+
+              {step === 2 && (
+  <div className="space-y-6">
+    <div>
+      <Label htmlFor="name">Full Name</Label>
+      <Input
+        id="name"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Your full name"
+        required
+      />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <Label htmlFor="email">Email Address</Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Your email address"
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="phone">Phone Number</Label>
+        <Input
+          id="phone"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Your phone number"
+          required
         />
       </div>
     </div>
-  )}
 
-  {/* =================== SPECIAL INSTRUCTIONS =================== */}
-  <div>
-    <Label htmlFor="specialInstructions">Special Instructions (Optional)</Label>
-    <Textarea
-      id="specialInstructions"
-      name="specialInstructions"
-      value={formData.specialInstructions}
-      onChange={handleChange}
-      placeholder="Any special handling instructions or requirements"
-      rows={3}
-    />
+    {/* Receiver Section */}
+    <div className="border-t pt-4">
+      <h3 className="text-lg font-semibold mb-2">Receiver Details</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="receiverName">Receiver Name</Label>
+          <Input
+            id="receiverName"
+            name="receiverName"
+            value={formData.receiverName}
+            onChange={handleChange}
+            placeholder="Receiver's full name"
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="receiverEmail">Receiver Email</Label>
+          <Input
+            id="receiverEmail"
+            name="receiverEmail"
+            value={formData.receiverEmail}
+            onChange={handleChange}
+            placeholder="Receiver's email"
+          />
+        </div>
+        <div>
+          <Label htmlFor="receiverPhone">Receiver Phone</Label>
+          <Input
+            id="receiverPhone"
+            name="receiverPhone"
+            value={formData.receiverPhone}
+            onChange={handleChange}
+            placeholder="Receiver's phone"
+            required
+          />
+        </div>
+      </div>
+    </div>
+
+    <div className="flex justify-between">
+      <Button type="button" variant="outline" onClick={handleBack}>
+        Back
+      </Button>
+      <Button
+        type="button"
+        className="bg-orange-600 hover:bg-orange-700"
+        onClick={handleNext}
+      >
+        Proceed to Checkout
+      </Button>
+    </div>
   </div>
+)}
 
-  {/* =================== NEXT BUTTON =================== */}
-  <div className="flex justify-end">
-    <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
-      Next Step
-    </Button>
-  </div>
-</div>
+{step === 3 && (
+  
+  <div className="space-y-6 max-w-md mx-auto px-4">
+    <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 text-center">
+      Review Your Booking
+    </h2>
 
-                </form>
-              )}
-
-              {step === 2 && (
-                <div className="space-y-6">
-                  <div>
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Your email address"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="Your phone number"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Receiver Section */}
-                  <div className="border-t pt-4">
-                    <h3 className="text-lg font-semibold mb-2">Receiver Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="receiverName">Receiver Name</Label>
-                        <Input
-                          id="receiverName"
-                          name="receiverName"
-                          value={formData.receiverName}
-                          onChange={handleChange}
-                          placeholder="Receiver's full name"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="receiverEmail">Receiver Email</Label>
-                        <Input
-                          id="receiverEmail"
-                          name="receiverEmail"
-                          value={formData.receiverEmail}
-                          onChange={handleChange}
-                          placeholder="Receiver's email"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="receiverPhone">Receiver Phone</Label>
-                        <Input
-                          id="receiverPhone"
-                          name="receiverPhone"
-                          value={formData.receiverPhone}
-                          onChange={handleChange}
-                          placeholder="Receiver's phone"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <Button type="button" variant="outline" onClick={handleBack}>
-                      Back
-                    </Button>
-                    <Button
-                      type="button"
-                      className="bg-orange-600 hover:bg-orange-700"
-                      onClick={handleNext}
-                    >
-                      Proceed to Checkout
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {step === 3 && (
-
-                <div className="space-y-6 max-w-md mx-auto px-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 text-center">
-                    Review Your Booking
-                  </h2>
-
-                  <div className="space-y-4">
+    <div className="space-y-4">
 
                     {/* Service & Pickup */}
                     <div className="bg-orange-50/20 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-orange-100">
@@ -1002,27 +982,27 @@ const handleInputChange = (field, value) => {
 
                   </div>
 
-                  <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full md:w-auto"
-                      onClick={handleBack}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-                      disabled={isSubmitting}
-                      onClick={handleSubmit}
-                    >
-                      {isSubmitting ? "Submitting..." : "Proceed to Payment"}
-                    </Button>
-                  </div>
-                </div>
-                
-              )}
+
+    <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full md:w-auto"
+        onClick={handleBack}
+      >
+        Back
+      </Button>
+      <Button
+        type="submit"
+        className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+        disabled={isSubmitting}
+        onClick={handleSubmit}
+      >
+        {isSubmitting ? "Submitting..." : "Pay on Pickup"}
+      </Button>
+    </div>
+  </div>
+)}
 
 
 
