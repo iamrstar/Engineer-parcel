@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
 import {
   Popover,
   PopoverContent,
@@ -168,74 +169,159 @@ const handleInputChange = (field, value) => {
     setStep((prev) => prev - 1);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const handleSubmit = async (paymentMethod = "COD", e) => {
+  if (e) e.preventDefault(); // only prevent default if called from form submit
 
-    const payload = {
-      senderDetails: {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.pickupAddress,
-        pincode: formData.pickupAddress.match(/\b\d{6}\b/)?.[0] || "826004",
-      },  
-      receiverDetails: {
-        name: formData.receiverName || "Receiver Name",
-        email: formData.receiverEmail || "receiver@example.com",
-        phone: formData.receiverPhone || "9123456780",
-        address: formData.deliveryAddress,
-        pincode: formData.deliveryAddress.match(/\b\d{6}\b/)?.[0] || "700001",
+  setIsSubmitting(true);
+
+  const payload = {
+    senderDetails: {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.pickupAddress,
+      pincode: formData.pickupAddress.match(/\b\d{6}\b/)?.[0] || "826004",
+    },
+    receiverDetails: {
+      name: formData.receiverName || "Receiver Name",
+      email: formData.receiverEmail || "receiver@example.com",
+      phone: formData.receiverPhone || "9123456780",
+      address: formData.deliveryAddress,
+      pincode: formData.deliveryAddress.match(/\b\d{6}\b/)?.[0] || "700001",
+    },
+    serviceType: formData.serviceType,
+    pickupDate: date?.toISOString(),
+    pickupSlot: formData.pickupTime || "afternoon",
+    paymentMethod, // ✅ use the parameter
+    packageDetails: {
+      weight: parseFloat(formData.weight) || 1,
+      weightUnit: formData.weightUnit || "kg",
+      dimensions: {
+        length: parseFloat(formData.length) || 0,
+        width: parseFloat(formData.width) || 0,
+        height: parseFloat(formData.height) || 0,
       },
-      serviceType: formData.serviceType,
-      pickupDate: date?.toISOString(),
-      pickupSlot: formData.pickupTime || "afternoon",
-      paymentMethod: "COD",
-      packageDetails: {
-  weight: parseFloat(formData.weight) || 1,
-  weightUnit: formData.weightUnit || "kg",
-  dimensions: {
-    length: parseFloat(formData.length) || 0,
-    width: parseFloat(formData.width) || 0,
-    height: parseFloat(formData.height) || 0,
-  },
-  description: formData.parcelContents || "",
-  value: parseFloat(formData.value) || 0,
-  fragile: formData.fragile || false,
-},
-      notes: formData.specialInstructions || "",
-    };
+      description: formData.parcelContents || "",
+      value: parseFloat(formData.value) || 0,
+      fragile: formData.fragile || false,
+    },
+    notes: formData.specialInstructions || "",
+  };
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/bookings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/bookings`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      setBookingId(data?.data?.bookingId || "");
+      setPriceDetails(data?.data?.pricing || null);
+      toast({
+        title: "Booking Confirmed",
+        description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`,
       });
+      setStep(4);
+    } else {
+      toast({
+        title: "Error",
+        description: data.message || "Something went wrong",
+      });
+    }
+  } catch (err) {
+    console.error("Error submitting booking:", err);
+    toast({ title: "Server Error", description: "Could not submit booking" });
+  }
 
-      const data = await res.json();
-      if (data.success) {
-        setBookingId(data?.data?.bookingId || "");
-        setPriceDetails(data?.data?.pricing || null);
-        toast({
-          title: "Booking Confirmed",
-          description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`,
-        });
-        setStep(4);
-      } else {
-        toast({
-          title: "Error",
-          description: data.message || "Something went wrong",
-        });
-      }
-    } catch (err) {
-      console.error("Error submitting booking:", err);
-      toast({ title: "Server Error", description: "Could not submit booking" });
+  setIsSubmitting(false);
+};
+
+
+useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  // 🟠 Handle Razorpay Online Payment
+  const handleRazorpayPayment = async () => {
+  try {
+    if (!priceDetails?.totalAmount) {
+      alert("Price not calculated yet!");
+      return;
     }
 
+    const amountInPaise = priceDetails.totalAmount * 100;
+
+    // 1️⃣ Create order from backend
+    const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
+      amount: amountInPaise,
+      currency: "INR",
+    });
+
+    // 2️⃣ Razorpay options
+    const options = {
+      key: "rzp_test_RQR1R4jT7vZiUD", // replace with your key
+      amount: data.amount,
+      currency: data.currency,
+      name: "EngineersParcel",
+      description: "Parcel Booking Payment",
+      order_id: data.id,
+      handler: async function (response) {
+  try {
+    const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify-payment`, {
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_order_id: response.razorpay_order_id,
+      razorpay_signature: response.razorpay_signature,
+    });
+
+    if (verifyRes.data.success) {
+      // ✅ Call handleSubmit for online payment
+      await handleSubmit("Online"); 
+     
+    } else {
+      alert("⚠️ Payment verification failed!");
+    }
+  } catch (error) {
+    console.error("Booking creation after payment failed:", error);
+    alert("❌ Booking creation failed after payment.");
+  }
+}
+,
+      prefill: {
+        name: formData.name || "Customer",
+        email: formData.email || "test@example.com",
+        contact: formData.phone || "9999999999",
+      },
+      theme: { color: "#f97316" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (err) {
+    console.error("Payment Error:", err);
+    alert("❌ Payment Failed");
+  }
+};
+
+
+  // 🟢 COD or Online submit handler
+  const handleStep3Submit = async () => {
+    setIsSubmitting(true);
+    if (formData.paymentMethod === "Online") {
+      await handleRazorpayPayment();
+    } else {
+      // COD logic (your existing booking submission)
+      alert("COD Booking Confirmed ✅");
+      setStep(4);
+    }
     setIsSubmitting(false);
   };
-// BookingPage ke andar
+
+
 
 
   return (
@@ -829,8 +915,11 @@ const handleInputChange = (field, value) => {
   </div>
 )}
 
+
+
 {step === 3 && (
-  
+
+
   <div className="space-y-6 max-w-md mx-auto px-4">
     <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 text-center">
       Review Your Booking
@@ -984,23 +1073,36 @@ const handleInputChange = (field, value) => {
 
 
     <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full md:w-auto"
-        onClick={handleBack}
-      >
-        Back
-      </Button>
-      <Button
-        type="submit"
-        className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-        disabled={isSubmitting}
-        onClick={handleSubmit}
-      >
-        {isSubmitting ? "Submitting..." : "Pay on Pickup"}
-      </Button>
-    </div>
+  <Button
+    type="button"
+    variant="outline"
+    className="w-full md:w-auto"
+    onClick={handleBack}
+  >
+    Back
+  </Button>
+
+  {/* Pay on Pickup */}
+  <Button
+    type="button"
+    className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+    disabled={isSubmitting}
+    onClick={(e) => handleSubmit("COD", e)} // ✅ Pass "COD" explicitly
+  >
+    {isSubmitting ? "Submitting..." : "Pay on Pickup"}
+  </Button>
+
+  {/* Pay Online */}
+  <Button
+    type="button"
+    className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+    disabled={isSubmitting}
+    onClick={handleRazorpayPayment} // Razorpay popup
+  >
+    {isSubmitting ? "Processing..." : "Pay Online"}
+  </Button>
+</div>
+
   </div>
 )}
 
