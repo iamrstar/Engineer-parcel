@@ -264,7 +264,7 @@ useEffect(() => {
 
     // 2️⃣ Razorpay options
     const options = {
-      key: "rzp_test_RQR1R4jT7vZiUD", // replace with your key
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: data.amount,
       currency: data.currency,
       name: "EngineersParcel",
