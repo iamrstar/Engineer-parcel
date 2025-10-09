@@ -724,35 +724,42 @@ useEffect(() => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="weight">Actual Weight</Label>
-              <div className="flex items-center gap-3">
-                <Input
-                  type="number"
-                  id="weight"
-                  placeholder="Enter weight (max. 30kgs)"
-                  value={formData.weight || ""}
-                  onChange={(e) => handleInputChange("weight", e.target.value)}
-                  min="0"
-                  step="0.01"
-                />
-                <Select
-                  value={formData.weightUnit || "kg"}
-                  onValueChange={(v) => handleSelectChange("weightUnit", v)}
-                >
-                  <SelectTrigger className="w-[100px]">
-                    <SelectValue placeholder="Unit" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="kg">kg</SelectItem>
-                    <SelectItem value="g">grams</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <p className="text-xs text-gray-400">
-                Tip: 1000g = 1kg — For small parcels, choose grams.
-              </p>
-            </div>
-
+  <Label htmlFor="weight">Actual Weight</Label>
+  <div className="flex items-center gap-3">
+    <Input
+      type="number"
+      id="weight"
+      placeholder="Enter weight (max. 30kgs)"
+      value={formData.weight || ""}
+      onChange={(e) => {
+        let value = parseFloat(e.target.value);
+        if (value > 30) {
+          value = 30; // Max limit 30
+          alert("You can book maximum 30 kg parcel at once!");
+        }
+        handleInputChange("weight", value);
+      }}
+      min="0"
+      max="30"
+      step="0.01"
+    />
+    <Select
+      value={formData.weightUnit || "kg"}
+      onValueChange={(v) => handleSelectChange("weightUnit", v)}
+    >
+      <SelectTrigger className="w-[100px]">
+        <SelectValue placeholder="Unit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="kg">kg</SelectItem>
+        <SelectItem value="g">grams</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+  <p className="text-xs text-gray-400">
+    Tip: 1000g = 1kg — For small parcels, choose grams.
+  </p>
+</div>
             <div className="space-y-2">
               <Label>Dimensions (in cm)</Label>
               <div className="flex items-center gap-2">
