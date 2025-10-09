@@ -38,6 +38,7 @@ export default function BookingPage() {
 
   const [formData, setFormData] = useState({
     pickupPincode: "",
+     deliveryPincode: "",
     serviceType: "",
     pickupLandmark: "",
     deliveryLandmark: "",
@@ -54,6 +55,9 @@ export default function BookingPage() {
     receiverEmail: "",
     receiverPhone: "",
   });
+
+    const [bookingData, setBookingData] = useState(null);
+
 
 useEffect(() => {
   if (formData.weight && formData.serviceType) {
@@ -91,6 +95,7 @@ useEffect(() => {
     fetchPrice();
   }
 }, [formData.weight, formData.serviceType]);
+
 
 
   
@@ -164,78 +169,104 @@ const handleInputChange = (field, value) => {
     setStep((prev) => prev + 1);
   };
 
+
   const handleBack = () => {
     setStep((prev) => prev - 1);
   };
+console.log("FormData:", formData);
 
-  const handleSubmit = async (paymentMethod = "COD", e) => {
-  if (e) e.preventDefault(); // only prevent default if called from form submit
+  const handleSubmit = async (paymentMethod, e) => {
+  if (e && e.preventDefault) e.preventDefault();
+
+  // 🚨 Weight limit check
+  if (Number(formData.weight) > 30) {
+    alert("You can book parcels up to 30 kg only at once!");
+    return;
+  }
 
   setIsSubmitting(true);
 
-  const payload = {
-    senderDetails: {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      address: formData.pickupAddress,
-      pincode: formData.pickupAddress.match(/\b\d{6}\b/)?.[0] || "826004",
-    },
-    receiverDetails: {
-      name: formData.receiverName || "Receiver Name",
-      email: formData.receiverEmail || "receiver@example.com",
-      phone: formData.receiverPhone || "9123456780",
-      address: formData.deliveryAddress,
-      pincode: formData.deliveryAddress.match(/\b\d{6}\b/)?.[0] || "700001",
-    },
-    serviceType: formData.serviceType,
-    pickupDate: date?.toISOString(),
-    pickupSlot: formData.pickupTime || "afternoon",
-    paymentMethod, // ✅ use the parameter
-    packageDetails: {
-      weight: parseFloat(formData.weight) || 1,
-      weightUnit: formData.weightUnit || "kg",
-      dimensions: {
-        length: parseFloat(formData.length) || 0,
-        width: parseFloat(formData.width) || 0,
-        height: parseFloat(formData.height) || 0,
-      },
-      description: formData.parcelContents || "",
-      value: parseFloat(formData.value) || 0,
-      fragile: formData.fragile || false,
-    },
-    notes: formData.specialInstructions || "",
-  };
-
   try {
-    const res = await fetch(`${API_BASE_URL}/api/bookings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // ✅ Payload exactly matching backend Booking model
+    const payload = {
+      pickupPincode:
+        formData.pickupPincode ||
+        formData.pickupAddress?.match(/\b\d{6}\b/)?.[0] ||
+        "826004",
+      deliveryPincode:
+        formData.deliveryPincode ||
+        formData.deliveryAddress?.match(/\b\d{6}\b/)?.[0] ||
+        "700001",
 
-    const data = await res.json();
-    if (data.success) {
-      setBookingId(data?.data?.bookingId || "");
-      setPriceDetails(data?.data?.pricing || null);
-      toast({
-        title: "Booking Confirmed",
-        description: `Your booking ID is ${data?.data?.bookingId || "N/A"}`,
-      });
-      setStep(4);
-    } else {
-      toast({
-        title: "Error",
-        description: data.message || "Something went wrong",
-      });
+      senderDetails: {
+        name: formData.senderName || formData.name || "",
+        phone: formData.senderPhone || formData.phone || "",
+        email: formData.senderEmail || formData.email || "",
+        address: formData.senderAddress || formData.pickupAddress || "",
+        pincode: formData.pickupPincode || "",
+        city: formData.senderCity || "",
+        state: formData.senderState || "",
+        landmark: formData.senderLandmark || formData.pickupLandmark || "",
+      },
+
+      receiverDetails: {
+        name: formData.receiverName || "",
+        phone: formData.receiverPhone || "",
+        email: formData.receiverEmail || "",
+        address: formData.receiverAddress || formData.deliveryAddress || "",
+        pincode: formData.deliveryPincode || "",
+        city: formData.receiverCity || "",
+        state: formData.receiverState || "",
+        landmark:
+          formData.receiverLandmark || formData.deliveryLandmark || "",
+      },
+
+      serviceType: formData.serviceType || "surface",
+      pickupDate: formData.pickupDate || new Date().toISOString(),
+      pickupSlot: formData.pickupSlot || "morning",
+      paymentMethod, // "COD" ya "Online"
+
+      packageDetails: {
+        weight: Number(formData.weight) || 1,
+        weightUnit: formData.weightUnit || "kg",
+        dimensions: {
+          length: Number(formData.length) || 10,
+          width: Number(formData.width) || 10,
+          height: Number(formData.height) || 10,
+        },
+        description: formData.description || formData.parcelContents || "Parcel",
+        value: Number(formData.value) || 100,
+        fragile: Boolean(formData.fragile) || false,
+      },
+
+      notes: formData.notes || formData.specialInstructions || "",
+      couponCode: formData.couponCode || "",
+      insuranceRequired: Boolean(formData.insuranceRequired) || false,
+    };
+
+    console.log("📦 Sending booking data:", payload);
+    if (paymentMethod === "COD") {
+  const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
+  console.log("✅ Booking response:", res.data);
+  
+  setBookingData(res.data.data); // <-- yahi fix hai
+  setStep(4);
+  setFormData({}); // safe, kyunki step 4 bookingData use karega
+}
+
+ else if (paymentMethod === "Online") {
+      // 🟢 Razorpay flow (keep loading until done)
+      await handleRazorpayPayment(payload);
     }
-  } catch (err) {
-    console.error("Error submitting booking:", err);
-    toast({ title: "Server Error", description: "Could not submit booking" });
+  } catch (error) {
+    console.error("❌ Booking failed:", error.response?.data || error.message);
+    alert(`Booking failed! ${error.response?.data?.message || error.message}`);
+  } finally {
+    setIsSubmitting(false);
   }
-
-  setIsSubmitting(false);
 };
+
+
 
 
 useEffect(() => {
@@ -760,6 +791,9 @@ useEffect(() => {
     Tip: 1000g = 1kg — For small parcels, choose grams.
   </p>
 </div>
+
+
+
             <div className="space-y-2">
               <Label>Dimensions (in cm)</Label>
               <div className="flex items-center gap-2">
@@ -1089,7 +1123,7 @@ useEffect(() => {
   </Button>
 
   {/* Pay on Pickup */}
-   <Button
+  <Button
   type="button"
   className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
   disabled={isSubmitting}
@@ -1118,6 +1152,7 @@ useEffect(() => {
 >
   {isSubmitting ? "Processing..." : "Pay Online"}
 </Button>
+
 </div>
 
   </div>
@@ -1129,76 +1164,81 @@ useEffect(() => {
 
 
 
-              {step === 4 && (
-                <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-4">
-                    <CheckCircle className="h-8 w-8" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Booking Confirmed!
-                  </h2>
-                  <p className="text-gray-600 mb-6">
-                    Your booking has been successfully submitted. We'll update
-                    you shortly to confirm the details and Estimated Time of
-                    delivery .
-                  </p>
+              {step === 4 && bookingData && (
+  <div className="text-center py-8">
+    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-4">
+      <CheckCircle className="h-8 w-8" />
+    </div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      Booking Confirmed!
+    </h2>
+    <p className="text-gray-600 mb-6">
+      Your booking has been successfully submitted. We'll update
+      you shortly to confirm the details and Estimated Time of
+      delivery.
+    </p>
 
-                  {/* Booking Summary */}
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      Booking Summary
-                    </h3>
-                    <ul className="space-y-1 text-sm text-gray-600">
-                      <li className="flex justify-between">
-                        <span>Service Type:</span>
-                        <span className="font-medium">
-                          {formData.serviceType.charAt(0).toUpperCase() +
-                            formData.serviceType.slice(1)}
-                        </span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Pickup Date:</span>
-                        <span className="font-medium">
-                          {date ? format(date, "PPP") : "Not specified"}
-                        </span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Booking Reference:</span>
-                        <span className="font-medium">
-                          {bookingId || "N/A"}
-                        </span>
-                      </li>
+    {/* Booking Summary */}
+    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-6">
+      <h3 className="font-semibold text-gray-900 mb-2">
+        Booking Summary
+      </h3>
+      <ul className="space-y-1 text-sm text-gray-600">
+        <li className="flex justify-between">
+          <span>Service Type:</span>
+          <span className="font-medium">
+            {bookingData.serviceType
+              ? bookingData.serviceType.charAt(0).toUpperCase() +
+                bookingData.serviceType.slice(1)
+              : "N/A"}
+          </span>
+        </li>
+        <li className="flex justify-between">
+          <span>Pickup Date:</span>
+          <span className="font-medium">
+            {bookingData.pickupDate
+              ? format(new Date(bookingData.pickupDate), "PPP")
+              : "Not specified"}
+          </span>
+        </li>
+        <li className="flex justify-between">
+          <span>Booking Reference:</span>
+          <span className="font-medium">
+            {bookingData.bookingId || "N/A"}
+          </span>
+        </li>
 
-                      {priceDetails && (
-                        <>
-                          <li className="flex justify-between">
-                            <span>Base Price:</span>
-                            <span className="font-medium">
-                              ₹{priceDetails.basePrice}
-                            </span>
-                          </li>
-                          <li className="flex justify-between">
-                            <span>Tax (18% GST):</span>
-                            <span className="font-medium">
-                              ₹{priceDetails.tax}
-                            </span>
-                          </li>
-                          <li className="flex justify-between text-orange-600 font-semibold">
-                            <span>Total Amount:</span>
-                            <span className="font-medium">
-                              ₹{priceDetails.totalAmount}
-                            </span>
-                          </li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
+        {bookingData.pricing && (
+          <>
+            <li className="flex justify-between">
+              <span>Base Price:</span>
+              <span className="font-medium">
+                ₹{bookingData.pricing.basePrice}
+              </span>
+            </li>
+            <li className="flex justify-between">
+              <span>Tax (18% GST):</span>
+              <span className="font-medium">
+                ₹{bookingData.pricing.tax}
+              </span>
+            </li>
+            <li className="flex justify-between text-orange-600 font-semibold">
+              <span>Total Amount:</span>
+              <span className="font-medium">
+                ₹{bookingData.pricing.totalAmount}
+              </span>
+            </li>
+          </>
+        )}
+      </ul>
+    </div>
 
-                  <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                    <a href="/">Return to Home</a>
-                  </Button>
-                </div>
-              )}
+    <Button asChild className="bg-orange-600 hover:bg-orange-700">
+      <a href="/">Return to Home</a>
+    </Button>
+  </div>
+)}
+
             </CardContent>
           </Card>
         </div>
