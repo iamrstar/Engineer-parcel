@@ -92,7 +92,6 @@ useEffect(() => {
   }
 }, [formData.weight, formData.serviceType]);
 
-console.log("Price details:", priceDetails);
 
   
 const handleInputChange = (field, value) => {
