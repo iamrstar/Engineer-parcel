@@ -1083,24 +1083,35 @@ useEffect(() => {
   </Button>
 
   {/* Pay on Pickup */}
-  <Button
-    type="button"
-    className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-    disabled={isSubmitting}
-    onClick={(e) => handleSubmit("COD", e)} // ✅ Pass "COD" explicitly
-  >
-    {isSubmitting ? "Submitting..." : "Pay on Pickup"}
-  </Button>
+   <Button
+  type="button"
+  className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+  disabled={isSubmitting}
+  onClick={(e) => handleSubmit("COD", e)}
+>
+  {isSubmitting ? "Submitting..." : "Pay on Pickup"}
+</Button>
 
   {/* Pay Online */}
-  <Button
-    type="button"
-    className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-    disabled={isSubmitting}
-    onClick={handleRazorpayPayment} // Razorpay popup
-  >
-    {isSubmitting ? "Processing..." : "Pay Online"}
-  </Button>
+ <Button
+  type="button"
+  className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
+  disabled={isSubmitting}
+  onClick={async (e) => {
+    e.preventDefault(); // prevent default behavior
+    setIsSubmitting(true); // ✅ show processing immediately
+
+    try {
+      await handleRazorpayPayment(); // Razorpay popup logic
+    } catch (error) {
+      console.error("Payment error:", error);
+    } finally {
+      setIsSubmitting(false); // ✅ hide processing after popup closes
+    }
+  }}
+>
+  {isSubmitting ? "Processing..." : "Pay Online"}
+</Button>
 </div>
 
   </div>
