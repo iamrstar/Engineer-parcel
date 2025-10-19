@@ -35,6 +35,11 @@ export default function BookingPage() {
   const [bookingId, setBookingId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
+const [showCouponPopup, setShowCouponPopup] = useState(false);
+const [coupons, setCoupons] = useState([]);
+const [loadingCoupons, setLoadingCoupons] = useState(false);
+const [appliedCoupon, setAppliedCoupon] = useState(null);
+const [discountAmount, setDiscountAmount] = useState(0);
 
   const [formData, setFormData] = useState({
     pickupPincode: "",
@@ -55,6 +60,45 @@ export default function BookingPage() {
     receiverEmail: "",
     receiverPhone: "",
   });
+useEffect(() => {
+  if (showCouponPopup) {
+    fetchCoupons();
+  }
+}, [showCouponPopup]);
+
+const fetchCoupons = async () => {
+  setLoadingCoupons(true);
+  try {
+    const res = await axios.get("https://api.engineersparcel.in/api/coupons");
+    console.log("Coupons fetched:", res.data); // ✅ Check in console
+    setCoupons(res.data);
+  } catch (error) {
+    console.error("Error fetching coupons:", error);
+  } finally {
+    setLoadingCoupons(false);
+  }
+};
+
+
+const handleApplyCoupon = async (coupon) => {
+    console.log("Apply clicked for coupon:", coupon);
+
+  try {
+    const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`, {
+      code: coupon.code,
+      orderTotal: priceDetails.totalAmount, // correct field name
+    });
+
+    setAppliedCoupon(coupon);
+    setDiscountAmount(res.data.discount);
+    toast.success(`${coupon.code} applied! You saved ₹${res.data.discount}`);
+    setShowCouponPopup(false);
+
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Error applying coupon");
+  }
+};
+
 
     const [bookingData, setBookingData] = useState(null);
 
@@ -284,7 +328,9 @@ useEffect(() => {
       return;
     }
 
-    const amountInPaise = priceDetails.totalAmount * 100;
+    // Use final total after discount
+    const finalAmount = priceDetails.totalAmount - discountAmount;
+    const amountInPaise = finalAmount * 100;
 
     // 1️⃣ Create order from backend
     const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
@@ -301,26 +347,24 @@ useEffect(() => {
       description: "Parcel Booking Payment",
       order_id: data.id,
       handler: async function (response) {
-  try {
-    const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify-payment`, {
-      razorpay_payment_id: response.razorpay_payment_id,
-      razorpay_order_id: response.razorpay_order_id,
-      razorpay_signature: response.razorpay_signature,
-    });
+        try {
+          const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify-payment`, {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          });
 
-    if (verifyRes.data.success) {
-      // ✅ Call handleSubmit for online payment
-      await handleSubmit("Online"); 
-     
-    } else {
-      alert("⚠️ Payment verification failed!");
-    }
-  } catch (error) {
-    console.error("Booking creation after payment failed:", error);
-    alert("❌ Booking creation failed after payment.");
-  }
-}
-,
+          if (verifyRes.data.success) {
+            // ✅ Call handleSubmit for online payment
+            await handleSubmit("Online"); 
+          } else {
+            alert("⚠️ Payment verification failed!");
+          }
+        } catch (error) {
+          console.error("Booking creation after payment failed:", error);
+          alert("❌ Booking creation failed after payment.");
+        }
+      },
       prefill: {
         name: formData.name || "Customer",
         email: formData.email || "test@example.com",
@@ -336,6 +380,7 @@ useEffect(() => {
     alert("❌ Payment Failed");
   }
 };
+
 
 
   // 🟢 COD or Online submit handler
@@ -1085,31 +1130,130 @@ useEffect(() => {
 
                     {/* Pricing */}
                     {priceDetails ? (
-                      <div className="bg-green-50 p-4 rounded-xl border border-green-100 shadow-sm">
-                        <h3 className="text-md md:text-lg font-semibold text-green-600 border-b border-green-200 pb-2 mb-2">
-                          Pricing
-                        </h3>
-                        <ul className="space-y-1">
-                          <li className="flex justify-between">
-                            <span>Base Price:</span>
-                            <span className="font-medium">₹{priceDetails.basePrice}</span>
-                          </li>
-                         
-                          <li className="flex justify-between">
-                            <span>Tax (18% GST):</span>
-                            <span className="font-medium">₹{priceDetails.tax}</span>
-                          </li>
-                          <li className="flex justify-between text-orange-600 font-semibold">
-                            <span>Total Amount:</span>
-                            <span className="font-medium">₹{priceDetails.totalAmount}</span>
-                          </li>
-                        </ul>
-                      </div>
-                    ) : (
-                      <p className="text-gray-500 text-center mt-2">Calculating price...</p>
-                    ) }
+  <div className="bg-green-50 p-4 rounded-xl border border-green-100 shadow-sm">
+    {/* Section Title */}
+    <h3 className="text-md md:text-lg font-semibold text-green-600 border-b border-green-200 pb-2 mb-2">
+      Pricing
+    </h3>
+
+    {/* Base Price, Tax, Total Amount */}
+    <ul className="space-y-1">
+      <li className="flex justify-between">
+        <span>Base Price:</span>
+        <span className="font-medium">₹{priceDetails.basePrice}</span>
+      </li>
+      <li className="flex justify-between">
+        <span>Tax (18% GST):</span>
+        <span className="font-medium">₹{priceDetails.tax}</span>
+      </li>
+      {/* <li className="flex justify-between text-orange-600 font-semibold">
+        <span>Total Amount:</span>
+        <span className="font-medium">
+          ₹{(priceDetails.totalAmount - discountAmount).toFixed(2)}
+        </span>
+      </li> */}
+    </ul>
+
+    {/* Subtotal, Discount, Final Total */}
+    <div className="mt-3 text-right">
+      <p className="text-sm text-gray-600">Subtotal: ₹{priceDetails.totalAmount}</p>
+      {discountAmount > 0 && (
+        <p className="text-sm text-green-600">
+          Discount: -₹{discountAmount.toFixed(2)}
+        </p>
+      )}
+      <p className="text-lg font-semibold  text-orange-600 mt-1">
+        Final Total: ₹{(priceDetails.totalAmount - discountAmount).toFixed(2)}
+      </p>
+    </div>
+  </div>
+) : (
+  <p className="text-gray-500 text-center mt-2">Calculating price...</p>
+)}
+
+
 
                   </div>
+{/* Apply Coupon Section */}
+<div className="mt-4">
+  {/* Button to toggle coupon list */}
+  <Button
+    variant="outline"
+    className="w-full bg-white text-orange-600 border-orange-400 hover:bg-orange-50"
+    onClick={() => setShowCouponPopup((prev) => !prev)}
+  >
+    {showCouponPopup ? "Hide Coupons" : "Apply Coupon"}
+  </Button>
+
+  {/* Show available coupons inline */}
+  {showCouponPopup && (
+    <div className="mt-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
+      <h2 className="text-lg font-semibold text-orange-700 mb-3 text-center">
+        Available Coupons
+      </h2>
+
+      {loadingCoupons ? (
+        <p className="text-center text-gray-500">Loading coupons...</p>
+      ) : coupons.length > 0 ? (
+        coupons.map((coupon) => (
+          <Card key={coupon._id} className="mb-3 border border-gray-200">
+            <CardContent className="p-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-orange-600">{coupon.code}</p>
+                  <p className="text-sm text-gray-700">{coupon.description}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Valid till:{" "}
+                    {new Date(coupon.validUntil).toLocaleDateString()}
+                  </p>
+                </div>
+               <Button
+  size="sm"
+  className="bg-orange-600 hover:bg-orange-700 text-white"
+  onClick={() => handleApplyCoupon(coupon)}
+>
+  {appliedCoupon?._id === coupon._id ? "Applied" : "Apply"}
+</Button>
+
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <p className="text-center text-gray-500">No coupons available</p>
+      )}
+    </div>
+  )}
+
+  {/* Applied Coupon Display */}
+  {appliedCoupon && (
+    <div className="bg-green-50 border border-green-200 p-3 rounded-xl mt-3 flex justify-between items-center">
+      <div>
+        <p className="text-sm text-green-800">
+          ✅ <strong>{appliedCoupon.code}</strong> applied successfully!
+        </p>
+        <p className="text-xs text-gray-600">
+          Discount: ₹{discountAmount.toFixed(2)}
+        </p>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-red-500"
+        onClick={() => {
+          setAppliedCoupon(null);
+          setDiscountAmount(0);
+        }}
+      >
+        Remove
+      </Button>
+    </div>
+  )}
+
+  {/* Updated Final Total */}
+  
+</div>
+
 
 
     <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
@@ -1213,7 +1357,7 @@ useEffect(() => {
             <li className="flex justify-between">
               <span>Base Price:</span>
               <span className="font-medium">
-                ₹{bookingData.pricing.basePrice}
+                ₹{bookingData.pricing.basePrice}   
               </span>
             </li>
             <li className="flex justify-between">
@@ -1225,7 +1369,7 @@ useEffect(() => {
             <li className="flex justify-between text-orange-600 font-semibold">
               <span>Total Amount:</span>
               <span className="font-medium">
-                ₹{bookingData.pricing.totalAmount}
+                ₹{(priceDetails.totalAmount - discountAmount).toFixed(2)}
               </span>
             </li>
           </>
