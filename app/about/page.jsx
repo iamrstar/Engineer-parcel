@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Award, Clock, Shield, Truck, Users } from "lucide-react";
+import { Award, Clock, Shield, Truck, Users,MessageCircle,IndianRupee,BrainCircuit,ChartCandlestick,Cpu,QrCode,Cog} from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -194,7 +194,7 @@ export default function AboutPage() {
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Shield className="h-6 w-6" />
+                  <BrainCircuit className="h-6 w-6" />
                 </div>
               </div>
               <div className="ml-4">
@@ -210,7 +210,7 @@ export default function AboutPage() {
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Clock className="h-6 w-6" />
+                  <Cog className="h-6 w-6" />
                 </div>
               </div>
               <div className="ml-4">
@@ -241,7 +241,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Shield className="h-8 w-8" />
+                <Cpu className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 India’s First AI-IoT Courier & Logistics Platform
@@ -256,7 +256,7 @@ export default function AboutPage() {
 
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Users className="h-8 w-8" />
+                <ChartCandlestick className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Real-Time Accuracy & Dynamic Pricing
@@ -270,7 +270,7 @@ export default function AboutPage() {
 
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Award className="h-8 w-8" />
+                <QrCode className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Automated Hub Scan Updates
@@ -359,7 +359,7 @@ export default function AboutPage() {
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Shield className="h-6 w-6" />
+                  <MessageCircle className="h-6 w-6" />
                 </div>
               </div>
               <div className="ml-4">
@@ -376,7 +376,7 @@ export default function AboutPage() {
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Truck className="h-6 w-6" />
+                  <IndianRupee className="h-6 w-6" />
                 </div>
               </div>
               <div className="ml-4">
