@@ -2,16 +2,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, Box, Globe, MapPin, Package, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
-     
+
 export default function Home() {
   return (
-    <div> 
+    <div>
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Fast & Reliable Parcel Delivery Services</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Revolutionsing Logistics in India</h1>
               <p className="text-lg mb-8"> 
                 We provide efficient courier and parcel delivery services across India and internationally.
               </p>
