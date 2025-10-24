@@ -49,7 +49,7 @@ export default function AboutPage() {
             </div>
             <div className="md:w-1/2">
               <Image
-                src="/about-us.jpg?height=400&width=600"
+                src="/our-story.jpg?height=400&width=600"
                 alt="EngineersParcel Team"
                 width={600}
                 height={400}
@@ -316,7 +316,7 @@ export default function AboutPage() {
             </div>
             <div className="md:w-1/2">
               <Image
-                src="/about-us.jpg?height=400&width=600"
+                src="/ai-packer-mover.jpg?height=400&width=600"
                 alt="EngineersParcel Team"
                 width={600}
                 height={400}
