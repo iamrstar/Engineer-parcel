@@ -388,7 +388,7 @@ const makeBookingPayload = (formData) => {
     }
 
     const finalAmount = priceDetails.totalAmount - discountAmount;
-     const amountInPaise =  100;
+     const amountInPaise = finalAmount * 100;
 
     const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
       amount: amountInPaise,
