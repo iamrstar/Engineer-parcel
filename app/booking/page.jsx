@@ -219,6 +219,8 @@ const handleInputChange = (field, value) => {
   };
 console.log("FormData:", formData);
 
+
+
   const handleSubmit = async (paymentMethod, e) => {
   if (e && e.preventDefault) e.preventDefault();
 
@@ -320,25 +322,79 @@ useEffect(() => {
     document.body.appendChild(script);
   }, []);
 
+  // ✅ Helper to build payload for booking
+const makeBookingPayload = (formData) => {
+  return {
+    pickupPincode:
+      formData.pickupPincode ||
+      formData.pickupAddress?.match(/\b\d{6}\b/)?.[0] ||
+      "826004",
+    deliveryPincode:
+      formData.deliveryPincode ||
+      formData.deliveryAddress?.match(/\b\d{6}\b/)?.[0] ||
+      "700001",
+
+    senderDetails: {
+      name: formData.senderName || formData.name || "",
+      phone: formData.senderPhone || formData.phone || "",
+      email: formData.senderEmail || formData.email || "",
+      address: formData.senderAddress || formData.pickupAddress || "",
+      pincode: formData.pickupPincode || "",
+      city: formData.senderCity || "",
+      state: formData.senderState || "",
+      landmark: formData.senderLandmark || formData.pickupLandmark || "",
+    },
+
+    receiverDetails: {
+      name: formData.receiverName || "",
+      phone: formData.receiverPhone || "",
+      email: formData.receiverEmail || "",
+      address: formData.receiverAddress || formData.deliveryAddress || "",
+      pincode: formData.deliveryPincode || "",
+      city: formData.receiverCity || "",
+      state: formData.receiverState || "",
+      landmark: formData.receiverLandmark || formData.deliveryLandmark || "",
+    },
+
+    serviceType: formData.serviceType || "surface",
+    pickupDate: formData.pickupDate || new Date().toISOString(),
+    pickupSlot: formData.pickupSlot || "morning",
+
+    packageDetails: {
+      weight: Number(formData.weight) || 1,
+      weightUnit: formData.weightUnit || "kg",
+      dimensions: {
+        length: Number(formData.length) || 10,
+        width: Number(formData.width) || 10,
+        height: Number(formData.height) || 10,
+      },
+      description: formData.description || formData.parcelContents || "Parcel",
+      value: Number(formData.value) || 100,
+      fragile: Boolean(formData.fragile) || false,
+    },
+
+    notes: formData.notes || formData.specialInstructions || "",
+    couponCode: formData.couponCode || "",
+    insuranceRequired: Boolean(formData.insuranceRequired) || false,
+  };
+};
+
   // 🟠 Handle Razorpay Online Payment
-  const handleRazorpayPayment = async () => {
+  const handleRazorpayPayment = async (payload) => {
   try {
     if (!priceDetails?.totalAmount) {
       alert("Price not calculated yet!");
       return;
     }
 
-    // Use final total after discount
     const finalAmount = priceDetails.totalAmount - discountAmount;
     const amountInPaise = finalAmount * 100;
 
-    // 1️⃣ Create order from backend
     const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
       amount: amountInPaise,
       currency: "INR",
     });
 
-    // 2️⃣ Razorpay options
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: data.amount,
@@ -346,6 +402,7 @@ useEffect(() => {
       name: "EngineersParcel",
       description: "Parcel Booking Payment",
       order_id: data.id,
+
       handler: async function (response) {
         try {
           const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify-payment`, {
@@ -355,16 +412,30 @@ useEffect(() => {
           });
 
           if (verifyRes.data.success) {
-            // ✅ Call handleSubmit for online payment
-            await handleSubmit("Online"); 
+            alert("✅ Payment Verified Successfully!");
+
+            // ✅ Now directly create booking with payload (don’t call handleSubmit again)
+            const bookingRes = await axios.post(`${API_BASE_URL}/api/bookings`, {
+              ...payload,
+              paymentMethod: "Online",
+            });
+
+            if (bookingRes.data.success) {
+              alert("🎉 Booking created successfully!");
+              setBookingData(bookingRes.data.data);
+              setStep(4);
+            } else {
+              alert("❌ Booking creation failed after payment!");
+            }
           } else {
             alert("⚠️ Payment verification failed!");
           }
         } catch (error) {
-          console.error("Booking creation after payment failed:", error);
-          alert("❌ Booking creation failed after payment.");
+          console.error("Error verifying payment:", error);
+          alert("❌ Booking creation failed after payment!");
         }
       },
+
       prefill: {
         name: formData.name || "Customer",
         email: formData.email || "test@example.com",
@@ -378,6 +449,22 @@ useEffect(() => {
   } catch (err) {
     console.error("Payment Error:", err);
     alert("❌ Payment Failed");
+  }
+};
+
+
+
+
+const createBookingAfterPayment = async (payload) => {
+  try {
+    const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
+    console.log("✅ Booking created after payment:", res.data);
+    setBookingData(res.data.data);
+    toast.success("🎉 Booking Created Successfully!");
+    setStep(4); // ✅ move to confirmation
+  } catch (error) {
+    console.error("❌ Booking creation failed:", error);
+    toast.error("Booking creation failed after payment!");
   }
 };
 
@@ -1282,20 +1369,26 @@ useEffect(() => {
   className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
   disabled={isSubmitting}
   onClick={async (e) => {
-    e.preventDefault(); // prevent default behavior
-    setIsSubmitting(true); // ✅ show processing immediately
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      await handleRazorpayPayment(); // Razorpay popup logic
+      // ✅ Make payload first
+      const payload = makeBookingPayload(formData); // custom helper (same logic as handleSubmit)
+      console.log("🟢 Payload Before Payment:", payload);
+
+      // ✅ Pass payload to Razorpay
+      await handleRazorpayPayment(payload);
     } catch (error) {
       console.error("Payment error:", error);
     } finally {
-      setIsSubmitting(false); // ✅ hide processing after popup closes
+      setIsSubmitting(false);
     }
   }}
 >
   {isSubmitting ? "Processing..." : "Pay Online"}
 </Button>
+
 
 </div>
 
