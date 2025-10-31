@@ -919,9 +919,9 @@ const createBookingAfterPayment = async (payload) => {
       </SelectContent>
     </Select>
   </div>
-  <p className="text-xs text-gray-400">
-    Tip: 1000g = 1kg — For small parcels, choose grams.
-  </p>
+<p className="text-xs text-gray-400">
+  💡 Tip: If you choose <strong>grams</strong>, enter the value in decimals — for example:
+  <strong> 950g = .95</strong>, <strong>300g = .3</strong>
 </div>
 
 
