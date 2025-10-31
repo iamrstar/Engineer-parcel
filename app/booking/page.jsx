@@ -388,8 +388,7 @@ const makeBookingPayload = (formData) => {
     }
 
     const finalAmount = priceDetails.totalAmount - discountAmount;
-        const amountInPaise = finalAmount * 100;
-
+     const amountInPaise = finalAmount * 100;
 
     const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
       amount: amountInPaise,
@@ -413,7 +412,7 @@ const makeBookingPayload = (formData) => {
           });
 
           if (verifyRes.data.success) {
-            alert("✅ Payment Verified Successfully!");
+          
 
             // ✅ Now directly create booking with payload (don’t call handleSubmit again)
             const bookingRes = await axios.post(`${API_BASE_URL}/api/bookings`, {
@@ -422,18 +421,18 @@ const makeBookingPayload = (formData) => {
             });
 
             if (bookingRes.data.success) {
-              alert("🎉 Booking created successfully!");
+              ;
               setBookingData(bookingRes.data.data);
               setStep(4);
             } else {
-              alert("❌ Booking creation failed after payment!");
+              alert("❌ Booking creation failed after payment contact support for refund !");
             }
           } else {
             alert("⚠️ Payment verification failed!");
           }
         } catch (error) {
           console.error("Error verifying payment:", error);
-          alert("❌ Booking creation failed after payment!");
+          alert("❌ Booking creation failed after payment contact support for refund!");
         }
       },
 
