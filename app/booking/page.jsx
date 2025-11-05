@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 import {
   Popover,
   PopoverContent,
@@ -22,14 +23,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+
+
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function BookingPage() {
   const { toast } = useToast();
+  
   const [step, setStep] = useState(0);
   const [date, setDate] = useState();
   const [bookingId, setBookingId] = useState("");
@@ -81,26 +84,37 @@ const fetchCoupons = async () => {
 
 
 const handleApplyCoupon = async (coupon) => {
-    console.log("Apply clicked for coupon:", coupon);
-
+  console.log("Apply clicked for coupon:", coupon);
   try {
     const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`, {
       code: coupon.code,
-      orderTotal: priceDetails.totalAmount, // correct field name
+      orderTotal: priceDetails.totalAmount,
     });
 
     setAppliedCoupon(coupon);
     setDiscountAmount(res.data.discount);
-    toast.success(`${coupon.code} applied! You saved ₹${res.data.discount}`);
-    setShowCouponPopup(false);
 
+    toast({
+      title: "Coupon Applied!",
+      description: `${coupon.code} applied successfully. You saved ₹${res.data.discount}.`,
+      variant: "success",
+    });
+
+    setShowCouponPopup(false);
   } catch (err) {
-    toast.error(err.response?.data?.message || "Error applying coupon");
+    toast({
+      title: "Error Applying Coupon",
+      description: err.response?.data?.message || "Something went wrong.",
+      variant: "destructive",
+    });
   }
 };
 
 
+
     const [bookingData, setBookingData] = useState(null);
+    const [manualCoupon, setManualCoupon] = useState("");
+
 
 
 useEffect(() => {
@@ -890,22 +904,35 @@ const createBookingAfterPayment = async (payload) => {
   <Label htmlFor="weight">Actual Weight</Label>
   <div className="flex items-center gap-3">
     <Input
-      type="number"
-      id="weight"
-      placeholder="Enter weight (max. 30kgs)"
-      value={formData.weight || ""}
-      onChange={(e) => {
-        let value = parseFloat(e.target.value);
-        if (value > 30) {
-          value = 30; // Max limit 30
-          alert("You can book maximum 30 kg parcel at once!");
-        }
-        handleInputChange("weight", value);
-      }}
-      min="0"
-      max="30"
-      step="0.01"
-    />
+  type="text" // 👈 changed from number to text
+  id="weight"
+  placeholder="Enter weight (max. 30kgs)"
+  value={formData.weight || ""}
+  onChange={(e) => {
+    let value = e.target.value;
+
+    // ✅ Allow only valid numeric or decimal values
+    if (!/^\d*\.?\d*$/.test(value)) return;
+
+    const numValue = parseFloat(value);
+
+    // 🚨 Limit for kg
+    if (formData.weightUnit === "kg" && numValue > 30) {
+      alert("You can book maximum 30 kg parcel at once!");
+      return;
+    }
+
+    // 🚨 Limit for grams
+    if (formData.weightUnit === "g" && numValue > 1000) {
+      alert("Please choose kilograms for parcels above 1000 grams (1 kg)!");
+      return;
+    }
+
+    handleInputChange("weight", value);
+  }}
+  inputMode="decimal" // 👈 allows numeric keyboard on mobile
+/>
+
     <Select
       value={formData.weightUnit || "kg"}
       onValueChange={(v) => handleSelectChange("weightUnit", v)}
@@ -919,10 +946,11 @@ const createBookingAfterPayment = async (payload) => {
       </SelectContent>
     </Select>
   </div>
-<p className="text-xs text-gray-400">
-   💡Tip: If you choose <strong>grams</strong>, enter the value in decimals — for example:
-  <strong> 950g = .95</strong>, <strong>300g = .3</strong>
+  <p className="text-xs text-gray-400">
+  💡 Tip: If you choose <strong>grams</strong>, enter the value in decimals — for example:
+  <strong> 950g = 0.95</strong>, <strong>300g = 0.3</strong>
 </p>
+
 </div>
 
 
@@ -1273,10 +1301,67 @@ const createBookingAfterPayment = async (payload) => {
     {showCouponPopup ? "Hide Coupons" : "Apply Coupon"}
   </Button>
 
-  {/* Show available coupons inline */}
+  {/* Show coupon popup */}
   {showCouponPopup && (
     <div className="mt-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
       <h2 className="text-lg font-semibold text-orange-700 mb-3 text-center">
+        Apply a Coupon
+      </h2>
+
+      {/* Manual Coupon Input */}
+      <div className="flex gap-2 items-center mb-4">
+        <Input
+          type="text"
+          placeholder="Enter coupon code"
+          value={manualCoupon}
+          onChange={(e) => setManualCoupon(e.target.value.toUpperCase())}
+          className="flex-1"
+        />
+        <Button
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+          onClick={async () => {
+            if (!manualCoupon.trim()) {
+              toast({
+                title: "Enter Coupon",
+                description: "Please enter a coupon code before applying.",
+                variant: "destructive",
+              });
+              return;
+            }
+
+            try {
+              const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`, {
+                code: manualCoupon,
+                orderTotal: priceDetails.totalAmount,
+              });
+
+              setAppliedCoupon(res.data.coupon);
+              setDiscountAmount(res.data.discount);
+
+              toast({
+                title: "Coupon Applied!",
+                description: `${manualCoupon} applied successfully. You saved ₹${res.data.discount}.`,
+                variant: "success",
+              });
+
+              setShowCouponPopup(false);
+              setManualCoupon("");
+            } catch (err) {
+              toast({
+                title: "Invalid Coupon",
+                description:
+                  err.response?.data?.message || "Coupon is not valid or expired.",
+                variant: "destructive",
+              });
+            }
+          }}
+        >
+          Apply
+        </Button>
+      </div>
+
+      {/* Available Coupons List */}
+      <h2 className="text-md font-semibold text-orange-700 mb-2 text-center">
         Available Coupons
       </h2>
 
@@ -1291,18 +1376,16 @@ const createBookingAfterPayment = async (payload) => {
                   <p className="font-semibold text-orange-600">{coupon.code}</p>
                   <p className="text-sm text-gray-700">{coupon.description}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Valid till:{" "}
-                    {new Date(coupon.validUntil).toLocaleDateString()}
+                    Valid till: {new Date(coupon.validUntil).toLocaleDateString()}
                   </p>
                 </div>
-               <Button
-  size="sm"
-  className="bg-orange-600 hover:bg-orange-700 text-white"
-  onClick={() => handleApplyCoupon(coupon)}
->
-  {appliedCoupon?._id === coupon._id ? "Applied" : "Apply"}
-</Button>
-
+                <Button
+                  size="sm"
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                  onClick={() => handleApplyCoupon(coupon)}
+                >
+                  {appliedCoupon?._id === coupon._id ? "Applied" : "Apply"}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -1337,10 +1420,8 @@ const createBookingAfterPayment = async (payload) => {
       </Button>
     </div>
   )}
-
-  {/* Updated Final Total */}
-  
 </div>
+
 
 
 
