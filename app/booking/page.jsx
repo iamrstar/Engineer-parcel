@@ -127,8 +127,8 @@ useEffect(() => {
           body: JSON.stringify({
             serviceType: formData.serviceType,
             weight: parseFloat(formData.weight),
-            weightUnit: "kg",
-            lengths: formData.lengths || 0,
+            weightUnit: formData.weightUnit || "kg",
+            length: formData.length || 0,
             width: formData.width || 0,
             height: formData.height || 0,
             distance: formData.distance || 0,
@@ -143,16 +143,19 @@ useEffect(() => {
         if (data.success) {
           setPriceDetails(data.data);
         } else {
+          setPriceDetails(null);
           console.warn("Price calculation failed:", data.message);
         }
       } catch (err) {
         console.error("Error fetching price:", err);
+        setPriceDetails(null);
       }
     };
 
     fetchPrice();
   }
-}, [formData.weight, formData.serviceType]);
+}, [formData.weight, formData.weightUnit, formData.serviceType, formData.length, formData.width, formData.height, formData.distance, formData.fragile, formData.value]);
+
 
 
 
@@ -239,10 +242,7 @@ console.log("FormData:", formData);
   if (e && e.preventDefault) e.preventDefault();
 
   // 🚨 Weight limit check
-  if (Number(formData.weight) > 30) {
-    alert("You can book parcels up to 30 kg only at once!");
-    return;
-  }
+  
 
   setIsSubmitting(true);
 
@@ -402,7 +402,7 @@ const makeBookingPayload = (formData) => {
     }
 
     const finalAmount = priceDetails.totalAmount - discountAmount;
-     const amountInPaise = finalAmount * 100;
+     const amountInPaise = finalAmount*100;
 
     const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
       amount: amountInPaise,
@@ -897,105 +897,126 @@ const createBookingAfterPayment = async (payload) => {
         formData.serviceType === "local" ||
         formData.serviceType === "international") && (
         <div className="p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm space-y-6">
-          <h3 className="text-lg font-semibold text-orange-500">📏 Parcel Details</h3>
+  <h3 className="text-lg font-semibold text-orange-500">📏 Parcel Details</h3>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-2">
-  <Label htmlFor="weight">Actual Weight</Label>
-  <div className="flex items-center gap-3">
-    <Input
-  type="text" // 👈 changed from number to text
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-2">
+      <Label htmlFor="weight">Actual Weight</Label>
+      <div className="flex items-center gap-3">
+       <Input
+  type="text"
   id="weight"
-  placeholder="Enter weight (max. 30kgs)"
+  placeholder="Enter weight (max. 30kgs / 1000g)"
   value={formData.weight || ""}
   onChange={(e) => {
     let value = e.target.value;
 
-    // ✅ Allow only valid numeric or decimal values
+    // Allow only numeric or decimal
     if (!/^\d*\.?\d*$/.test(value)) return;
 
     const numValue = parseFloat(value);
 
-    // 🚨 Limit for kg
+    // KG limit
     if (formData.weightUnit === "kg" && numValue > 30) {
-      alert("You can book maximum 30 kg parcel at once!");
-      return;
+      alert("Maximum 30 kg allowed");
+      value = ""; // reset value to max
     }
 
-    // 🚨 Limit for grams
+    // Gram limit
     if (formData.weightUnit === "g" && numValue > 1000) {
-      alert("Please choose kilograms for parcels above 1000 grams (1 kg)!");
-      return;
+      alert("Above 1000g, use kg unit");
+      value = ""; // reset value to max
     }
 
     handleInputChange("weight", value);
   }}
-  inputMode="decimal" // 👈 allows numeric keyboard on mobile
+  inputMode="decimal"
 />
 
-    <Select
-      value={formData.weightUnit || "kg"}
-      onValueChange={(v) => handleSelectChange("weightUnit", v)}
-    >
-      <SelectTrigger className="w-[100px]">
-        <SelectValue placeholder="Unit" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="kg">kg</SelectItem>
-        <SelectItem value="g">grams</SelectItem>
-      </SelectContent>
-    </Select>
+
+        <Select
+          value={formData.weightUnit || "kg"}
+          onValueChange={(v) => handleSelectChange("weightUnit", v)}
+        >
+          <SelectTrigger className="w-[100px]">
+            <SelectValue placeholder="Unit" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="kg">kg</SelectItem>
+            <SelectItem value="g">grams</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <p className="text-xs text-gray-400">
+        {/* 💡 Tip: Enter grams as is (e.g., 300g, 500g) — backend will handle price as minimum 1kg. */}
+      </p>
+    </div>
+
+    <div className="space-y-2">
+      <Label>Dimensions (in cm)</Label>
+      <div className="flex items-center gap-2">
+        <Input
+          type="number"
+          placeholder="Length"
+          value={formData.length || ""}
+          onChange={(e) => handleInputChange("length", e.target.value)}
+          min="0"
+        />
+        <Input
+          type="number"
+          placeholder="Width"
+          value={formData.width || ""}
+          onChange={(e) => handleInputChange("width", e.target.value)}
+          min="0"
+        />
+        <Input
+          type="number"
+          placeholder="Height"
+          value={formData.height || ""}
+          onChange={(e) => handleInputChange("height", e.target.value)}
+          min="0"
+        />
+      </div>
+      <p className="text-xs text-gray-400">(Leave blank if not applicable)</p>
+    </div>
   </div>
-  <p className="text-xs text-gray-400">
-  💡 Tip: If you choose <strong>grams</strong>, enter the value in decimals — for example:
-  <strong> 950g = 0.95</strong>, <strong>300g = 0.3</strong>
-</p>
 
+  <div>
+    <Label htmlFor="parcelContents">Parcel Contents</Label>
+    <Input
+      id="parcelContents"
+      name="parcelContents"
+      value={formData.parcelContents}
+      onChange={handleChange}
+      placeholder="Brief description of contents"
+    />
+  </div>
+
+  {/* Pricing Section */}
+  {/* {priceDetails && (
+    <div className="bg-green-50 p-4 rounded-xl border border-green-100 shadow-sm">
+      <h3 className="text-md md:text-lg font-semibold text-green-600 border-b border-green-200 pb-2 mb-2">
+        Pricing
+      </h3>
+      <ul className="space-y-1">
+        <li className="flex justify-between">
+          <span>Base Price:</span>
+          <span className="font-medium">₹{priceDetails.basePrice}</span>
+        </li>
+        <li className="flex justify-between">
+          <span>Tax (18% GST):</span>
+          <span className="font-medium">₹{priceDetails.tax}</span>
+        </li>
+      </ul>
+      <div className="mt-3 text-right">
+        <p className="text-sm text-gray-600">Subtotal: ₹{priceDetails.totalAmount}</p>
+        <p className="text-lg font-semibold text-orange-600 mt-1">
+          Final Total: ₹{priceDetails.totalAmount}
+        </p>
+      </div>
+    </div>
+  )} */}
 </div>
-
-
-
-            <div className="space-y-2">
-              <Label>Dimensions (in cm)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  placeholder="Length"
-                  value={formData.length || ""}
-                  onChange={(e) => handleInputChange("length", e.target.value)}
-                  min="0"
-                />
-                <Input
-                  type="number"
-                  placeholder="Width"
-                  value={formData.width || ""}
-                  onChange={(e) => handleInputChange("width", e.target.value)}
-                  min="0"
-                />
-                <Input
-                  type="number"
-                  placeholder="Height"
-                  value={formData.height || ""}
-                  onChange={(e) => handleInputChange("height", e.target.value)}
-                  min="0"
-                />
-              </div>
-              <p className="text-xs text-gray-400">
-             ( LEAVE BLANK IF NOT APPLICABLE)              </p>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="parcelContents">Parcel Contents</Label>
-            <Input
-              id="parcelContents"
-              name="parcelContents"
-              value={formData.parcelContents}
-              onChange={handleChange}
-              placeholder="Brief description of contents"
-            />
-          </div>
-        </div>
       )}
 
       {/* =================== SPECIAL INSTRUCTIONS =================== */}
@@ -1223,8 +1244,9 @@ const createBookingAfterPayment = async (payload) => {
   </h3>
   <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
     <span>Weight:</span>
-    <span className="font-medium">{formData.weight} {formData.packageDetails?.weightUnit || "kg"}</span>
-  </div>
+<span className="font-medium">
+  {formData.weight} {formData.weightUnit || "kg"}
+</span>  </div>
   <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
     <span>Contents:</span>
     <span className="font-medium max-w-full">{formData.parcelContents || "-"}</span>
@@ -1521,8 +1543,8 @@ const createBookingAfterPayment = async (payload) => {
           </span>
         </li>
         <li className="flex justify-between">
-          <span>Booking Reference:</span>
-          <span className="font-medium">
+          <span className="text-orange-600 font-bold">TRACKING ID :</span>
+          <span className="font-bold text-orange-600">
             {bookingData.bookingId || "N/A"}
           </span>
         </li>
