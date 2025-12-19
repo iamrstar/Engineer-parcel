@@ -1,5 +1,18 @@
+import Image from "next/image";
 import { Handshake, TrendingUp, Shield, Globe, Building2, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Corrected paths (directly in public/)
+const featuredPartners = [
+  { name: "Partner 1", logo: "/partner1.png" },
+  { name: "Partner 2", logo: "/partner2.png" },
+  { name: "Partner 3", logo: "/partner3.png" },
+  { name: "Partner 4", logo: "/partner4.png" },
+  { name: "Partner 5", logo: "/partner5.png" },
+  { name: "Partner 6", logo: "/partner6.png" }, // placeholder if not available
+  { name: "Partner 7", logo: "/partner7.png" },
+  { name: "Partner 8", logo: "/partner8.png" },
+];
 
 export default function OurPartners() {
   return (
@@ -7,9 +20,7 @@ export default function OurPartners() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Our Partners
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Partners</h1>
           <p className="text-lg max-w-3xl mx-auto">
             Building success together through trusted partnerships and collaborative growth
           </p>
@@ -24,9 +35,7 @@ export default function OurPartners() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-6">
                 <Handshake className="h-8 w-8 text-orange-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Partnership Philosophy
-              </h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">Partnership Philosophy</h2>
               <p className="text-lg text-gray-600 mb-4">
                 We believe in creating meaningful partnerships that drive mutual growth and deliver exceptional value to our customers. Our partner ecosystem spans logistics providers, technology platforms, and industry leaders.
               </p>
@@ -85,8 +94,8 @@ export default function OurPartners() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <PartnerLogo key={i} name={`Partner ${i}`} />
+            {featuredPartners.map((partner, i) => (
+              <PartnerLogo key={i} name={partner.name} logo={partner.logo} />
             ))}
           </div>
         </div>
@@ -127,9 +136,7 @@ export default function OurPartners() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-orange-50 p-8 md:p-12 rounded-lg border border-orange-100 text-center">
             <Building2 className="h-16 w-16 text-orange-600 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Become Our Partner
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Become Our Partner</h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
               Join our growing network of partners and unlock new opportunities for growth. Whether you&apos;re a logistics provider, technology company, or business looking for reliable shipping solutions, we&apos;d love to explore partnership opportunities.
             </p>
@@ -161,6 +168,8 @@ export default function OurPartners() {
   );
 }
 
+// Components
+
 function PartnershipBenefit({ icon, title, desc }) {
   return (
     <div className="bg-orange-50 p-6 rounded-lg border border-orange-100 text-center">
@@ -190,18 +199,17 @@ function CategoryCard({ title, desc, partners }) {
   );
 }
 
-function PartnerLogo({ name }) {
+function PartnerLogo({ name, logo }) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow flex items-center justify-center border border-gray-100">
-      <div className="text-center">
-        <div className="w-20 h-20 bg-orange-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-          <Building2 className="h-10 w-10 text-orange-600" />
-        </div>
-        <p className="text-sm font-medium text-gray-700">{name}</p>
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center border border-gray-100">
+      <div className="relative w-32 h-32 mb-3"> {/* bigger container */}
+        <Image src={logo} alt={name} fill className="object-contain" />
       </div>
+     
     </div>
   );
 }
+
 
 function SuccessStory({ partner, metric, desc }) {
   return (
