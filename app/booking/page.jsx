@@ -519,60 +519,57 @@ const createBookingAfterPayment = async (payload) => {
           {/* Progress Steps */}
           {/* Progress Steps */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
-              {/* Step 1 */}
-              <div className={cn("flex flex-col items-center", step >= 0 ? "text-orange-600" : "text-gray-400")}>
-                <div className={cn(
-                  "h-8 w-8 rounded-full flex items-center justify-center border-2",
-                  step >= 0 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-                )}>
-                  1
-                </div>
-                <span className="text-sm mt-1">Service Details</span>
-              </div>
+<div className="flex items-center justify-between">
+    {/* Step 1 */}
+    <div className={cn("flex flex-col items-center", step >= 1 ? "text-orange-600" : "text-gray-400")}>
+      <div className={cn(
+        "h-8 w-8 rounded-full flex items-center justify-center border-2",
+        step >= 1 ? "border-orange-600 bg-orange-50" : "border-gray-300"
+      )}>
+        1
+      </div>
+      <span className="text-sm mt-1 text-center">Service Details</span>
+    </div>
 
-              
+    <div className={cn("flex-1 h-1 mx-4", step >= 2 ? "bg-orange-600" : "bg-gray-300")}></div>
 
-              <div className={cn("flex-1 h-1 mx-4", step >= 1 ? "bg-orange-600" : "bg-gray-300")}></div>
+    {/* Step 2 */}
+    <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
+      <div className={cn(
+        "h-8 w-8 rounded-full flex items-center justify-center border-2",
+        step >= 2 ? "border-orange-600 bg-orange-50" : "border-gray-300"
+      )}>
+        2
+      </div>
+      <span className="text-sm mt-1 text-center">Pickup & Delivery</span>
+    </div>
 
-              {/* Step 2 */}
-              <div className={cn("flex flex-col items-center", step >= 1 ? "text-orange-600" : "text-gray-400")}>
-                <div className={cn(
-                  "h-8 w-8 rounded-full flex items-center justify-center border-2",
-                  step >= 1 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-                )}>
-                  2
-                </div>
-                <span className="text-sm mt-1">Pickup and Delivery Details</span>
-              </div>
+    <div className={cn("flex-1 h-1 mx-4", step >= 3 ? "bg-orange-600" : "bg-gray-300")}></div>
 
-              <div className={cn("flex-1 h-1 mx-4", step >= 2 ? "bg-orange-600" : "bg-gray-300")}></div>
+    {/* Step 3 */}
+    <div className={cn("flex flex-col items-center", step >= 3 ? "text-orange-600" : "text-gray-400")}>
+      <div className={cn(
+        "h-8 w-8 rounded-full flex items-center justify-center border-2",
+        step >= 3 ? "border-orange-600 bg-orange-50" : "border-gray-300"
+      )}>
+        3
+      </div>
+      <span className="text-sm mt-1 text-center">Contact Info</span>
+    </div>
 
-             {/* Step 3 */}
+    <div className={cn("flex-1 h-1 mx-4", step >= 4 ? "bg-orange-600" : "bg-gray-300")}></div>
 
-               <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
-                <div className={cn(
-                  "h-8 w-8 rounded-full flex items-center justify-center border-2",
-                  step >= 2 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-                )}>
-                  3
-                </div>
-                <span className="text-sm mt-1">Contact information</span>
-              </div>
-
-
-
-              {/* Step 4 */}
-              <div className={cn("flex flex-col items-center", step >= 3 ? "text-orange-600" : "text-gray-400")}>
-                <div className={cn(
-                  "h-8 w-8 rounded-full flex items-center justify-center border-2",
-                  step >= 3 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-                )}>
-                  4
-                </div>
-                <span className="text-sm mt-1">Checkout</span>
-              </div>
-            </div>
+    {/* Step 4 */}
+    <div className={cn("flex flex-col items-center", step >= 4 ? "text-orange-600" : "text-gray-400")}>
+      <div className={cn(
+        "h-8 w-8 rounded-full flex items-center justify-center border-2",
+        step >= 4 ? "border-orange-600 bg-orange-50" : "border-gray-300"
+      )}>
+        4
+      </div>
+      <span className="text-sm mt-1 text-center">Checkout</span>
+    </div>
+  </div>
           </div>
 
 
