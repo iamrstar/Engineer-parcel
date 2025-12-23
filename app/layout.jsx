@@ -7,8 +7,11 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "EngineersParcel - Your Trusted Parcel Delivery Partner",
-  description: "EngineersParcel offers courier, shifting, and parcel delivery services locally and internationally.",
-   
+  description:
+    "EngineersParcel offers courier, shifting, and parcel delivery services locally and internationally.",
+  icons: {
+    icon: "/logo.png",
+  },
 }
 
 export default function RootLayout({ children }) {
