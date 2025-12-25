@@ -13,7 +13,7 @@ import PrivacyPolicyPage from "../app/privacy-policy/page.jsx";
 import TermsPage from "../app/terms/page.jsx";
 import VisionMission from "../app/vision-mission/page.jsx";
 import OurPartners from "../app/our-partners/page.jsx";
-import Gallery from "../app/Activities/page.jsx";
+import Gallery from "../app/activities/page.jsx";
 
 function App() {
   return (
