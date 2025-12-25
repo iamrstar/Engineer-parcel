@@ -84,22 +84,31 @@ export default function OurPartners() {
       </section>
 
       {/* Featured Partners */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Partners</h2>
-            <p className="text-lg text-gray-600">
-              Trusted collaborations that power our service excellence
-            </p>
-          </div>
+      {/* Featured Partners with Marquee */}
+<section className="py-16 bg-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Partners</h2>
+      <p className="text-lg text-gray-600">
+        Trusted collaborations that power our service excellence
+      </p>
+    </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {featuredPartners.map((partner, i) => (
-              <PartnerLogo key={i} name={partner.name} logo={partner.logo} />
-            ))}
+    {/* Marquee container */}
+    <div className="overflow-hidden relative">
+      <div className="flex animate-marquee gap-8">
+        {featuredPartners.map((partner, i) => (
+          <div key={i} className="flex-shrink-0 bg-white p-6 rounded-lg shadow-md border border-gray-100">
+            <div className="relative w-32 h-32">
+              <Image src={partner.logo} alt={partner.name} fill className="object-contain" />
+            </div>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Success Stories */}
       <section className="py-16 bg-gray-50">
