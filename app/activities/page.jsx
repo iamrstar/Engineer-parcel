@@ -12,14 +12,14 @@ const galleryItems = [
     title: "Annual Team Building Retreat",
     desc: "Our team bonding at the annual retreat, strengthening connections and celebrating achievements together",
     category: "team-events",
-   image: "activities/express-delivery.jpeg"
+   image: "activities/happy-customer.jpeg"
   },
   {
     id: 2,
     title: "Training Workshop Session",
     desc: "Professional development workshop enhancing our team's skills and capabilities",
     category: "team-events",
-    image: "activities/mla-meet.jpeg"
+    image: "activities/dinner-wth-team.jpeg"
   },
   {
     id: 3,
@@ -49,28 +49,28 @@ const galleryItems = [
     title: "Birthday Celebration",
     desc: "Making every team member feel special on their birthday",
     category: "happy-moments",
-    image: "activities/team-members.jpeg"
+    image: "activities/mla-meet.jpeg"
   },
   {
     id: 7,
     title: "Festival Celebrations",
     desc: "Embracing cultural diversity through festival celebrations at workplace",
     category: "happy-moments",
-   image: "activities/at-news-paper.jpeg"
+   image: "activities/volvo-partner.jpeg"
   },
   {
     id: 8,
     title: "Achievement Milestone",
     desc: "Celebrating 1 million successful deliveries with our incredible team",
     category: "happy-moments",
-   image: "activities/happy-customer.jpeg"
+   image: "activities/signed-mou-robotics.jpeg"
   },
   {
     id: 9,
     title: "Team Lunch Gathering",
     desc: "Bonding over good food and great conversations",
     category: "happy-moments",
-   image: "/express-delivery.jpeg"
+   image: "activities/campaigning.jpeg"
   },
   
   // Customer Deliveries
@@ -79,35 +79,35 @@ const galleryItems = [
     title: "Express Parcel Delivery",
     desc: "Delivering smiles with every package - our commitment to excellence",
     category: "customer-delivery",
-   image: "/express-delivery.jpeg"
+   image: "activities/our-first-own-truck.jpeg"
   },
   {
     id: 11,
     title: "Safe Delivery in Remote Area",
     desc: "Reaching every corner of India, no matter how remote",
     category: "customer-delivery",
-   image: "/express-delivery.jpeg"
+   image: "activities/team-members.jpeg"
   },
   {
     id: 12,
     title: "Happy Customer Moment",
     desc: "The joy on customer's face makes every delivery worthwhile",
     category: "customer-delivery",
-   image: "/express-delivery.jpeg"
+   image: "activities/our-warehouse.jpeg"
   },
   {
     id: 13,
     title: "Bulk Order Success",
     desc: "Successfully handled and delivered large corporate shipment",
     category: "customer-delivery",
-   image: "/express-delivery.jpeg"
+   image: "activities/vendor-trust-us.jpeg"
   },
   {
     id: 14,
     title: "Same Day Delivery",
     desc: "Lightning-fast service ensuring urgent packages reach on time",
     category: "customer-delivery",
-    image: "/express-delivery.jpeg"
+    image: "activities/we-care-our-products.jpeg"
   },
   {
     id: 15,
