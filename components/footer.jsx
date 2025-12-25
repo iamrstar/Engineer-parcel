@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { Mail, MapPin, Phone } from "lucide-react" 
+import { Mail, MapPin, Phone } from "lucide-react"
 import Image from "next/image"
 
 export default function Footer() {
@@ -70,7 +70,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/activities" className="text-gray-300 hover:text-orange-500 text-sm">
-                  Activites & Moments
+                  Activites & Moments 
                 </Link>
               </li>
               <li>
