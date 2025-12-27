@@ -9,15 +9,15 @@ const galleryItems = [
   // Team Events
   {
     id: 1,
-    title: "Annual Team Building Retreat",
-    desc: "Our team bonding at the annual retreat, strengthening connections and celebrating achievements together",
+    title: "Happy Clients – IIT ISM Campus",
+    desc: "Smiling faces of our student clients at IIT ISM campus, showcasing satisfaction, trust, and a positive experience.",
     category: "team-events",
    image: "activities/happy-customer.jpeg"
   },
   {
     id: 2,
-    title: "Training Workshop Session",
-    desc: "Professional development workshop enhancing our team's skills and capabilities",
+    title: "Dinner Night With Team",
+    desc: "We dine together every month to celebrate achievements and strengthen our team bond.",
     category: "team-events",
     image: "activities/dinner-wth-team.jpeg"
   },
@@ -39,22 +39,22 @@ const galleryItems = [
   // Happy Moments
   {
     id: 5,
-    title: "Employee of the Month Award",
-    desc: "Celebrating excellence and dedication of our outstanding team members",
+    title: "We Are in the Newspaper",
+    desc: "Celebrating the dedication and excellence of our team members, proudly featured in the press",
     category: "happy-moments",
    image: "activities/at-news-paper.jpeg"
   },
   {
     id: 6,
-    title: "Birthday Celebration",
-    desc: "Making every team member feel special on their birthday",
+    title: "Award from Member of Parliament",
+    desc: "Proudly recognized as the Best Business Startup of Dhanbad by the MP Of Dhanbad.",
     category: "happy-moments",
     image: "activities/mla-meet.jpeg"
   },
   {
     id: 7,
-    title: "Festival Celebrations",
-    desc: "Embracing cultural diversity through festival celebrations at workplace",
+    title: "Official Logistics Partner – Volvo Jharkhand",
+    desc: "Proudly serving as the official logistics partner for Volvo in Jharkhand, ensuring seamless operations.",
     category: "happy-moments",
    image: "activities/volvo-partner.jpeg"
   },
@@ -67,8 +67,8 @@ const galleryItems = [
   },
   {
     id: 9,
-    title: "Team Lunch Gathering",
-    desc: "Bonding over good food and great conversations",
+    title: "Public Engagement Campaign",
+    desc: "Engaging with the community through interactive campaigns, going beyond traditional pamphlets and card supply marketing.",
     category: "happy-moments",
    image: "activities/campaigning.jpeg"
   },
@@ -83,15 +83,15 @@ const galleryItems = [
   },
   {
     id: 11,
-    title: "Safe Delivery in Remote Area",
-    desc: "Reaching every corner of India, no matter how remote",
+    title: "Startup Meet – Jharkhand",
+    desc: "Connecting and collaborating with fellow startups at a state-wide event in Jharkhand.",
     category: "customer-delivery",
    image: "activities/team-members.jpeg"
   },
   {
     id: 12,
-    title: "Happy Customer Moment",
-    desc: "The joy on customer's face makes every delivery worthwhile",
+    title: "Our Warehouse",
+    desc: "Safely storing every item with care, ensuring secure and efficient operations.",
     category: "customer-delivery",
    image: "activities/our-warehouse.jpeg"
   },
@@ -116,20 +116,20 @@ const galleryItems = [
     category: "customer-delivery",
    image: "/express-delivery.jpeg"
   },
-  {
-    id: 16,
-    title: "International Shipment",
-    desc: "Connecting borders and delivering dreams globally",
-    category: "customer-delivery",
-  image: "/express-delivery.jpeg"
-  },
-  {
-    id: 17,
-    title: "Fragile Item Care",
-    desc: "Extra care and attention for your precious items",
-    category: "customer-delivery",
-   image: "/express-delivery.jpeg"
-  }
+  // {
+  //   id: 16,
+  //   title: "International Shipment",
+  //   desc: "Connecting borders and delivering dreams globally",
+  //   category: "customer-delivery",
+  // image: "/express-delivery.jpeg"
+  // },
+  // {
+  //   id: 17,
+  //   title: "Fragile Item Care",
+  //   desc: "Extra care and attention for your precious items",
+  //   category: "customer-delivery",
+  //  image: "/express-delivery.jpeg"
+  // }
 ];
 
 const categories = [
