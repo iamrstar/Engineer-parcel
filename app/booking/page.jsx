@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import Link from "next/link";
+
 import { useToast } from "@/hooks/use-toast";
 import {
   Popover,
@@ -662,13 +664,21 @@ const createBookingAfterPayment = async (payload) => {
                             </svg>
                           </div>
                           <div className="text-center">
-                            <span className="font-semibold">
-                              Shifting & Moving
-                            </span>
-                            <p className="text-sm text-muted-foreground">
-                              Home & office relocation
-                            </p>
-                          </div>
+                          <span className="font-semibold">
+                            Shifting & Moving
+                          </span>
+
+                          <p className="text-sm text-muted-foreground">
+                            Home & office relocation ·{" "}
+                            <Link
+                              href="/get-quote"
+                              className="text-orange-600 font-medium hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Get Quote
+                            </Link>
+                          </p>
+                        </div>
                         </Label>
                       </div>
                       <div>
