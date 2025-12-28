@@ -90,7 +90,7 @@ export default function ServicesPage() {
                 </li>
               </ul>
               <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                <Link href="/booking">Book Shifting Service</Link>
+                <Link href="/get-quote">Book Shifting Service</Link>
               </Button>
             </div>
             <div className="md:w-1/2">
