@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "../components/Layout";
 
+
 // Import pages from app folder
 import HomePage from "../app/page.jsx";
 import AboutPage from "../app/about/page.jsx";
@@ -14,6 +15,7 @@ import TermsPage from "../app/terms/page.jsx";
 import VisionMission from "../app/vision-mission/page.jsx";
 import OurPartners from "../app/our-partners/page.jsx";
 import Gallery from "../app/activities/page.jsx";
+import QuotationPage from "../app/get-quote/page.jsx";
 
 function App() {
   return (
@@ -30,6 +32,7 @@ function App() {
         <Route path="/vision-mission" element={<VisionMission />} />
         <Route path="/our-partners" element={<OurPartners />} />
         <Route path="/activities" element={<Gallery />} />
+        <Route path="/get-quote" element={<QuotationPage />} />
       </Routes>
     </Layout>
   );
