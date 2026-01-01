@@ -9,10 +9,9 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold mb-4">About EngineersParcel</h1>
           <p className="text-lg max-w-3xl mx-auto">
-            We are set to transform India's logistics landscape with
-            cutting-edge AI and IoT technology. We're building a smarter, more
-            transparent, and highly efficient courier and logistics platform
-            designed for the future. .
+         We are set to transform India’s logistics landscape by leveraging a powerful combination of next-generation technologies—AI, Blockchain, and IoT.
+            Our vision is to build a smarter, more transparent, and highly efficient courier and logistics platform designed for the future, 
+            while providing safe, secure, and assured logistics support to diverse industries with critical delivery needs.
           </p>
         </div>
       </section>
