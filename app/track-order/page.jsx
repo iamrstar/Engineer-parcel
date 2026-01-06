@@ -1,4 +1,4 @@
-"use client"
+"use client" 
 
 import { useState, useEffect } from "react"
 import useSWR from "swr"
@@ -477,3 +477,4 @@ export default function TrackPage() {
     </main>
   )
 }
+
