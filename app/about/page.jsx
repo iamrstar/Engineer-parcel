@@ -3,7 +3,7 @@ import { Award, Clock, Shield, Truck, Users,MessageCircle,IndianRupee,BrainCircu
 
 export default function AboutPage() {
   return (
-    <div>
+    <div> 
       {/* Hero Section */}
       <section className="bg-orange-600 text-white py-16">  
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
