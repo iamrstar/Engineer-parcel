@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Award, Clock, Shield, Truck, Users,MessageCircle,IndianRupee,BrainCircuit,ChartCandlestick,Cpu,QrCode,Cog} from "lucide-react";
 
 export default function AboutPage() {
-  return (
+  return ( 
     <div> 
       {/* Hero Section */}
       <section className="bg-orange-600 text-white py-16">  
