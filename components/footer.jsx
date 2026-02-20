@@ -64,12 +64,17 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/price-estimator" className="text-gray-300 hover:text-orange-500 text-sm">
+                  Price Estimator
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy-policy" className="text-gray-300 hover:text-orange-500 text-sm">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="activities" className="text-gray-300 hover:text-orange-500 text-sm">
+                <Link href="/activities" className="text-gray-300 hover:text-orange-500 text-sm">
                   Activites & Moments 
                 </Link>
               </li>
