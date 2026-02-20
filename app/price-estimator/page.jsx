@@ -1,4 +1,4 @@
-  "use client"
+"use client"
 
 import { useState, useMemo } from "react"
 import { Calculator, Package, Info, CheckCircle, ArrowRight, Dimensions, Truck, Zap, Star } from "lucide-react"
@@ -67,7 +67,7 @@ export default function PriceEstimatorPage() {
     const basePrice = Math.max(ratePerKg * calculations.chargeableWeight, 100)
     const fragileCharge = formData.isFragile ? 30 : 0
     const valueCharge = (parseFloat(formData.declaredValue) || 0) * 0.02
-    
+
     const subtotal = basePrice + fragileCharge + valueCharge
     const tax = subtotal * 0.18
     const total = subtotal + tax
@@ -94,7 +94,7 @@ export default function PriceEstimatorPage() {
         <div className="absolute inset-0 bg-black opacity-5"></div>
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
-        
+
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl mb-6">
             <Calculator className="w-8 h-8" />
@@ -109,7 +109,7 @@ export default function PriceEstimatorPage() {
       {/* Estimator Section */}
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-8">
-          
+
           {/* Input Panel */}
           <div className="flex-1">
             <Card className="shadow-xl border-0 overflow-hidden h-full">
@@ -117,7 +117,7 @@ export default function PriceEstimatorPage() {
                 <h2 className="text-2xl font-bold text-white mb-2">Parcel Details</h2>
                 <p className="text-orange-100 font-medium">Enter your parcel's weight and dimensions</p>
               </div>
-              
+
               <CardContent className="p-8 space-y-8">
                 {/* Weight Row */}
                 <div className="space-y-3">
@@ -196,13 +196,13 @@ export default function PriceEstimatorPage() {
                     />
                     <p className="text-[10px] text-gray-400">Insurance coverage at 2% of value</p>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3 h-12 mt-auto">
                     <Checkbox
                       id="isFragile"
                       name="isFragile"
                       checked={formData.isFragile}
-                      onCheckedChange={(checked) => setFormData(p => ({...p, isFragile: checked}))}
+                      onCheckedChange={(checked) => setFormData(p => ({ ...p, isFragile: checked }))}
                     />
                     <Label htmlFor="isFragile" className="text-base font-semibold text-gray-700 cursor-pointer">
                       Fragile Parcel
@@ -225,57 +225,34 @@ export default function PriceEstimatorPage() {
           <div className="lg:w-[400px]">
             <Card className="shadow-xl border-0 h-full overflow-hidden flex flex-col">
               <div className="bg-gray-900 p-6 text-white text-center">
-                <h3 className="text-lg font-semibold opacity-80">Calculated Weight</h3>
-                <div className="text-4xl font-black mt-1">
-                  {calculations.chargeableWeight} <span className="text-xl">KG</span>
-                </div>
-                <p className="text-xs uppercase tracking-widest mt-2 text-orange-400 font-bold">Chargeable Weight</p>
+                <Truck className="w-12 h-12 mx-auto mb-2 text-orange-500 opacity-80" />
+                <h3 className="text-xl font-bold">Shipping Estimate</h3>
+                <p className="text-xs uppercase tracking-widest mt-1 opacity-60">Result for your parcel</p>
               </div>
 
               <CardContent className="p-6 flex-1 bg-white">
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 flex items-center gap-1">
-                      <Package className="w-4 h-4" /> Actual Weight
-                    </span>
-                    <span className="font-semibold">{calculations.actualWeight.toFixed(2)} Kg</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-500 flex items-center gap-1">
-                      <Calculator className="w-4 h-4" /> Volumetric Weight
-                    </span>
-                    <span className="font-semibold">{calculations.volumetricWeight.toFixed(2)} Kg</span>
-                  </div>
-                  {calculations.usedVolumetric && (
-                    <div className="bg-orange-50 text-orange-700 p-3 rounded-lg text-xs flex items-start gap-2">
-                      <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <p>Chargeable weight is based on <strong>volumetric weight</strong> (bulky item).</p>
-                    </div>
-                  )}
-                </div>
-
                 {!showEstimates ? (
-                  <div className="h-48 flex flex-col items-center justify-center text-center opacity-40">
-                    <Truck className="w-16 h-16 mb-4 text-gray-300" />
-                    <p className="text-sm font-medium">Estimates will appear here<br/>after calculation</p>
+                  <div className="h-full flex flex-col items-center justify-center text-center opacity-40 min-h-[300px]">
+                    <Calculator className="w-16 h-16 mb-4 text-gray-300" />
+                    <p className="text-sm font-medium">Enter details and click<br />"Calculate Price Estimate"</p>
                   </div>
                 ) : (
                   <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <h4 className="font-bold text-gray-900 border-b pb-2 mb-4">Estimated Ranges</h4>
-                    
-                    <ResultItem 
+                    <h4 className="font-bold text-gray-900 border-b pb-2 mb-4">Estimated Price Ranges</h4>
+
+                    <ResultItem
                       icon={<Truck className="w-4 h-4" />}
                       label="Surface"
                       estimate={calculateEstimate(rates.surface)}
                       color="blue"
                     />
-                    <ResultItem 
+                    <ResultItem
                       icon={<Zap className="w-4 h-4" />}
                       label="Express"
                       estimate={calculateEstimate(rates.express)}
                       color="orange"
                     />
-                    <ResultItem 
+                    <ResultItem
                       icon={<Star className="w-4 h-4" />}
                       label="Premium"
                       estimate={calculateEstimate(rates.premium)}
