@@ -16,7 +16,6 @@ export default function PriceEstimatorPage() {
     width: "",
     height: "",
     isFragile: false,
-    declaredValue: "",
   })
 
   const [showEstimates, setShowEstimates] = useState(false)
@@ -66,9 +65,8 @@ export default function PriceEstimatorPage() {
   const calculateEstimate = (ratePerKg) => {
     const basePrice = Math.max(ratePerKg * calculations.chargeableWeight, 100)
     const fragileCharge = formData.isFragile ? 30 : 0
-    const valueCharge = (parseFloat(formData.declaredValue) || 0) * 0.02
 
-    const subtotal = basePrice + fragileCharge + valueCharge
+    const subtotal = basePrice + fragileCharge
     const tax = subtotal * 0.18
     const total = subtotal + tax
 
@@ -131,16 +129,16 @@ export default function PriceEstimatorPage() {
                       placeholder="Enter weight"
                       className="h-12 text-lg border-2 focus:border-orange-500"
                     />
-                    <div className="flex rounded-lg overflow-hidden border-2 border-gray-200">
+                    <div className="flex rounded-lg overflow-hidden border-2 border-gray-200 shrink-0">
                       <button
                         onClick={() => handleUnitChange("kg")}
-                        className={`px-4 h-full font-bold transition-colors ${formData.weightUnit === "kg" ? "bg-orange-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                        className={`w-14 h-full font-bold transition-colors ${formData.weightUnit === "kg" ? "bg-orange-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
                       >
                         KG
                       </button>
                       <button
                         onClick={() => handleUnitChange("g")}
-                        className={`px-4 h-full font-bold transition-colors ${formData.weightUnit === "g" ? "bg-orange-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+                        className={`w-14 h-full font-bold transition-colors ${formData.weightUnit === "g" ? "bg-orange-600 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
                       >
                         G
                       </button>
@@ -183,21 +181,8 @@ export default function PriceEstimatorPage() {
                 </div>
 
                 {/* Additional Options */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
-                  <div className="space-y-3">
-                    <Label className="text-base font-semibold text-gray-700">Declared Value (₹)</Label>
-                    <Input
-                      type="number"
-                      name="declaredValue"
-                      value={formData.declaredValue}
-                      onChange={handleChange}
-                      placeholder="Optional"
-                      className="h-12 border-2 focus:border-orange-500"
-                    />
-                    <p className="text-[10px] text-gray-400">Insurance coverage at 2% of value</p>
-                  </div>
-
-                  <div className="flex items-center space-x-3 h-12 mt-auto">
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="flex items-center space-x-3 h-12">
                     <Checkbox
                       id="isFragile"
                       name="isFragile"
