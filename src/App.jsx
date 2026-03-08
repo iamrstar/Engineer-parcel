@@ -20,6 +20,7 @@ import QuotationPage from "../app/get-quote/page.jsx";
 import FranchisePage from "../app/franchise/page.jsx";
 import CityPage from "../app/courier-service-in-[city]/page.jsx";
 import PriceEstimatorPage from "../app/price-estimator/page.jsx";
+import StudentMovePage from "../app/campus-parcel/page.jsx";
 
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
           element={<CityPage />}
         />
         <Route path="/price-estimator" element={<PriceEstimatorPage />} />
+        <Route path="/campus-parcel" element={<StudentMovePage />} />
 
       </Routes>
     </Layout>
