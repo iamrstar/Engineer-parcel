@@ -9,13 +9,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div>
-             <Image
-      src="/logo.png" // Make sure logo.png is inside the /public folder
-      alt="EngineersParcel Logo"
-      width={120}      // Adjust width as needed
-      height={40}
-      className="mb-4"
-    />
+            <Image
+              src="/logo.png" // Make sure logo.png is inside the /public folder
+              alt="EngineersParcel Logo"
+              width={120}      // Adjust width as needed
+              height={40}
+              className="mb-4"
+            />
             <p className="text-gray-300 text-sm">
               EngineersParcel offers great value for the price. The movers were friendly and very efficient. They
               managed to pack and move everything without any issues.
@@ -61,6 +61,16 @@ export default function Footer() {
               <li>
                 <Link href="/pincode-checker" className="text-gray-300 hover:text-orange-500 text-sm">
                   Pincode Checker
+                </Link>
+              </li>
+              <li>
+                <Link href="/price-estimator" className="text-gray-300 hover:text-orange-500 text-sm">
+                  Price Estimator
+                </Link>
+              </li>
+              <li>
+                <Link href="/campus-parcel" className="text-gray-300 hover:text-orange-500 text-sm">
+                  🎓 Campus Parcel
                 </Link>
               </li>
               <li>
