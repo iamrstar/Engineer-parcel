@@ -12,19 +12,19 @@ function Navbar() {
   }
 
   return (
-    
+
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-  <Image
-    src="/logo.png" // Place your logo.jpg in the /public folder
-    alt="EngineersParcel Logo"
-    width={40}       // Adjust size as needed
-    height={40}
-    className="mr-2"
-  />
+              <Image
+                src="/logo.png" // Place your logo.jpg in the /public folder
+                alt="EngineersParcel Logo"
+                width={40}       // Adjust size as needed
+                height={40}
+                className="mr-2"
+              />
 
               <span className="text-xl font-bold text-orange-600">EnjgineersParrcel</span>
             </Link>
@@ -37,7 +37,7 @@ function Navbar() {
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
             >
               Home
-              
+
             </Link>
             <Link
               to="/about"
@@ -68,6 +68,18 @@ function Navbar() {
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
             >
               Pincode Checker
+            </Link>
+            <Link
+              to="/price-estimator"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+            >
+              Price Estimator
+            </Link>
+            <Link
+              to="/campus-parcel"
+              className="px-3 py-2 rounded-md text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 transition-colors"
+            >
+              🎓 Campus Parcel
             </Link>
           </div>
 
@@ -134,6 +146,20 @@ function Navbar() {
               onClick={toggleMenu}
             >
               Pincode Checker
+            </Link>
+            <Link
+              to="/price-estimator"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+              onClick={toggleMenu}
+            >
+              Price Estimator
+            </Link>
+            <Link
+              to="/campus-parcel"
+              className="block px-3 py-2 rounded-md text-base font-medium text-white bg-orange-600 hover:bg-orange-700 transition-colors"
+              onClick={toggleMenu}
+            >
+              🎓 Campus Parcel
             </Link>
           </div>
         </div>
