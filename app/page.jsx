@@ -13,102 +13,124 @@ const CelebrationPopup = dynamic(() => import("./CelebrationAnimation"), { ssr: 
 export default function Home() {
   return (
     <>
-     <CelebrationPopup />
-    <div>
-      {/* Celebration popup (client-only) */}
       <CelebrationPopup />
+      <div>
+        {/* Celebration popup (client-only) */}
+        <CelebrationPopup />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-10 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Revolutionising Logistics in India
-              </h1>
-              <p className="text-lg mb-8">
-                We provide efficient courier and parcel delivery services across India and internationally.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
-                  <Link href="/booking">Book Now</Link>
-                </Button>
-                <Button className="text-orange-600 bg-white hover:bg-slate-50" asChild>
-                  <Link href="/track-order">Track Order</Link>
-                </Button>
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="md:w-1/2 mb-10 md:mb-0">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                  Revolutionising Logistics in India
+                </h1>
+                <p className="text-lg mb-8">
+                  We provide efficient courier and parcel delivery services across India and internationally.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
+                    <Link href="/booking">Book Now</Link>
+                  </Button>
+                  <Button className="text-orange-600 bg-white hover:bg-slate-50" asChild>
+                    <Link href="/track-order">Track Order</Link>
+                  </Button>
+                </div>
+              </div>
+              <div className="md:w-1/2 flex justify-center">
+                <Image
+                  src="/Delivery-boy.png"
+                  alt="Parcel Delivery"
+                  width={500}
+                  height={400}
+                  className="rounded-lg shadow-lg"
+                />
               </div>
             </div>
-            <div className="md:w-1/2 flex justify-center">
-              <Image
-                src="/Delivery-boy.png"
-                alt="Parcel Delivery"
-                width={500}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
+          </div>
+        </section>
+
+        {/* Services Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900">Our Services</h2>
+              <p className="mt-4 text-lg text-gray-600">
+                We offer a wide range of delivery and logistics services
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <ServiceCard icon={<Package />} title="Courier Service" desc="Fast and secure courier service for documents and packages." link="/services#courier" />
+              <ServiceCard icon={<Truck />} title="Shifting and Moving" desc="Complete relocation services for homes and offices." link="/services#shifting" />
+              <ServiceCard icon={<Box />} title="Local Parcel Service" desc="Same-day delivery for local parcels within your city." link="/services#local" />
+              <ServiceCard icon={<Globe />} title="International Courier" desc="Reliable international shipping to destinations worldwide." link="/services#international" />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Services Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Our Services</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              We offer a wide range of delivery and logistics services
-            </p>
+        {/* 🎓 Student Move Banner */}
+        <section className="py-12 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs px-3 py-1 rounded-full mb-3">
+                🎓 For IIT ISM Dhanbad Students
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                Graduating? Let Us Move Your Stuff.
+              </h3>
+              <p className="text-gray-400 max-w-lg">
+                Fixed-price box packing for hostel students. Books, electronics, clothes — we handle it all.
+              </p>
+            </div>
+            <Link href="/campus-parcel">
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white h-14 px-8 text-lg font-bold rounded-xl shadow-lg shadow-orange-500/40 animate-pulse hover:animate-none transition-all">
+                🎓 Campus Parcel
+              </Button>
+            </Link>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <ServiceCard icon={<Package />} title="Courier Service" desc="Fast and secure courier service for documents and packages." link="/services#courier" />
-            <ServiceCard icon={<Truck />} title="Shifting and Moving" desc="Complete relocation services for homes and offices." link="/services#shifting" />
-            <ServiceCard icon={<Box />} title="Local Parcel Service" desc="Same-day delivery for local parcels within your city." link="/services#local" />
-            <ServiceCard icon={<Globe />} title="International Courier" desc="Reliable international shipping to destinations worldwide." link="/services#international" />
+        </section>
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <QuickAccessCard
+              title="Check Delivery Area"
+              desc="Enter your pincode to check if we deliver to your area and get estimated delivery times."
+              btnText="Check Pincode"
+              link="/pincode-checker"
+              icon={<MapPin className="ml-2 h-4 w-4" />}
+            />
+            <QuickAccessCard
+              title="Book a Pickup"
+              desc="Schedule a pickup for your parcel or request our shifting and moving services."
+              btnText="Book Now"
+              link="/booking"
+              icon={<ArrowRight className="ml-2 h-4 w-4" />}
+            />
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Quick Access Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <QuickAccessCard
-            title="Check Delivery Area"
-            desc="Enter your pincode to check if we deliver to your area and get estimated delivery times."
-            btnText="Check Pincode"
-            link="/pincode-checker"
-            icon={<MapPin className="ml-2 h-4 w-4" />}
-          />
-          <QuickAccessCard
-            title="Book a Pickup"
-            desc="Schedule a pickup for your parcel or request our shifting and moving services."
-            btnText="Book Now"
-            link="/booking"
-            icon={<ArrowRight className="ml-2 h-4 w-4" />}
-          />
-        </div>
-      </section>
+        {/* Testimonials Section */}
+        <TestimonialsSection />
 
-      {/* Testimonials Section */}
-      <TestimonialsSection />
-
-      {/* CTA Section */}
-      <section className="py-16 bg-orange-600 text-white text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Ship Your Parcel?</h2>
-        <p className="text-lg mb-8 max-w-3xl mx-auto">
-          Experience our fast, reliable, and affordable delivery services today.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
-            <Link href="/booking">Book a Pickup</Link>
-          </Button>
-          <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
-            <Link href="/contact">Contact Us</Link>
-          </Button>
-        </div>
-      </section>
-    </div>
+        {/* CTA Section */}
+        <section className="py-16 bg-orange-600 text-white text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Ship Your Parcel?</h2>
+          <p className="text-lg mb-8 max-w-3xl mx-auto">
+            Experience our fast, reliable, and affordable delivery services today.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
+              <Link href="/booking">Book a Pickup</Link>
+            </Button>
+            <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
+              <Link href="/contact">Contact Us</Link>
+            </Button>
+          </div>
+        </section>
+      </div>
     </>
   );
 }
