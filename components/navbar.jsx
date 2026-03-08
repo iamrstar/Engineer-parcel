@@ -25,7 +25,7 @@ export default function Navbar() {
                 height={40}
                 className="mr-2"
               />
-            
+
             </Link>
           </div>
 
@@ -73,11 +73,17 @@ export default function Navbar() {
             >
               Price Estimator
             </Link>
-              <Link
+            <Link
               href="/track-order"
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
             >
-             Track Order
+              Track Order
+            </Link>
+            <Link
+              href="/campus-parcel"
+              className="campus-parcel-cta px-4 py-2 rounded-full text-sm font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg shadow-orange-500/40 transition-all hover:scale-105"
+            >
+              🎓 Campus Parcel
             </Link>
           </div>
 
@@ -150,7 +156,14 @@ export default function Navbar() {
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50"
               onClick={toggleMenu}
             >
-            Track Order
+              Track Order
+            </Link>
+            <Link
+              href="/campus-parcel"
+              className="campus-parcel-cta block px-4 py-2 rounded-full text-base font-bold text-white text-center bg-gradient-to-r from-orange-500 to-red-500 shadow-lg shadow-orange-500/40"
+              onClick={toggleMenu}
+            >
+              🎓 Campus Parcel
             </Link>
           </div>
         </div>
