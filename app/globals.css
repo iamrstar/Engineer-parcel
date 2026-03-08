@@ -108,3 +108,17 @@ body {
   width: max-content;
   animation: marquee 20s linear infinite;
 }
+
+/* Campus Parcel CTA glow animation */
+@keyframes ctaGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.4), 0 0 20px rgba(249, 115, 22, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(249, 115, 22, 0.6), 0 0 40px rgba(249, 115, 22, 0.3);
+  }
+}
+
+.campus-parcel-cta {
+  animation: ctaGlow 2s ease-in-out infinite;
+}
