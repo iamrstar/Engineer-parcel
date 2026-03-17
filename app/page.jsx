@@ -49,16 +49,16 @@ export default function Home() {
               {/* Tracking Search Bar */}
               <div className="relative max-w-md group mb-10">
                 <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-focus-within:duration-200"></div>
-                <div className="relative flex items-center bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                  <Search className="ml-4 w-5 h-5 text-gray-400" />
+                <div className="relative flex items-center bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden group-focus-within:border-orange-500 transition-colors">
+                  <Search className="ml-4 w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
                   <input
                     type="text"
-                    placeholder="Enter Tracking ID..."
+                    placeholder="ENTER TRACKING ID..."
                     value={trackingId}
-                    onChange={(e) => setTrackingId(e.target.value)}
-                    className="flex-1 h-16 px-4 bg-transparent outline-none text-gray-900 font-medium"
+                    onChange={(e) => setTrackingId(e.target.value.toUpperCase())}
+                    className="flex-1 h-16 px-4 bg-transparent outline-none text-gray-900 font-black uppercase tracking-widest placeholder:text-gray-300 placeholder:font-bold"
                   />
-                  <Button asChild className="mr-2 bg-orange-600 hover:bg-orange-700 h-12 px-6 rounded-lg">
+                  <Button asChild className="mr-2 bg-orange-600 hover:bg-orange-700 h-12 px-6 rounded-lg text-xs font-black uppercase tracking-widest">
                     <Link href={`/track-order?id=${trackingId}`}>Track</Link>
                   </Button>
                 </div>
