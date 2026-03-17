@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react"
 import {
     GraduationCap, Package, Plus, Minus, CreditCard, ArrowRight,
     CheckCircle, XCircle, MapPin, Phone, Mail, User, Calendar,
-    Truck, Shield, Clock, AlertTriangle, Sparkles, Box, Search
+    Truck, Shield, Clock, AlertTriangle, Sparkles, Box, Search, Check
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -636,52 +636,31 @@ export default function StudentMovePage() {
                                             />
                                         </div>
 
-                                        {/* Destination Pincode with auto-check */}
+                                        {/* Destination Pincode (Verified in Step 0, Read-only here) */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                                <MapPin className="w-4 h-4" /> Destination Pincode
+                                                <MapPin className="w-4 h-4 text-orange-600" /> Destination Pincode
                                             </Label>
                                             <div className="relative">
                                                 <Input
                                                     name="destPincode"
                                                     value={formData.destPincode}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter 6-digit pincode"
-                                                    maxLength={6}
-                                                    className={`h-12 border-2 pr-12 ${pincodeStatus === "serviceable"
-                                                        ? "border-green-500 focus:border-green-500"
-                                                        : pincodeStatus === "not-serviceable"
-                                                            ? "border-red-500 focus:border-red-500"
-                                                            : "focus:border-orange-500"
-                                                        }`}
+                                                    readOnly
+                                                    className="h-12 border-2 pr-12 bg-gray-50/80 cursor-not-allowed font-bold text-gray-600 border-green-500/30"
                                                 />
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                    {pincodeStatus === "checking" && (
-                                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-orange-500 border-t-transparent" />
-                                                    )}
-                                                    {pincodeStatus === "serviceable" && (
-                                                        <CheckCircle className="w-5 h-5 text-green-500" />
-                                                    )}
-                                                    {pincodeStatus === "not-serviceable" && (
-                                                        <XCircle className="w-5 h-5 text-red-500" />
-                                                    )}
+                                                    <div className="p-1 bg-green-500 rounded-full text-white">
+                                                        <Check className="w-3 h-3" />
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            {pincodeStatus === "serviceable" && (
-                                                <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
-                                                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                                                    <p className="text-sm text-green-800">
-                                                        <strong>Serviceable!</strong> — {formData.destCity}, {formData.destState}
-                                                    </p>
-                                                </div>
-                                            )}
-                                            {pincodeStatus === "not-serviceable" && (
-                                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
-                                                    <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-                                                    <p className="text-sm text-red-800">{pincodeError}</p>
-                                                </div>
-                                            )}
+                                            <div className="bg-green-50/50 border border-green-200/50 rounded-xl p-3 flex items-center gap-2">
+                                                <Sparkles className="w-4 h-4 text-green-600 flex-shrink-0" />
+                                                <p className="text-[11px] font-bold text-green-800 uppercase tracking-tight">
+                                                    Verified Serviceable Area — {formData.destCity}, {formData.destState}
+                                                </p>
+                                            </div>
                                         </div>
 
                                         {/* City & State (auto-filled, read-only) */}
