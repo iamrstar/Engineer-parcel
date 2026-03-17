@@ -1,287 +1,333 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Box, Clock, Globe, MapPin, Package, Truck } from "lucide-react"
-import { Button } from "@/components/ui/button"
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Box, Clock, Globe, MapPin, Package, Truck,
+  ArrowRight, CheckCircle2, Zap, Shield, Sparkles,
+  ZapIcon as Flash, IndianRupee, Map
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 }
+  }
+};
 
 export default function ServicesPage() {
   return (
-    <div>
-      {/* Hero Section  */}
-      <section className="bg-orange-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-4">Our Services</h1>
-          <p className="text-lg max-w-3xl mx-auto">
-            Comprehensive logistics solutions tailored to meet your shipping and moving needs
-          </p>
+    <div className="relative overflow-hidden bg-white min-h-screen">
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-orange-100/50 rounded-full blur-[120px] -translate-y-1/2"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-[120px]"></div>
+      </div>
+
+      {/* ══════════ HERO SECTION ══════════ */}
+      <section className="relative pt-24 pb-32 lg:pt-32 lg:pb-48">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-orange-600 text-xs font-black px-4 py-2 rounded-full mb-8 tracking-widest uppercase">
+              <Flash className="w-3 h-3 fill-current" />
+              Engineered Logistics Solutions
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8">
+              Precision Shipping. <br />
+              <span className="text-orange-600">Universal Coverage.</span>
+            </h1>
+            <p className="text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed">
+              From hyperlocal parcel drops to global supply chain management, we combine AI technology with physical precision to move your world.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Courier Service */}
-      <section id="courier" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Package className="h-8 w-8" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Courier Service</h2>
-              <p className="text-gray-600 mb-4">
-                Our courier service offers reliable and timely delivery of documents, packages, and parcels across
-                India. Whether it's important business documents or personal items, we ensure your shipments reach their
-                destination safely.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start">
-                  <Clock className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Express delivery options available</span>
-                </li>
-                <li className="flex items-start">
-                  <MapPin className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Coverage across 19,000+ pin codes in India</span>
-                </li>
-                <li className="flex items-start">
-                  <Package className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Secure packaging and handling</span>
-                </li>
-              </ul>
-              <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                <Link href="/booking">Book Courier Service</Link>
-              </Button>
-            </div>
-            <div className="md:w-1/2">
-              <Image
-                src="/main-service.jpg?height=400&width=600"
-                alt="Courier Service"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ══════════ MAIN SERVICES ══════════ */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-32 pb-32">
 
-      {/* Shifting and Moving */}
-      <section id="shifting" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row-reverse items-center gap-12">
-            <div className="md:w-1/2">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Truck className="h-8 w-8" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Shifting and Moving</h2>
-              <p className="text-gray-600 mb-4">
-                Our comprehensive shifting and moving services make relocation hassle-free. We handle everything from
-                packing your belongings to safely transporting them to your new location, whether you're moving your
-                home or office.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start">
-                  <Package className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Professional packing and unpacking services</span>
-                </li>
-                <li className="flex items-start">
-                  <Truck className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Safe transportation with specialized vehicles</span>
-                </li>
-                <li className="flex items-start">
-                  <MapPin className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Local and long-distance moving services</span>
-                </li>
-              </ul>
-              <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                <Link href="/get-quote">Book Shifting Service</Link>
-              </Button>
-            </div>
-            <div className="md:w-1/2">
-              <Image
-                src="/shifing.jpg?height=400&width=600"
-                alt="Shifting and Moving"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* 1. Courier Service */}
+        <ServiceSection
+          id="courier"
+          icon={<Package className="w-8 h-8" />}
+          title="National Courier"
+          subtitle="Fast, Safe, and Smarter."
+          desc="Our AI-driven courier network ensures your documents and packages are delivered across 19,000+ pin codes with unshakeable reliability."
+          features={[
+            "Express transit for critical shipments",
+            "End-to-end automated hub tracking",
+            "Smart routing via neural networks"
+          ]}
+          imgSrc="/main-service.jpg"
+          imgAlt="Professional Courier Service"
+          ctaLink="/booking"
+          ctaText="Book Courier Service"
+        />
 
-      {/* Local Parcel Service */}
-      <section id="local" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Box className="h-8 w-8" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Local Parcel Service</h2>
-              <p className="text-gray-600 mb-4">
-                Our local parcel service provides quick and efficient delivery within your city. Perfect for businesses
-                that need same-day deliveries or individuals sending gifts or documents locally.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start">
-                  <Clock className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Same-day and next-day delivery options</span>
-                </li>
-                <li className="flex items-start">
-                  <MapPin className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Available in major cities across India</span>
-                </li>
-                <li className="flex items-start">
-                  <Package className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Real-time tracking of your parcels</span>
-                </li>
-              </ul>
-              <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                <Link href="/booking">Book Local Delivery</Link>
-              </Button>
-            </div>
-            <div className="md:w-1/2">
-              <Image
-                src="/local-delivery.jpg?height=400&width=600"
-                alt="Local Parcel Service"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* 2. Shifting & Moving */}
+        <ServiceSection
+          id="shifting"
+          icon={<Truck className="w-8 h-8" />}
+          title="Packers & Movers"
+          subtitle="Relocating with IQ."
+          desc="Moving your home or office? Our AI Packers & Movers handle everything from automated space estimation to IoT-tracked transport."
+          features={[
+            "App-based furniture volume survey",
+            "High-security IoT barcode tracking",
+            "Specialized fragile item handling"
+          ]}
+          imgSrc="/shifing.jpg"
+          imgAlt="Shifting and Moving Service"
+          ctaLink="/get-quote"
+          ctaText="Get a Moving Quote"
+          reverse
+        />
 
-      {/* International Courier */}
-      <section id="international" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row-reverse items-center gap-12">
-            <div className="md:w-1/2">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Globe className="h-8 w-8" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">International Courier Service</h2>
-              <p className="text-gray-600 mb-4">
-                Our international courier service connects you to the world. We offer reliable and cost-effective
-                shipping solutions to destinations worldwide, with customs clearance assistance and package tracking.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start">
-                  <Globe className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Delivery to 200+ countries and territories</span>
-                </li>
-                <li className="flex items-start">
-                  <Package className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Customs documentation assistance</span>
-                </li>
-                <li className="flex items-start">
-                  <Clock className="h-5 w-5 text-orange-500 mr-2 mt-0.5" />
-                  <span className="text-gray-600">Express and economy shipping options</span>
-                </li>
-              </ul>
-              <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                <Link href="/booking">Book International Shipping</Link>
-              </Button>
-            </div>
-            <div className="md:w-1/2">
-              <Image
-                src="/service.jpg?height=400&width=600"
-                alt="International Courier"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* 3. Local Parcel Service */}
+        <ServiceSection
+          id="local"
+          icon={<Box className="w-8 h-8" />}
+          title="Hyperlocal Delivery"
+          subtitle="City speed, redefined."
+          desc="The fastest way to move items within your city. Perfect for gift drops, document exchanges, and business deliveries."
+          features={[
+            "Instant pickup via hostel/doorstep scans",
+            "Same-day delivery within 4 hours",
+            "Optimal grouping for low-carbon delivery"
+          ]}
+          imgSrc="/local-delivery.jpg"
+          imgAlt="Local Parcel Service"
+          ctaLink="/booking"
+          ctaText="Book Local Pickup"
+        />
 
-      {/* Service Rates */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Our Service Rates</h2>
-            <p className="mt-4 text-lg text-gray-600">Competitive pricing for all your shipping and moving needs</p>
+        {/* 4. International Service */}
+        <ServiceSection
+          id="international"
+          icon={<Globe className="w-8 h-8" />}
+          title="Global Shipping"
+          subtitle="Borders are just lines."
+          desc="Connect to 200+ countries with our cost-effective international shipping solutions. We handle the complexity, you ship the parcel."
+          features={[
+            "Pre-filled customs documentation",
+            "Specialized handling for exports",
+            "International door-to-door transit"
+          ]}
+          imgSrc="/service.jpg"
+          imgAlt="International Courier"
+          ctaLink="/booking"
+          ctaText="Ship Internationally"
+          reverse
+        />
+      </div>
+
+      {/* ══════════ PRICE RATES SECTION ══════════ */}
+      <section className="py-32 bg-gray-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-600 rounded-full blur-[150px]"></div>
+          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-blue-600 rounded-full blur-[150px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-24">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Transparency First</h2>
+              <p className="text-lg text-gray-400">Competitive, algorithmic pricing with zero hidden surprises.</p>
+            </motion.div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Local Delivery</h3>
-              <p className="text-3xl font-bold text-orange-600 mb-4">
-                ₹50<span className="text-sm text-gray-500 font-normal"> onwards</span>
-              </p>
-              <ul className="space-y-2 mb-6 text-gray-600">
-                <li>Within city limits</li>
-                <li>Up to 5kg weight</li>
-                <li>Same-day delivery</li>
-                <li>Real-time tracking</li>
-              </ul>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/booking">Book Now</Link>
-              </Button>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Domestic Courier</h3>
-              <p className="text-3xl font-bold text-orange-600 mb-4">
-                ₹100<span className="text-sm text-gray-500 font-normal"> onwards</span>
-              </p>
-              <ul className="space-y-2 mb-6 text-gray-600">
-                <li>Pan-India delivery</li>
-                <li>Up to 10kg weight</li>
-                <li>2-3 days delivery</li>
-                <li>Insurance included</li>
-              </ul>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/booking">Book Now</Link>
-              </Button>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Home Shifting</h3>
-              <p className="text-3xl font-bold text-orange-600 mb-4">
-                ₹5,000<span className="text-sm text-gray-500 font-normal"> onwards</span>
-              </p>
-              <ul className="space-y-2 mb-6 text-gray-600">
-                <li>Professional packing</li>
-                <li>Loading & unloading</li>
-                <li>Transportation</li>
-                <li>Insurance coverage</li>
-              </ul>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/booking">Get Quote</Link>
-              </Button>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">International</h3>
-              <p className="text-3xl font-bold text-orange-600 mb-4">
-                ₹1,500<span className="text-sm text-gray-500 font-normal"> onwards</span>
-              </p>
-              <ul className="space-y-2 mb-6 text-gray-600">
-                <li>Worldwide shipping</li>
-                <li>Customs clearance</li>
-                <li>5-7 days delivery</li>
-                <li>Package tracking</li>
-              </ul>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/booking">Book Now</Link>
-              </Button>
-            </div>
+            <PricingCard
+              title="Local Pickup"
+              price="50"
+              features={["Within city limits", "Up to 5kg weight", "4-hour delivery", "Real-time tracking"]}
+              color="orange"
+              delay={0.1}
+            />
+            <PricingCard
+              title="Domestic Express"
+              price="100"
+              features={["Pan-India delivery", "Up to 10kg weight", "2-3 days transit", "Insurance included"]}
+              color="blue"
+              delay={0.2}
+            />
+            <PricingCard
+              title="Home Shifting"
+              price="4,999"
+              features={["Full packing/unpacking", "Loading/Unloading", "Transit insurance", "Dedicated manager"]}
+              color="purple"
+              delay={0.3}
+            />
+            <PricingCard
+              title="International"
+              price="1,499"
+              features={["Worldwide coverage", "Customs support", "Door-to-door shipping", "Global tracking"]}
+              color="teal"
+              delay={0.4}
+            />
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-orange-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Need a Custom Solution?</h2>
-          <p className="text-lg mb-8 max-w-3xl mx-auto">
-            Contact our team for personalized logistics solutions tailored to your specific requirements.
-          </p>
-          <Button asChild className="bg-white text-orange-600 hover:bg-gray-100">
-            <Link href="/contact">Contact Us</Link>
-          </Button>
+      {/* ══════════ FINAL CTA ══════════ */}
+      <section className="py-32 bg-white text-center">
+        <div className="max-w-5xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="bg-orange-600 rounded-[60px] p-12 md:p-24 text-white shadow-2xl shadow-orange-600/20 relative overflow-hidden"
+          >
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-orange-400/20 rounded-full blur-3xl"></div>
+
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">Need a customized <br /> enterprise solution?</h2>
+              <p className="text-xl text-orange-50 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Our engineers work with businesses to design custom logistics pipelines. Let’s talk about your requirements.
+              </p>
+              <div className="flex flex-wrap justify-center gap-6">
+                <Button asChild className="bg-white text-orange-600 hover:bg-orange-50 h-16 px-12 text-xl font-black rounded-2xl transition-all shadow-xl hover:scale-105 active:scale-95">
+                  <Link href="/contact">Consult an Engineer</Link>
+                </Button>
+                <Button asChild variant="ghost" className="text-white border-2 border-white/30 hover:border-white hover:bg-white/10 h-16 px-12 text-xl font-black rounded-2xl transition-all hover:scale-105 active:scale-95">
+                  <Link href="/price-estimator">Get Custom Quote</Link>
+                </Button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>
-  )
+  );
+}
+
+/* ══════════ REUSABLE COMPONENTS ══════════ */
+
+function ServiceSection({ id, icon, title, subtitle, desc, features, imgSrc, imgAlt, ctaLink, ctaText, reverse = false }) {
+  return (
+    <section id={id} className="relative">
+      <div className={`flex flex-col ${reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-16 lg:gap-24`}>
+        <motion.div
+          initial={{ opacity: 0, x: reverse ? 50 : -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="flex-1 space-y-8"
+        >
+          <div className="inline-flex items-center gap-3">
+            <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shadow-lg shadow-orange-100/50">
+              {icon}
+            </div>
+            <div>
+              <p className="text-orange-600 font-black text-xs tracking-widest uppercase">{subtitle}</p>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900">{title}</h2>
+            </div>
+          </div>
+
+          <p className="text-lg text-gray-500 leading-relaxed italic border-l-4 border-gray-100 pl-6">
+            "{desc}"
+          </p>
+
+          <ul className="space-y-4">
+            {features.map((feature, idx) => (
+              <li key={idx} className="flex items-center gap-3 text-gray-700 font-bold group">
+                <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="pt-4">
+            <Button asChild className="bg-orange-600 hover:bg-orange-700 h-14 px-10 text-lg font-black rounded-xl transition-all shadow-xl shadow-orange-600/20 active:scale-95">
+              <Link href={ctaLink} className="flex items-center gap-2">
+                {ctaText} <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="flex-1 relative group"
+        >
+          <div className="absolute -inset-4 bg-orange-600/10 rounded-[4rem] blur-3xl group-hover:bg-orange-600/20 transition-all duration-700"></div>
+          <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3]">
+            <Image
+              src={imgSrc}
+              alt={imgAlt}
+              fill
+              className="object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function PricingCard({ title, price, features, color, delay }) {
+  const colorClasses = {
+    orange: "text-orange-500 bg-orange-500 shadow-orange-500/20",
+    blue: "text-blue-500 bg-blue-500 shadow-blue-500/20",
+    purple: "text-purple-500 bg-purple-500 shadow-purple-500/20",
+    teal: "text-teal-500 bg-teal-500 shadow-teal-500/20",
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay, duration: 0.5 }}
+      className="glass-dark border border-white/5 p-8 rounded-[40px] hover:border-white/10 transition-all group"
+    >
+      <h3 className="text-xl font-black text-white mb-4 group-hover:text-orange-500 transition-colors">{title}</h3>
+      <div className="flex items-baseline gap-1 mb-8">
+        <span className="text-white font-black text-4xl leading-none">₹{price}</span>
+        <span className="text-gray-500 text-sm italic">onwards</span>
+      </div>
+
+      <ul className="space-y-4 mb-8">
+        {features.map((f, i) => (
+          <li key={i} className="flex items-center gap-3 text-gray-400 text-sm">
+            <div className={`w-1.5 h-1.5 rounded-full ${colorClasses[color].split(' ')[1]}`}></div>
+            {f}
+          </li>
+        ))}
+      </ul>
+
+      <Button asChild className={`w-full h-12 rounded-2xl font-black text-white ${colorClasses[color].split(' ')[1]} hover:scale-105 active:scale-95 transition-all shadow-xl`}>
+        <Link href="/booking">Select Plan</Link>
+      </Button>
+    </motion.div>
+  );
 }
