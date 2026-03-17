@@ -1,11 +1,11 @@
-"use client" 
+"use client"
 
 import { useState, useEffect } from "react"
 import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Package, Truck, Building2, MapPin, CheckCircle2, Check, Search } from "lucide-react"
+import { Package, Truck, Building2, MapPin, CheckCircle2, Check, Search, ArrowLeft, ArrowRight, Clock, ShieldCheck } from "lucide-react"
 
 const PRIMARY = "#eb5a0c"
 const API = process.env.NEXT_PUBLIC_API_URL
@@ -58,7 +58,13 @@ const safeDate = (d) => {
 
 const fmtDate = (d) => {
   const dt = safeDate(d)
-  return dt ? dt.toLocaleString() : "-"
+  return dt ? dt.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }) : "-"
 }
 
 const normalizeBooking = (b = {}) => {
@@ -82,7 +88,7 @@ const normalizeBooking = (b = {}) => {
 
 // ===== UI Components =====
 const Segmented = ({ value, onChange, options }) => (
-  <div className="inline-flex rounded-lg border overflow-hidden w-full sm:w-auto">
+  <div className="inline-flex rounded-2xl bg-gray-100 p-1 w-full sm:w-auto mb-6">
     {options.map((opt) => {
       const active = value === opt.value
       return (
@@ -90,10 +96,8 @@ const Segmented = ({ value, onChange, options }) => (
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-medium transition-colors ${
-            active ? "text-white" : "bg-white text-gray-700 hover:bg-gray-50"
-          }`}
-          style={{ backgroundColor: active ? PRIMARY : undefined }}
+          className={`flex-1 sm:flex-none px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${active ? "bg-white text-orange-600 shadow-lg" : "text-gray-500 hover:text-gray-700"
+            }`}
         >
           {opt.label}
         </button>
@@ -102,59 +106,79 @@ const Segmented = ({ value, onChange, options }) => (
   </div>
 )
 
-const SummaryChip = ({ label, value }) => (
-  <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
-    <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</div>
-    <div className="text-sm font-semibold text-gray-900">{value}</div>
+const SummaryChip = ({ label, value, icon: Icon }) => (
+  <div className="rounded-[2rem] border-2 border-gray-50 bg-white/50 backdrop-blur-md px-6 py-5 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:border-orange-100 transition-all duration-300">
+    <div className="absolute top-0 right-0 w-16 h-16 bg-orange-50 rounded-full blur-2xl -mr-8 -mt-8 group-hover:bg-orange-100 transition-colors" />
+    <div className="flex items-center gap-4 relative z-10">
+      <div className="p-3 bg-gray-100 rounded-2xl group-hover:bg-orange-100 transition-colors">
+        <Icon className="h-5 w-5 text-gray-500 group-hover:text-orange-600" />
+      </div>
+      <div>
+        <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">{label}</div>
+        <div className="text-sm font-black text-gray-900 leading-tight">{value}</div>
+      </div>
+    </div>
   </div>
 )
 
 function StatusTable({ rows = [] }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-[2.5rem] bg-white shadow-2xl shadow-gray-200/50 overflow-hidden border border-gray-50">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200" style={{ backgroundColor: PRIMARY }}>
-        <h3 className="text-center font-semibold text-white">Tracking History</h3>
+      <div className="px-8 py-6 bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-between">
+        <h3 className="font-black text-white uppercase tracking-widest text-sm flex items-center gap-3">
+          <Clock className="h-5 w-5 text-orange-500" /> Full Tracking History
+        </h3>
+        <span className="bg-orange-500/10 text-orange-500 text-[10px] font-black px-3 py-1 rounded-full border border-orange-500/20 uppercase">
+          {rows.length} Updates
+        </span>
       </div>
 
       {/* Timeline */}
-      <div className="p-4 sm:p-6">
+      <div className="p-8 sm:p-10">
         {rows.length ? (
-          <div className="space-y-6">
+          <div className="space-y-10">
             {rows.map((r, i) => {
               const isDelivered = r.status?.toLowerCase().includes("delivered")
-              const lineColor = isDelivered ? "bg-green-500" : "bg-orange-500"
-              const dotColor = isDelivered ? "border-green-500 bg-green-50" : "border-orange-500 bg-orange-50"
-              const iconColor = isDelivered ? "text-green-600" : "text-orange-600"
+              const isLast = i === rows.length - 1
+              const iconStyle = isDelivered
+                ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
+                : i === 0
+                  ? "bg-orange-600 text-white shadow-lg shadow-orange-600/30"
+                  : "bg-gray-100 text-gray-400"
 
               return (
-                <div key={i} className="relative flex gap-4">
+                <div key={i} className="relative flex gap-6">
                   {/* Vertical line */}
-                  {i !== rows.length - 1 && (
-                    <div className={`absolute left-4 top-10 bottom-0 w-0.5 ${lineColor}`} />
+                  {!isLast && (
+                    <div className="absolute left-5 top-12 bottom-0 w-0.5 bg-gray-100" />
                   )}
 
                   {/* Icon circle */}
-                  <div className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full border-2 ${dotColor} flex items-center justify-center`}>
-                    <Check className={`h-4 w-4 ${iconColor}`} />
+                  <div className={`relative z-10 flex-shrink-0 w-10 h-10 rounded-2xl ${iconStyle} flex items-center justify-center transition-all duration-500 transform hover:rotate-6`}>
+                    {isDelivered ? <CheckCircle2 className="h-5 w-5" /> : <Package className="h-5 w-5" />}
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 pb-2">
-                    <span className={`inline-block px-2.5 py-1 text-xs font-semibold rounded-full ${
-                      isDelivered ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
-                    }`}>
-                      {r.status || "-"}
-                    </span>
+                  <div className="flex-1 pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                      <span className={`inline-block px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl ${isDelivered ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+                        }`}>
+                        {r.status || "-"}
+                      </span>
+                      <span className="text-[11px] font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-lg border border-gray-100/50">
+                        {fmtDate(r.date)}
+                      </span>
+                    </div>
 
-                    <div className="mt-2 space-y-1">
-                      <div className="text-sm text-gray-700">
-                        <span className="font-semibold">Event:</span> {r.event || "-"}
+                    <div className="p-5 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-orange-200 transition-all duration-300">
+                      <div className="text-sm font-bold text-gray-800 leading-relaxed">
+                        {r.event || "-"}
                       </div>
-                      <div className="text-sm text-gray-600">
-                        <span className="font-semibold">Location:</span> {r.location || "-"}
+                      <div className="flex items-center gap-1.5 mt-3 text-gray-500">
+                        <MapPin className="h-3 w-3 text-orange-400" />
+                        <span className="text-xs font-black uppercase tracking-widest leading-none">{r.location || "-"}</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{fmtDate(r.date)}</div>
                     </div>
                   </div>
                 </div>
@@ -162,8 +186,12 @@ function StatusTable({ rows = [] }) {
             })}
           </div>
         ) : (
-          <div className="text-sm text-gray-500 text-center py-8">
-            No tracking updates yet
+          <div className="text-center py-20 bg-gray-50/50 rounded-[2rem] border-2 border-dashed border-gray-100">
+            <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100 shadow-sm">
+              <ShieldCheck className="h-10 w-10 text-gray-200" />
+            </div>
+            <h3 className="text-xl font-black text-gray-900">Awaiting Updates</h3>
+            <p className="text-gray-400 font-medium max-w-xs mx-auto mt-2">No tracking updates recorded for this parcel yet.</p>
           </div>
         )}
       </div>
@@ -172,18 +200,9 @@ function StatusTable({ rows = [] }) {
 }
 
 const Stepper = ({ current = "IN_TRANSIT", dates = {} }) => {
-  const [isLarge, setIsLarge] = useState(false)
-  
-  useEffect(() => {
-    const handleResize = () => setIsLarge(window.innerWidth >= 1024)
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
   const steps = [
     { key: "CONFIRMED", label: "BOOKED", icon: Package },
-    { key: "IN_TRANSIT", label: "IN TRANSIT", icon: Truck },
+    { key: "IN_TRANSIT", label: "TRANSIT", icon: Truck },
     { key: "ARRIVED_AT_DESTINATION", label: "ARRIVED", icon: Building2 },
     { key: "OUT_FOR_DELIVERY", label: "OUT FOR DELIVERY", icon: MapPin },
     { key: "DELIVERED", label: "DELIVERED", icon: CheckCircle2 },
@@ -191,74 +210,60 @@ const Stepper = ({ current = "IN_TRANSIT", dates = {} }) => {
 
   const idx = Math.max(0, steps.findIndex((s) => s.key === current))
 
-  if (isLarge) {
-    return (
-      <div className="w-full py-8">
-        <div className="flex justify-between items-center relative px-2">
-          {/* Progress line */}
-          <div className="absolute left-0 right-0 top-6 h-1 bg-gray-200 rounded-full" />
-          <div 
-            className="absolute left-0 top-6 h-1 rounded-full transition-all duration-500"
-            style={{ 
-              backgroundColor: PRIMARY,
-              width: `${(idx / (steps.length - 1)) * 100}%`
-            }}
-          />
-          
-          {steps.map((s, i) => (
-            <div key={s.key} className="relative z-10 flex flex-col items-center" style={{ width: `${100 / steps.length}%` }}>
-              <div 
-                className={`h-12 w-12 rounded-full flex items-center justify-center border-2 shadow-md transition-all duration-300 ${
-                  i <= idx ? "text-white border-transparent" : "text-gray-400 border-gray-300 bg-white"
-                }`}
-                style={{ backgroundColor: i <= idx ? PRIMARY : undefined }}
-              >
-                <s.icon className="h-5 w-5" />
-              </div>
-              <span className="mt-3 text-xs font-semibold text-center text-gray-700 max-w-[80px]">
-                {s.label}
-              </span>
-              {dates[s.key] && (
-                <span className="text-[10px] text-gray-500 mt-1">
-                  {fmtDate(dates[s.key])}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="py-4">
-      <ol className="space-y-4">
-        {steps.map((s, i) => (
-          <li key={s.key} className="relative flex items-start gap-3">
-            {i !== steps.length - 1 && (
-              <div 
-                className={`absolute left-4 top-10 bottom-0 w-0.5 ${
-                  i < idx ? "bg-orange-500" : "bg-gray-200"
-                }`}
-              />
-            )}
-            <span 
-              className={`relative z-10 h-9 w-9 flex-shrink-0 rounded-full border-2 flex items-center justify-center shadow-sm transition-all ${
-                i <= idx ? "text-white border-transparent" : "text-gray-400 border-gray-300 bg-white"
-              }`}
-              style={{ backgroundColor: i <= idx ? PRIMARY : undefined }}
-            >
-              <s.icon className="h-5 w-5" />
-            </span>
-            <div className="flex-1 min-w-0 pt-1">
-              <div className="text-sm font-semibold text-gray-900">{s.label}</div>
+    <div className="w-full py-12">
+      <div className="flex justify-between items-center relative">
+        {/* Background Line */}
+        <div className="absolute left-[20px] right-[20px] top-[24px] h-1.5 bg-gray-100 rounded-full" />
+
+        {/* Progress Line */}
+        <div
+          className="absolute left-[20px] top-[24px] h-1.5 rounded-full transition-all duration-1000 ease-in-out shadow-lg"
+          style={{
+            backgroundColor: PRIMARY,
+            width: `calc(${(idx / (steps.length - 1)) * 100}% - 40px)`,
+            boxShadow: `0 0 15px ${PRIMARY}40`
+          }}
+        />
+
+        {steps.map((s, i) => {
+          const isActive = i <= idx
+          const isCurrent = i === idx
+          return (
+            <div key={s.key} className="relative z-10 flex flex-col items-center flex-1">
+              <div
+                className={`h-12 w-12 rounded-2xl flex items-center justify-center border-4 shadow-2xl transition-all duration-500 transform ${isActive
+                    ? "text-white scale-110 rotate-3"
+                    : "text-gray-400 border-white bg-gray-50 scale-90"
+                  }`}
+                style={{
+                  backgroundColor: isActive ? PRIMARY : undefined,
+                  borderColor: i < idx ? PRIMARY : 'white',
+                  animation: isCurrent ? 'pulse-orange 2s infinite' : 'none'
+                }}
+              >
+                <s.icon className={`h-5 w-5 ${isCurrent ? 'animate-bounce' : ''}`} />
+              </div>
+              <div className={`mt-4 text-[10px] font-black tracking-[0.15em] uppercase text-center transition-colors duration-300 ${isActive ? "text-orange-600" : "text-gray-400"
+                }`}>
+                {s.label}
+              </div>
               {dates[s.key] && (
-                <div className="text-xs text-gray-500 mt-1">{fmtDate(dates[s.key])}</div>
+                <div className="mt-1.5 px-2 py-0.5 bg-gray-100 rounded text-[9px] font-bold text-gray-500 whitespace-nowrap">
+                  {new Date(dates[s.key]).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                </div>
               )}
             </div>
-          </li>
-        ))}
-      </ol>
+          )
+        })}
+      </div>
+      <style jsx>{`
+            @keyframes pulse-orange {
+                0% { box-shadow: 0 0 0 0 rgba(235, 90, 12, 0.4); }
+                70% { box-shadow: 0 0 0 10px rgba(235, 90, 12, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(235, 90, 12, 0); }
+            }
+        `}</style>
     </div>
   )
 }
@@ -333,91 +338,99 @@ export default function TrackPage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-gray-50">
-      <div className="w-full max-w-5xl mx-auto px-4 py-6 sm:py-8">
-        {/* Header */}
-        <section className="text-center mb-8 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg shadow-lg p-6 sm:p-8 text-white">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Track Your Order</h1>
-          <p className="text-sm sm:text-base opacity-90 max-w-2xl mx-auto">
-            Enter your tracking ID or mobile number to check parcel status and delivery info
+    <main className="min-h-screen w-full bg-gray-50 pb-20">
+      <div className="w-full max-w-5xl mx-auto px-4 py-12 sm:py-16">
+        {/* Hero Section */}
+        <section className="text-center mb-12 relative">
+          <div className="inline-block px-4 py-1.5 rounded-full bg-orange-100 text-orange-600 text-[10px] font-black uppercase tracking-[0.2em] mb-6 animate-pulse">
+            Real-Time Monitoring
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-black text-gray-900 tracking-tight leading-none mb-4">
+            Track Your <span className="text-orange-600">Parcel</span>
+          </h1>
+          <p className="text-base sm:text-lg text-gray-500 font-medium max-w-xl mx-auto leading-relaxed">
+            Get comprehensive updates on your shipment's journey from pickup to doorstep.
           </p>
         </section>
 
         {/* Form */}
         {step === "form" && (
-          <Card className="shadow-lg border-gray-200">
-            <CardContent className="p-4 sm:p-6 space-y-4">
-              <Segmented 
-                value={mode} 
+          <Card className="border-none shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white/70 backdrop-blur-xl transition-all duration-500 hover:shadow-[0_48px_80px_-16px_rgba(0,0,0,0.12)]">
+            <CardContent className="p-10 sm:p-14 text-center">
+              <Segmented
+                value={mode}
                 onChange={(v) => { setMode(v); setStep("form") }}
                 options={[
-                  { value: "id", label: "Tracking ID" }, 
+                  { value: "id", label: "Tracking ID" },
                   { value: "phone", label: "Mobile Number" }
-                ]} 
+                ]}
               />
-              <div className="flex gap-2">
-                <Input
-                  className="flex-1 border-gray-300 focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
-                  value={mode === "id" ? bookingId : phone}
-                  onChange={(e) => mode === "id" ? setBookingId(e.target.value.toUpperCase()) : setPhone(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && onTrack()}
-                  placeholder={mode === "id" ? "Enter Tracking ID" : "Enter Mobile Number"}
-                />
+              <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+                <div className="flex-1 relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-600 bg-orange-50 p-2 rounded-xl group-focus-within:bg-orange-600 group-focus-within:text-white transition-all duration-300">
+                    <Search className="h-4 w-4" />
+                  </div>
+                  <Input
+                    className="h-16 pl-16 rounded-2xl border-gray-100 bg-gray-50/50 text-lg font-bold placeholder:text-gray-300 focus:bg-white focus:border-orange-500 transition-all duration-300"
+                    value={mode === "id" ? bookingId : phone}
+                    onChange={(e) => mode === "id" ? setBookingId(e.target.value.toUpperCase()) : setPhone(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && onTrack()}
+                    placeholder={mode === "id" ? "EP123456" : "9876543210"}
+                  />
+                </div>
                 <Button
-                  className="text-white px-6 hover:opacity-90 transition-opacity"
-                  style={{ backgroundColor: PRIMARY }}
+                  className="h-16 px-10 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-black uppercase tracking-widest shadow-2xl shadow-orange-600/30 transition-all active:scale-95 disabled:opacity-50"
                   onClick={onTrack}
                   disabled={isValidating || (mode === "id" ? bookingId.length < 4 : phone.length < 10)}
                 >
-                  {isValidating ? (mode === "id" ? "Tracking..." : "Sending...") : (
-                    mode === "id" ? (
-                      <>
-                        Track <Search className="ml-2 h-4 w-4" />
-                      </>
-                    ) : "Get OTP"
-                  )}
+                  {isValidating ? "Loading..." : "Track Now"}
                 </Button>
               </div>
+              <p className="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                Safe & Secure Tracking • 24/7 Updates
+              </p>
             </CardContent>
           </Card>
         )}
 
         {/* OTP */}
         {step === "otp" && (
-          <Card className="shadow-lg border-gray-200">
-            <CardContent className="p-4 sm:p-6 space-y-4">
-              <div className="text-sm font-medium text-gray-700">
-                OTP sent to <span className="font-semibold">{phone}</span>. Please enter below:
+          <Card className="border-none shadow-2xl rounded-[3rem] max-w-md mx-auto overflow-hidden bg-white/80 backdrop-blur-xl">
+            <CardContent className="p-10 space-y-8 text-center">
+              <div>
+                <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                  <ShieldCheck className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 mb-2">Verify Identity</h3>
+                <p className="text-sm text-gray-500 font-medium">
+                  We've sent a code to <span className="text-orange-600 font-bold">{phone}</span>
+                </p>
               </div>
-              <Input 
-                value={otp} 
-                onChange={(e) => setOtp(e.target.value)} 
-                placeholder="Enter OTP"
-                className="border-gray-300 focus:ring-2 focus:ring-orange-400"
+
+              <Input
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter 4-digit OTP"
+                className="h-16 text-center text-3xl font-black tracking-[0.5em] rounded-2xl border-gray-100 bg-gray-50/50"
               />
-              <div className="flex justify-between items-center text-sm">
+
+              <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest">
                 {resendTimer > 0 ? (
-                  <span className="text-gray-500">Resend OTP in {resendTimer}s</span>
+                  <span className="text-gray-400">Resend in {resendTimer}s</span>
                 ) : (
-                  <button 
-                    className="font-medium hover:underline"
-                    style={{ color: PRIMARY }}
-                    onClick={onResendOtp}
-                  >
-                    Resend OTP
-                  </button>
+                  <button className="text-orange-600 hover:underline" onClick={onResendOtp}>Resend Now</button>
                 )}
               </div>
-              <div className="flex gap-3 pt-2">
-                <Button variant="outline" onClick={onBack} className="flex-1">
-                  ← Back
+
+              <div className="flex gap-3">
+                <Button variant="ghost" onClick={onBack} className="flex-1 h-14 rounded-xl font-bold text-gray-500 capitalize">
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Cancel
                 </Button>
-                <Button 
-                  className="flex-1 text-white hover:opacity-90"
-                  style={{ backgroundColor: PRIMARY }}
+                <Button
+                  className="flex-[2] h-14 rounded-2xl bg-orange-600 text-white font-black uppercase tracking-widest shadow-xl shadow-orange-600/20"
                   onClick={onVerifyOtp}
                 >
-                  Verify & Track
+                  Confirm <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -426,50 +439,66 @@ export default function TrackPage() {
 
         {/* Results */}
         {step === "result" && !error && bookings.length > 0 && (
-          <div className="space-y-6">
-            <Button variant="outline" onClick={onBack} className="shadow-sm">
-              ← Back to Search
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <Button
+              variant="ghost"
+              onClick={onBack}
+              className="hover:bg-orange-50 text-orange-600 font-black uppercase tracking-widest text-[11px] rounded-xl px-4 py-2"
+            >
+              <ArrowLeft className="mr-2 h-3 w-3" /> Search Another
             </Button>
-            
+
             {isValidating && (
-              <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: PRIMARY }}></div>
-                <p className="mt-2 text-gray-600">Loading tracking information...</p>
+              <div className="text-center py-20 bg-white rounded-[3rem] shadow-xl">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-100 border-t-orange-600"></div>
+                <p className="mt-4 text-gray-400 font-black uppercase tracking-widest text-xs">Syncing status...</p>
               </div>
             )}
-            
+
             {!isValidating && bookings.map((b, idx) => (
-              <Card key={idx} className="shadow-lg border-gray-200 overflow-hidden">
-                <CardContent className="p-0">
-                  {/* Summary Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 sm:p-6 bg-gray-50">
-                    <SummaryChip label="Waybill Number" value={b.waybill} />
-                    <SummaryChip label="Origin" value={b.origin} />
-                    <SummaryChip label="Destination" value={b.destination} />
-                    <SummaryChip label="Estimated Delivery" value={b.etd} />
-                  </div>
-                  
-                  {/* Stepper */}
-                  <div className="px-4 sm:px-6 bg-white">
-                    <Stepper current={b.currentStatus} dates={datesByStep(b)} />
-                  </div>
-                  
-                  {/* History */}
-                  <div className="p-4 sm:p-6 bg-gray-50">
-                    <StatusTable rows={b.history} />
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={idx} className="space-y-8">
+                {/* Visual Status Container */}
+                <Card className="border-none shadow-2xl rounded-[3rem] overflow-hidden bg-white relative">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -mr-32 -mt-32" />
+                  <CardContent className="p-0 relative z-10">
+                    {/* Summary Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-8 sm:p-10 bg-gray-50/50">
+                      <SummaryChip label="Waybill" value={b.waybill} icon={Package} />
+                      <SummaryChip label="Origin" value={b.origin} icon={MapPin} />
+                      <SummaryChip label="Destination" value={b.destination} icon={ArrowRight} />
+                      <SummaryChip label="Estimated" value={b.etd} icon={Clock} />
+                    </div>
+
+                    {/* Stepper Container */}
+                    <div className="px-8 sm:px-14 py-4">
+                      <Stepper current={b.currentStatus} dates={datesByStep(b)} />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* History */}
+                <StatusTable rows={b.history} />
+              </div>
             ))}
           </div>
         )}
 
         {step === "result" && error && (
-          <Card className="shadow-lg border-red-200">
-            <CardContent className="p-6 text-center">
-              <div className="text-red-600 font-medium mb-2">No results found</div>
-              <p className="text-sm text-gray-600 mb-4">Try a different tracking ID or mobile number</p>
-              <Button variant="outline" onClick={onBack}>← Back to Search</Button>
+          <Card className="border-none shadow-2xl rounded-[3rem] py-16 text-center max-w-2xl mx-auto bg-white">
+            <CardContent className="space-y-6">
+              <div className="w-20 h-20 bg-red-50 text-red-500 rounded-[2rem] flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="h-10 w-10 font-bold" />
+              </div>
+              <div>
+                <h3 className="text-3xl font-black text-gray-900 mb-2">Tracking Failed</h3>
+                <p className="text-gray-500 font-medium">We couldn't find any parcel matching your search details.</p>
+              </div>
+              <Button
+                onClick={onBack}
+                className="bg-gray-900 text-white rounded-2xl h-14 px-10 font-black uppercase tracking-widest hover:bg-gray-800 transition-all"
+              >
+                Try Again
+              </Button>
             </CardContent>
           </Card>
         )}
@@ -478,3 +507,23 @@ export default function TrackPage() {
   )
 }
 
+function AlertCircle(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" x2="12" y1="8" y2="12" />
+      <line x1="12" x2="12.01" y1="16" y2="16" />
+    </svg>
+  )
+}
