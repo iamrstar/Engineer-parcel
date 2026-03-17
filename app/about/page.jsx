@@ -1,483 +1,452 @@
+"use client";
+
 import Image from "next/image";
-import { Award, Clock, Shield, Truck, Users,MessageCircle,IndianRupee,BrainCircuit,ChartCandlestick,Cpu,QrCode,Cog} from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Award, Clock, Shield, Truck, Users, MessageCircle,
+  IndianRupee, BrainCircuit, ChartCandlestick, Cpu,
+  QrCode, Cog, ArrowRight, Star, Zap, Globe, Package
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
 
 export default function AboutPage() {
-  return ( 
-    <div> 
-      {/* Hero Section */}
-      <section className="bg-orange-600 text-white py-16">  
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-4">About EngineersParcel</h1>
-          <p className="text-lg max-w-3xl mx-auto">
-         We are set to transform India’s logistics landscape by leveraging a powerful combination of next-generation technologies—AI, Blockchain, and IoT.
-            Our vision is to build a smarter, more transparent, and highly efficient courier and logistics platform designed for the future, 
-            while providing safe, secure, and assured logistics support to diverse industries with critical delivery needs.
-          </p>
+  return (
+    <div className="relative overflow-hidden bg-white">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-orange-100/50 rounded-full blur-[120px] -translate-y-1/2"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-[120px]"></div>
+      </div>
+
+      {/* ══════════ HERO SECTION ══════════ */}
+      <section className="relative pt-24 pb-32 lg:pt-32 lg:pb-48">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-orange-600 text-xs font-bold px-4 py-2 rounded-full mb-8">
+              <Zap className="w-3 h-3 fill-current" />
+              ESTABLISHED BY IIT(ISM) & CSIR
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8">
+              We’re Building the <br />
+              <span className="text-orange-600">Future of Logistics.</span>
+            </h1>
+            <p className="text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed mb-12">
+              EngineersParcel is transforming India's logistics landscape with cutting-edge AI and IoT technology. We're creating a smarter, safer, and more transparent delivery ecosystem.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100">
+                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600">
+                  <Package className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Total Volume</p>
+                  <p className="text-xl font-black text-gray-900">7,000kg+</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Pincodes</p>
+                  <p className="text-xl font-black text-gray-900">19,000+</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Our Story */}
-      <section className="py-16">
+      {/* ══════════ OUR STORY ══════════ */}
+      <section className="py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Our Story
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
+                A Tech-First <br />
+                <span className="text-orange-600">Origin Story.</span>
               </h2>
-              <p className="text-gray-600 mb-4">
-                Engineers parcel start-up was started by IIT(ISM) Dhanbad and
-                CSIR students in the middle of the pandemic (Covid-19) due to
-                the strong demand for a secure, safe, and hygienic courier
-                service. Engineers Parcel has served students and efficiently
-                distributed over 7000kg parcels around the country, positioning
-                the firm to become one of the country's leading technologies on
-                demand super-local delivery services providers.
-              </p>
-              <p className="text-gray-600 mb-4">
-                We identified significant gaps in the existing parcel delivery
-                services, particularly in tier-2 and tier-3 cities. Our founders
-                combined their technical expertise and business acumen to create
-                a logistics solution that is reliable, transparent, and
-                customer-centric.
-              </p>
-              <p className="text-gray-600">
-                Today, EngineersParcel has grown to serve thousands of customers
-                across India and internationally, with a strong focus on
-                leveraging technology to enhance the delivery experience.
-              </p>
-            </div>
-            <div className="md:w-1/2">
-              <Image
-                src="/our-story.jpg?height=400&width=600"
-                alt="EngineersParcel Team"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
-            </div>
+              <div className="space-y-6">
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  Engineers Parcel was born in the middle of the pandemic at <span className="font-bold text-gray-900">IIT(ISM) Dhanbad</span>. We saw the critical need for secure, hygienic, and highly-trackable logistics during a global crisis.
+                </p>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  What started as a campus solution has rapidly scaled into a national mission. We identified massive gaps in Tier-2 and Tier-3 cities and filled them with technical excellence and customer-centric design.
+                </p>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  Today, we're not just moving boxes; we're moving the needle on how India perceives delivery quality.
+                </p>
+              </div>
+
+              <div className="mt-12 flex items-center gap-6">
+                <div className="h-1 bg-gray-100 flex-1 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-600 w-3/4"></div>
+                </div>
+                <p className="text-gray-900 font-black text-lg italic">"Innovation at speed."</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative group"
+            >
+              <div className="absolute -inset-4 bg-orange-600/20 rounded-[4rem] blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+              <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
+                <Image
+                  src="/our-story.jpg"
+                  alt="EngineersParcel Team"
+                  width={800}
+                  height={600}
+                  className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-transparent"></div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Our Values */}
-      <section className="py-16 bg-gray-50">
+      {/* ══════════ CORE VALUES ══════════ */}
+      <section className="py-32 relative bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Our Core Values
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              The principles that guide everything we do
-            </p>
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">Our DNA</h2>
+              <p className="text-lg text-gray-500 leading-relaxed">
+                The principles that guide every AI algorithm we write and every package we deliver.
+              </p>
+            </motion.div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-md text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Shield className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Reliability</h3>
-              <p className="text-gray-600">
-                We deliver on our promises. Your parcels arrive safely and on
-                time, every time.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Users className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Customer First</h3>
-              <p className="text-gray-600">
-                Our customers are at the heart of everything we do. We go the
-                extra mile to ensure satisfaction.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Award className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Excellence</h3>
-              <p className="text-gray-600">
-                We strive for excellence in every aspect of our service, from
-                pickup to delivery.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* usp */}
-
-     
-      {/* Why Choose Us */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Why Choose EngineersParcel
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              What sets us apart from other delivery services
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Clock className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Fast Delivery
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  We offer same-day delivery for local parcels and express
-                  options for long-distance shipments.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Shield className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Secure Handling
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  Your parcels are handled with utmost care and are fully
-                  insured against damage or loss.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Truck className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Wide Coverage
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  We deliver to over 19,000 pin codes across India and have
-                  international shipping options.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Users className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  24/7 Customer Support
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  Our dedicated customer service team is available round the
-                  clock to assist you with any queries.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <BrainCircuit className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  AI-IoT Courier & Logistics Platform
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  This ensures a level of service unmatched by traditional
-                  providers.{" "}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Cog className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Continuosly enhancement
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  We are constantly working on enhancing our services to provide
-                  you with the best possible experience.{" "}
-                </p>
-              </div>
-            </div>
+            <ValueCard
+              icon={<Shield className="w-8 h-8" />}
+              title="Unshakeable Trust"
+              desc="We treat every parcel like our own. Safety isn't just a feature; it's our foundational promise."
+              delay={0.1}
+            />
+            <ValueCard
+              icon={<Users className="w-8 h-8" />}
+              title="Human-Centric AI"
+              desc="Technology is our tool, but people are our purpose. We build systems that solve real human problems."
+              delay={0.2}
+            />
+            <ValueCard
+              icon={<Award className="w-8 h-8" />}
+              title="Engineered Excellence"
+              desc="Good enough isn't enough. We strive for mathematical precision in every delivery route."
+              delay={0.3}
+            />
           </div>
         </div>
       </section>
 
-       <section className="py-16 bg-gray-50">
+      {/* ══════════ UNIQUE SELLING POINTS ══════════ */}
+      <section className="py-32 relative bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Our Unique Selling Proposition
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              The thing which sets us apart
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-md text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <Cpu className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                India’s First AI-IoT Courier & Logistics Platform
-              </h3>
-              <p className="text-gray-600">
-                We are pioneering the integration of Artificial Intelligence and
-                the Internet of Things into every aspect of parcel delivery.
-                This ensures a level of service unmatched by traditional
-                providers.{" "}
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <ChartCandlestick className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                Real-Time Accuracy & Dynamic Pricing
-              </h3>
-              <p className="text-gray-600">
-                Gain unparalleled visibility with live location tracking and
-                flexible pricing that adapts to your specific needs, offering
-                transparency and cost-efficiency.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md text-center">
-              <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-orange-100 text-orange-600 mb-4">
-                <QrCode className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">
-                Automated Hub Scan Updates
-              </h3>
-              <p className="text-gray-600">
-                Receive instant, automated updates via WhatsApp/SMS at every
-                stage of your parcel's journey, keeping you informed without
-                manual checks.{" "}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                AI-Powered Packers & Movers
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="glass p-12 lg:p-20 rounded-[60px] border border-gray-100 shadow-2xl"
+          >
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-6 underline decoration-orange-600 decoration-8 underline-offset-8">
+                Why We’re Different
               </h2>
-              <p className="text-gray-600 mb-4">
-                The traditional moving experience is fraught with uncertainty,
-                lack of tracking, hidden costs, and potential damage. Engineers
-                Parcel is revolutionizing this sector with an AI and IoT-driven
-                solution designed for safety, transparency, and efficiency.
-              </p>
-              <p className="text-gray-600 mb-4">
-                App-based Video Survey: Auto-estimates space, vehicle size, and
-                cost.
-              </p>
-              <p className="text-gray-600">
-                Smart Load Balancing Algorithm: Suggests optimal packaging and
-                routes. a strong focus on leveraging technology to enhance the
-                delivery experience.
-              </p>
-              <p className="text-gray-600">
-                IoT Barcode Labels: Each box scanned, tracked, and time-stamped.
-              </p>
-              <p className="text-gray-600">
-                Auto Damage Reporting: Sends pickup & delivery photos via app.
-              </p>
             </div>
-            <div className="md:w-1/2">
-              <Image
-                src="/ai-packer-mover.jpg?height=400&width=600"
-                alt="EngineersParcel Team"
-                width={600}
-                height={400}
-                className="rounded-lg shadow-lg"
-              />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div className="space-y-6">
+                <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-orange-600/20">
+                  <Cpu className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900">AI-IoT Core</h3>
+                <p className="text-gray-500 leading-relaxed italic">
+                  "India’s First AI-IoT Logistics Platform. We don't just track; we predict and optimize."
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/20">
+                  <ChartCandlestick className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900">Dynamic Pricing</h3>
+                <p className="text-gray-500 leading-relaxed italic">
+                  "Algorithmically adapted pricing. No hidden costs, just fair value calculated in real-time."
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-purple-600/20">
+                  <QrCode className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900">Instant Updates</h3>
+                <p className="text-gray-500 leading-relaxed italic">
+                  "Automated hub scan notifications via WhatsApp. You're never in the dark about your parcel."
+                </p>
+              </div>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══════════ PACKERS & MOVERS ══════════ */}
+      <section className="py-24 relative bg-gray-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative order-2 lg:order-1"
+            >
+              <div className="absolute -inset-4 bg-blue-600/10 rounded-[4rem] blur-3xl transition-transform duration-700"></div>
+              <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
+                <Image
+                  src="/ai-packer-mover.jpg"
+                  alt="AI Packers and Movers"
+                  width={800}
+                  height={600}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-x-6 bottom-6 glass p-6 rounded-3xl border-white/40">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
+                      <BrainCircuit className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-gray-900">AI Surveyor</p>
+                      <p className="text-xs text-gray-500">Auto Space Estimation</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="order-1 lg:order-2"
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
+                AI-Powered <br />
+                <span className="text-blue-600">Packers & Movers.</span>
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                Traditional moving is broken. We fixed it with AI and IoT. Our systems ensure safety, transparency, and efficiency at every step of your journey.
+              </p>
+
+              <ul className="space-y-4">
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="App-based Video Survey for auto-estimation." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Smart Load Balancing Algorithms." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="IoT Barcode Labels for box-level tracking." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Auto Damage Reporting via app photos." />
+              </ul>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="py-16">
+      {/* ══════════ HYPERLOCAL SECTION ══════════ */}
+      <section className="py-24 relative bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Hyperlocal Pick & Drop: Campus & City
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              What sets us apart from other delivery services
-            </p>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
+                Hyperlocal <br />
+                <span className="text-orange-600">Pick & Drop.</span>
+              </h2>
+              <p className="text-lg text-gray-600 leading-relaxed mb-12">
+                Seamless same-city delivery designed for the fast-paced lifestyle. From hostels to homes, we pick up instantly.
+              </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Clock className="h-6 w-6" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-orange-200 transition-colors">
+                  <Clock className="w-8 h-8 text-orange-600 mb-4" />
+                  <h4 className="font-black text-gray-900 mb-2">Instant Pickup</h4>
+                  <p className="text-sm text-gray-500 italic">QR scan collection from your doorstep.</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-colors">
+                  <MessageCircle className="w-8 h-8 text-blue-600 mb-4" />
+                  <h4 className="font-black text-gray-900 mb-2">WhatsApp Booking</h4>
+                  <p className="text-sm text-gray-500 italic">Book on the go with our smart chatbot.</p>
                 </div>
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Instant Pickup
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  Effortless parcel collection via QR scan directly from
-                  hostels, homes, and shops.
-                </p>
-              </div>
-            </div>
+            </motion.div>
 
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <MessageCircle className="h-6 w-6" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-orange-600/5 rounded-[4rem] border-2 border-dashed border-orange-600/20"></div>
+              <div className="relative p-12 lg:p-20 text-center">
+                <div className="w-24 h-24 bg-orange-100 rounded-3xl flex items-center justify-center text-orange-600 mx-auto mb-8 animate-bounce-slow">
+                  <Truck className="w-12 h-12" />
                 </div>
+                <h3 className="text-3xl font-black text-gray-900 mb-4">Same-Area Clustering</h3>
+                <p className="text-gray-500 italic">"Our algorithms group pickups in real-time, reducing carbon footprint and increasing speed."</p>
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  WhatsApp Chatbot Booking{" "}
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  Seamless booking experience directly through a user-friendly
-                  WhatsApp chatbot.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <IndianRupee className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Dynamic Micro-Pricing
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  Flexible pricing based on real-time factors like distance,
-                  time, and weight.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-600 text-white">
-                  <Users className="h-6 w-6" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Auto-Scheduling & Clustering
-                </h3>
-                <p className="mt-2 text-gray-600">
-                  Optimised scheduling and vehicle grouping for efficient
-                  same-area pickups.
-                </p>
-              </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Our Team */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Meet Our Team</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              The dedicated professionals behind EngineersParcel
-            </p>
+      {/* ══════════ OUR TEAM ══════════ */}
+      <section className="py-32 bg-gray-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-orange-600 rounded-full blur-[150px]"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600 rounded-full blur-[150px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-24">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-4xl md:text-5xl font-black text-white mb-6"
+            >
+              The Minds Behind the Mission
+            </motion.h2>
+            <p className="text-lg text-gray-400">Meet the engineers and visionaries redefining Indian logistics.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <Image
-                src="/placeholder.svg?height=300&width=300"
-                alt="Team Member"
-                width={300}
-                height={300}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">Subham Sawarnkar</h3>
-                <p className="text-gray-500">Founder & CEO</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <Image
-                src="/placeholder.svg?height=300&width=300"
-                alt="Team Member"
-                width={300}
-                height={300}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">Sabir</h3>
-                <p className="text-gray-500">Operations Director</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <Image
-                src="/placeholder.svg?height=300&width=300"
-                alt="Team Member"
-                width={300}
-                height={300}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">Raj Chatterjee</h3>
-                <p className="text-gray-500">Technology Head</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <Image
-                src="/placeholder.svg?height=300&width=300"
-                alt="Team Member"
-                width={300}
-                height={300}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">Suraj</h3>
-                <p className="text-gray-500">Customer Relations</p>
-              </div>
-            </div>
+            <TeamMember name="Subham Sawarnkar" role="Founder & CEO" delay={0.1} />
+            <TeamMember name="Sabir" role="Operations Director" delay={0.2} />
+            <TeamMember name="Raj Chatterjee" role="Technology Head" delay={0.3} />
+            <TeamMember name="Suraj" role="Customer Relations" delay={0.4} />
           </div>
         </div>
       </section>
+
+      {/* ══════════ FINAL CTA ══════════ */}
+      <section className="py-32 bg-white text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="bg-orange-600 rounded-[50px] p-12 md:p-20 text-white shadow-2xl shadow-orange-600/20"
+          >
+            <h2 className="text-4xl md:text-5xl font-black mb-8">Ready to ship smarter?</h2>
+            <p className="text-xl text-orange-100 mb-12 leading-relaxed">
+              Join the revolution and experience logistics as it should be—fast, transparent, and built by engineers.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
+              <Button asChild className="bg-white text-orange-600 hover:bg-orange-50 h-16 px-12 text-xl font-black rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl">
+                <Link href="/booking">Book Now</Link>
+              </Button>
+              <Button asChild variant="ghost" className="text-white border-2 border-white/30 hover:border-white hover:bg-white/10 h-16 px-12 text-xl font-black rounded-2xl transition-all hover:scale-105 active:scale-95">
+                <Link href="/services">Our Services</Link>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
+  );
+}
+
+function ServiceFeature({ icon, text }) {
+  return (
+    <li className="flex items-center gap-4 text-gray-600">
+      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 group-hover:bg-orange-600 group-hover:text-white transition-all">
+        {icon}
+      </div>
+      <span className="font-semibold">{text}</span>
+    </li>
+  );
+}
+
+/* ══════════ REUSABLE COMPONENTS ══════════ */
+
+function ValueCard({ icon, title, desc, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay, duration: 0.5 }}
+      className="group glass p-10 rounded-[40px] border border-white hover:border-orange-200 shadow-sm hover:shadow-2xl transition-all duration-500"
+    >
+      <div className="w-16 h-16 bg-orange-50 rounded-2xl text-orange-600 flex items-center justify-center mb-8 group-hover:bg-orange-600 group-hover:text-white transition-all duration-500">
+        {icon}
+      </div>
+      <h3 className="text-2xl font-black text-gray-900 mb-4">{title}</h3>
+      <p className="text-gray-500 leading-relaxed">{desc}</p>
+    </motion.div>
+  );
+}
+
+function TeamMember({ name, role, delay }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay, duration: 0.5 }}
+      className="group"
+    >
+      <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 bg-gray-800 border border-white/10">
+        <Image
+          src={`https://i.pravatar.cc/400?u=${name}`}
+          alt={name}
+          fill
+          className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60"></div>
+      </div>
+      <h3 className="text-xl font-black text-white mb-1">{name}</h3>
+      <p className="text-orange-500 font-bold uppercase tracking-widest text-xs">{role}</p>
+    </motion.div>
   );
 }
