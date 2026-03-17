@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import useSWR from "swr"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -233,8 +234,8 @@ const Stepper = ({ current = "IN_TRANSIT", dates = {} }) => {
             <div key={s.key} className="relative z-10 flex flex-col items-center flex-1">
               <div
                 className={`h-12 w-12 rounded-2xl flex items-center justify-center border-4 shadow-2xl transition-all duration-500 transform ${isActive
-                    ? "text-white scale-110 rotate-3"
-                    : "text-gray-400 border-white bg-gray-50 scale-90"
+                  ? "text-white scale-110 rotate-3"
+                  : "text-gray-400 border-white bg-gray-50 scale-90"
                   }`}
                 style={{
                   backgroundColor: isActive ? PRIMARY : undefined,
@@ -268,8 +269,11 @@ const Stepper = ({ current = "IN_TRANSIT", dates = {} }) => {
   )
 }
 
-// ===== Main Page =====
-export default function TrackPage() {
+// ===== Main Page Content =====
+function TrackContent() {
+  const searchParams = useSearchParams()
+  const urlId = searchParams.get("id")
+
   const [bookingId, setBookingId] = useState("")
   const [phone, setPhone] = useState("")
   const [otp, setOtp] = useState("")
@@ -292,6 +296,16 @@ export default function TrackPage() {
       return () => clearTimeout(t)
     }
   }, [resendTimer])
+
+  // Auto-track if ID is in URL
+  useEffect(() => {
+    if (urlId) {
+      const cleanId = urlId.trim().toUpperCase()
+      setBookingId(cleanId)
+      setQuery({ type: "id", value: cleanId })
+      setStep("result")
+    }
+  }, [urlId])
 
   const onTrack = () => {
     if (mode === "id" && bookingId.trim()) {
@@ -504,6 +518,19 @@ export default function TrackPage() {
         )}
       </div>
     </main>
+  )
+}
+
+// ===== Main Page =====
+export default function TrackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-100 border-t-orange-600"></div>
+      </div>
+    }>
+      <TrackContent />
+    </Suspense>
   )
 }
 
