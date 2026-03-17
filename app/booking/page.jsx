@@ -1,1596 +1,893 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CalendarIcon, CheckCircle } from "lucide-react";
+import {
+  CalendarIcon,
+  CheckCircle,
+  Package,
+  MapPin,
+  User,
+  ChevronRight,
+  ChevronLeft,
+  CreditCard,
+  Truck,
+  Info,
+  Smartphone,
+  Mail,
+  Box,
+  BadgePercent,
+  AlertCircle,
+  Loader2
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";  
-import Link from "next/link";
-
-import { useToast } from "@/hooks/use-toast";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import axios from "axios";
+import { toast } from "sonner";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const steps = [
+  { id: 1, title: "Service", description: "Select shipping type", icon: Truck },
+  { id: 2, title: "Waypoints", description: "Pickup & Delivery", icon: MapPin },
+  { id: 3, title: "Details", description: "Parcel & Contact", icon: User },
+  { id: 4, title: "Checkout", description: "Review & Payment", icon: CreditCard },
+];
 
 export default function BookingPage() {
-  const { toast } = useToast();
-  
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [date, setDate] = useState();
-  const [bookingId, setBookingId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
-const [showCouponPopup, setShowCouponPopup] = useState(false);
-const [coupons, setCoupons] = useState([]);
-const [loadingCoupons, setLoadingCoupons] = useState(false);
-const [appliedCoupon, setAppliedCoupon] = useState(null);
-const [discountAmount, setDiscountAmount] = useState(0);
+  const [bookingData, setBookingData] = useState(null);
+  const [showCoupons, setShowCoupons] = useState(false);
+  const [coupons, setCoupons] = useState([]);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [manualCoupon, setManualCoupon] = useState("");
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
 
   const [formData, setFormData] = useState({
+    serviceType: "courier",
     pickupPincode: "",
-     deliveryPincode: "",
-    serviceType: "",
+    pickupAddress: "",
     pickupLandmark: "",
+    deliveryPincode: "",
+    deliveryAddress: "",
     deliveryLandmark: "",
+    pickupTime: "morning",
+    weight: "1",
+    weightUnit: "kg",
+    length: "",
+    width: "",
+    height: "",
+    parcelContents: "",
+    specialInstructions: "",
     name: "",
     email: "",
     phone: "",
-    pickupAddress: "",
-    deliveryAddress: "",
-    parcelWeight: "",
-    parcelContents: "",
-    specialInstructions: "",
-    pickupTime: "",
     receiverName: "",
     receiverEmail: "",
     receiverPhone: "",
+    fragile: false,
+    value: "",
+    insuranceRequired: false
   });
-useEffect(() => {
-  if (showCouponPopup) {
-    fetchCoupons();
-  }
-}, [showCouponPopup]);
 
-const fetchCoupons = async () => {
-  setLoadingCoupons(true);
-  try {
-    const res = await axios.get("https://api.engineersparcel.in/api/coupons");
-    console.log("Coupons fetched:", res.data); // ✅ Check in console
-    setCoupons(res.data);
-  } catch (error) {
-    console.error("Error fetching coupons:", error);
-  } finally {
-    setLoadingCoupons(false);
-  }
-};
+  // Fetch coupons
+  useEffect(() => {
+    if (showCoupons) {
+      const fetchCoupons = async () => {
+        setLoadingCoupons(true);
+        try {
+          const res = await axios.get(`${API_BASE_URL}/api/coupons`);
+          setCoupons(res.data);
+        } catch (err) {
+          console.error("Coupon fetch error:", err);
+        } finally {
+          setLoadingCoupons(false);
+        }
+      };
+      fetchCoupons();
+    }
+  }, [showCoupons]);
 
-
-const handleApplyCoupon = async (coupon) => {
-  console.log("Apply clicked for coupon:", coupon);
-  try {
-    const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`, {
-      code: coupon.code,
-      orderTotal: priceDetails.totalAmount,
-    });
-
-    setAppliedCoupon(coupon);
-    setDiscountAmount(res.data.discount);
-
-    toast({
-      title: "Coupon Applied!",
-      description: `${coupon.code} applied successfully. You saved ₹${res.data.discount}.`,
-      variant: "success",
-    });
-
-    setShowCouponPopup(false);
-  } catch (err) {
-    toast({
-      title: "Error Applying Coupon",
-      description: err.response?.data?.message || "Something went wrong.",
-      variant: "destructive",
-    });
-  }
-};
-
-
-
-    const [bookingData, setBookingData] = useState(null);
-    const [manualCoupon, setManualCoupon] = useState("");
-
-
-
-useEffect(() => {
-  if (formData.weight && formData.serviceType) {
-    const fetchPrice = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/calculate-price`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+  // Price Calculation
+  useEffect(() => {
+    if (formData.weight && formData.serviceType) {
+      const calculatePrice = async () => {
+        try {
+          const res = await axios.post(`${API_BASE_URL}/api/calculate-price`, {
             serviceType: formData.serviceType,
             weight: parseFloat(formData.weight),
-            weightUnit: formData.weightUnit || "kg",
-            length: formData.length || 0,
-            width: formData.width || 0,
-            height: formData.height || 0,
-            distance: formData.distance || 0,
-            fragile: formData.fragile || false,
-            value: formData.value || 0,
-          }),
-        });
+            weightUnit: formData.weightUnit,
+            length: parseFloat(formData.length) || 0,
+            width: parseFloat(formData.width) || 0,
+            height: parseFloat(formData.height) || 0,
+            fragile: formData.fragile,
+            value: parseFloat(formData.value) || 0,
+          });
+          if (res.data.success) {
+            setPriceDetails(res.data.data);
+          }
+        } catch (err) {
+          console.error("Price fetch error:", err);
+        }
+      };
+      const timeoutId = setTimeout(calculatePrice, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [formData.weight, formData.weightUnit, formData.serviceType, formData.length, formData.width, formData.height, formData.fragile, formData.value]);
 
-        const data = await res.json();
-        console.log("Backend response:", data);
+  const handleInputChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    setFormData(prev => ({ ...prev, [id]: type === "checkbox" ? checked : value }));
+  };
 
-        if (data.success) {
-          setPriceDetails(data.data);
-        } else {
-          setPriceDetails(null);
-          console.warn("Price calculation failed:", data.message);
+  const handleSelectChange = (id, value) => {
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleNext = () => setStep(prev => Math.min(prev + 1, 4));
+  const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
+
+  const applyCoupon = async (code) => {
+    if (!priceDetails) return;
+    try {
+      const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`, {
+        code,
+        orderTotal: priceDetails.totalAmount,
+      });
+      setAppliedCoupon(res.data.coupon || { code });
+      setDiscountAmount(res.data.discount);
+      toast.success("Coupon applied successfully!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid coupon.");
+    }
+  };
+
+  const makePayload = (paymentMethod) => {
+    return {
+      pickupPincode: formData.pickupPincode,
+      deliveryPincode: formData.deliveryPincode,
+      senderDetails: {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.pickupAddress,
+        pincode: formData.pickupPincode,
+        landmark: formData.pickupLandmark
+      },
+      receiverDetails: {
+        name: formData.receiverName,
+        phone: formData.receiverPhone,
+        email: formData.receiverEmail,
+        address: formData.deliveryAddress,
+        pincode: formData.deliveryPincode,
+        landmark: formData.deliveryLandmark
+      },
+      serviceType: formData.serviceType,
+      pickupDate: date ? date.toISOString() : new Date().toISOString(),
+      pickupSlot: formData.pickupTime,
+      paymentMethod,
+      packageDetails: {
+        weight: Number(formData.weight),
+        weightUnit: formData.weightUnit,
+        dimensions: {
+          length: Number(formData.length) || 0,
+          width: Number(formData.width) || 0,
+          height: Number(formData.height) || 0,
+        },
+        description: formData.parcelContents,
+        value: Number(formData.value) || 0,
+        fragile: formData.fragile,
+      },
+      notes: formData.specialInstructions,
+      couponCode: appliedCoupon?.code || "",
+      insuranceRequired: formData.insuranceRequired
+    };
+  };
+
+  const handleRazorpay = async (payload) => {
+    try {
+      const amountPaise = Math.round((priceDetails.totalAmount - discountAmount) * 100);
+      const { data: orderData } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
+        amount: amountPaise,
+        currency: "INR"
+      });
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "EngineersParcel",
+        description: "Booking Payment",
+        order_id: orderData.id,
+        handler: async (response) => {
+          try {
+            const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify-payment`, response);
+            if (verifyRes.data.success) {
+              const res = await axios.post(`${API_BASE_URL}/api/bookings`, { ...payload, paymentMethod: "Online" });
+              if (res.data.success) {
+                setBookingData(res.data.data);
+                setStep(5); // Confirmed Step
+                toast.success("Payment successful! Booking confirmed.");
+              }
+            }
+          } catch (err) {
+            toast.error("Payment verification failed.");
+          }
+        },
+        prefill: { name: formData.name, email: formData.email, contact: formData.phone },
+        theme: { color: "#ea580c" }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      toast.error("Error creating payment order.");
+    }
+  };
+
+  const handleFinalSubmit = async (paymentMethod) => {
+    setIsSubmitting(true);
+    const payload = makePayload(paymentMethod);
+
+    if (paymentMethod === "Online") {
+      await handleRazorpay(payload);
+    } else {
+      try {
+        const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
+        if (res.data.success) {
+          setBookingData(res.data.data);
+          setStep(5);
+          toast.success("Booking confirmed!");
         }
       } catch (err) {
-        console.error("Error fetching price:", err);
-        setPriceDetails(null);
+        toast.error(err.response?.data?.message || "Booking failed.");
       }
-    };
-
-    fetchPrice();
-  }
-}, [formData.weight, formData.weightUnit, formData.serviceType, formData.length, formData.width, formData.height, formData.distance, formData.fragile, formData.value]);
-
-
-
-
-  
-const handleInputChange = (field, value) => {
-  setFormData((prev) => ({
-    ...prev,
-    [field]: value,
-  }));
-};
-
-  const fetchPrice = async () => {
-  if (!formData.parcelWeight || !formData.serviceType) return;
-
-  const payload = {
-      serviceType: formData.serviceType,
-      pickupDate: date?.toISOString(),
-      pickupSlot: formData.pickupTime || "afternoon",
-      paymentMethod: "COD",
-      packageDetails: {
-  weight: parseFloat(formData.weight) || 1,             // Actual weight input from user
-  weightUnit: formData.weightUnit || "kg",             // kg or g
-  dimensions: {
-    length: parseFloat(formData.length) || 0,
-    width: parseFloat(formData.width) || 0,
-    height: parseFloat(formData.height) || 0,
-  },
-  description: formData.parcelContents || "",
-  value: parseFloat(formData.value) || 0,
-  fragile: formData.fragile || false,
-},
-      notes: formData.specialInstructions || "", // ya formData.paymentMethod agar dynamic
-  };
-
-  try {
-      const res = await fetch(`${API_BASE_URL}/api/calculate-price`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    console.log("Price API Response:", data);
-    if (data.success) {
-      setPriceDetails(data.data);
-    } else {
-      setPriceDetails(null);
-    }
-  } catch (err) {
-    console.error("Price fetch error:", err);
-    setPriceDetails(null);
-  }
-};
-
-  
- 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleServiceTypeChange = (value) => {
-    setFormData({ ...formData, serviceType: value });
-    setStep(1);
-  };
-
-  const handleNext = () => {
-    setStep((prev) => prev + 1);
-  };
-
-
-  const handleBack = () => {
-    setStep((prev) => prev - 1);
-  };
-console.log("FormData:", formData);
-
-
-
-  const handleSubmit = async (paymentMethod, e) => {
-  if (e && e.preventDefault) e.preventDefault();
-
-  // 🚨 Weight limit check
-  
-
-  setIsSubmitting(true);
-
-  try {
-    // ✅ Payload exactly matching backend Booking model
-    const payload = {
-      pickupPincode:
-        formData.pickupPincode ||
-        formData.pickupAddress?.match(/\b\d{6}\b/)?.[0] ||
-        "826004",
-      deliveryPincode:
-        formData.deliveryPincode ||
-        formData.deliveryAddress?.match(/\b\d{6}\b/)?.[0] ||
-        "700001",
-
-      senderDetails: {
-        name: formData.senderName || formData.name || "",
-        phone: formData.senderPhone || formData.phone || "",
-        email: formData.senderEmail || formData.email || "",
-        address: formData.senderAddress || formData.pickupAddress || "",
-        pincode: formData.pickupPincode || "",
-        city: formData.senderCity || "",
-        state: formData.senderState || "",
-        landmark: formData.senderLandmark || formData.pickupLandmark || "",
-      },
-
-      receiverDetails: {
-        name: formData.receiverName || "",
-        phone: formData.receiverPhone || "",
-        email: formData.receiverEmail || "",
-        address: formData.receiverAddress || formData.deliveryAddress || "",
-        pincode: formData.deliveryPincode || "",
-        city: formData.receiverCity || "",
-        state: formData.receiverState || "",
-        landmark:
-          formData.receiverLandmark || formData.deliveryLandmark || "",
-      },
-
-      serviceType: formData.serviceType || "surface",
-      pickupDate: formData.pickupDate || new Date().toISOString(),
-      pickupSlot: formData.pickupSlot || "morning",
-      paymentMethod, // "COD" ya "Online"
-
-      packageDetails: {
-        weight: Number(formData.weight) || 1,
-        weightUnit: formData.weightUnit || "kg",
-        dimensions: {
-          length: Number(formData.length) || 10,
-          width: Number(formData.width) || 10,
-          height: Number(formData.height) || 10,
-        },
-        description: formData.description || formData.parcelContents || "Parcel",
-        value: Number(formData.value) || 100,
-        fragile: Boolean(formData.fragile) || false,
-      },
-
-      notes: formData.notes || formData.specialInstructions || "",
-      couponCode: formData.couponCode || "",
-      insuranceRequired: Boolean(formData.insuranceRequired) || false,
-    };
-
-    console.log("📦 Sending booking data:", payload);
-    if (paymentMethod === "COD") {
-  const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
-  console.log("✅ Booking response:", res.data);
-  
-  setBookingData(res.data.data); // <-- yahi fix hai
-  setStep(4);
-  setFormData({}); // safe, kyunki step 4 bookingData use karega
-}
-
- else if (paymentMethod === "Online") {
-      // 🟢 Razorpay flow (keep loading until done)
-      await handleRazorpayPayment(payload);
-    }
-  } catch (error) {
-    console.error("❌ Booking failed:", error.response?.data || error.message);
-    alert(`Booking failed! ${error.response?.data?.message || error.message}`);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
-
-
-
-useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-
-  // ✅ Helper to build payload for booking
-const makeBookingPayload = (formData) => {
-  return {
-    pickupPincode:
-      formData.pickupPincode ||
-      formData.pickupAddress?.match(/\b\d{6}\b/)?.[0] ||
-      "826004",
-    deliveryPincode:
-      formData.deliveryPincode ||
-      formData.deliveryAddress?.match(/\b\d{6}\b/)?.[0] ||
-      "700001",
-
-    senderDetails: {
-      name: formData.senderName || formData.name || "",
-      phone: formData.senderPhone || formData.phone || "",
-      email: formData.senderEmail || formData.email || "",
-      address: formData.senderAddress || formData.pickupAddress || "",
-      pincode: formData.pickupPincode || "",
-      city: formData.senderCity || "",
-      state: formData.senderState || "",
-      landmark: formData.senderLandmark || formData.pickupLandmark || "",
-    },
-
-    receiverDetails: {
-      name: formData.receiverName || "",
-      phone: formData.receiverPhone || "",
-      email: formData.receiverEmail || "",
-      address: formData.receiverAddress || formData.deliveryAddress || "",
-      pincode: formData.deliveryPincode || "",
-      city: formData.receiverCity || "",
-      state: formData.receiverState || "",
-      landmark: formData.receiverLandmark || formData.deliveryLandmark || "",
-    },
-
-    serviceType: formData.serviceType || "surface",
-    pickupDate: formData.pickupDate || new Date().toISOString(),
-    pickupSlot: formData.pickupSlot || "morning",
-
-    packageDetails: {
-      weight: Number(formData.weight) || 1,
-      weightUnit: formData.weightUnit || "kg",
-      dimensions: {
-        length: Number(formData.length) || 10,
-        width: Number(formData.width) || 10,
-        height: Number(formData.height) || 10,
-      },
-      description: formData.description || formData.parcelContents || "Parcel",
-      value: Number(formData.value) || 100,
-      fragile: Boolean(formData.fragile) || false,
-    },
-
-    notes: formData.notes || formData.specialInstructions || "",
-    couponCode: formData.couponCode || "",
-    insuranceRequired: Boolean(formData.insuranceRequired) || false,
-  };
-};
-
-  // 🟠 Handle Razorpay Online Payment
-  const handleRazorpayPayment = async (payload) => {
-  try {
-    if (!priceDetails?.totalAmount) {
-      alert("Price not calculated yet!");
-      return;
-    }
-
-    const finalAmount = priceDetails.totalAmount - discountAmount;
-     const amountInPaise = finalAmount*100;
-
-    const { data } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
-      amount: amountInPaise,
-      currency: "INR",
-    });
-
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: data.amount,
-      currency: data.currency,
-      name: "EngineersParcel",
-      description: "Parcel Booking Payment",
-      order_id: data.id,
-
-      handler: async function (response) {
-        try {
-          const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify-payment`, {
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-
-          if (verifyRes.data.success) {
-          
-
-            // ✅ Now directly create booking with payload (don’t call handleSubmit again)
-            const bookingRes = await axios.post(`${API_BASE_URL}/api/bookings`, {
-              ...payload,
-              paymentMethod: "Online",
-            });
-
-            if (bookingRes.data.success) {
-              ;
-              setBookingData(bookingRes.data.data);
-              setStep(4);
-            } else {
-              alert("❌ Booking creation failed after payment contact support for refund !");
-            }
-          } else {
-            alert("⚠️ Payment verification failed!");
-          }
-        } catch (error) {
-          console.error("Error verifying payment:", error);
-          alert("❌ Booking creation failed after payment contact support for refund!");
-        }
-      },
-
-      prefill: {
-        name: formData.name || "Customer",
-        email: formData.email || "test@example.com",
-        contact: formData.phone || "9999999999",
-      },
-      theme: { color: "#f97316" },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  } catch (err) {
-    console.error("Payment Error:", err);
-    alert("❌ Payment Failed");
-  }
-};
-
-
-
-
-const createBookingAfterPayment = async (payload) => {
-  try {
-    const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
-    console.log("✅ Booking created after payment:", res.data);
-    setBookingData(res.data.data);
-    toast.success("🎉 Booking Created Successfully!");
-    setStep(4); // ✅ move to confirmation
-  } catch (error) {
-    console.error("❌ Booking creation failed:", error);
-    toast.error("Booking creation failed after payment!");
-  }
-};
-
-
-
-  // 🟢 COD or Online submit handler
-  const handleStep3Submit = async () => {
-    setIsSubmitting(true);
-    if (formData.paymentMethod === "Online") {
-      await handleRazorpayPayment();
-    } else {
-      // COD logic (your existing booking submission)
-      alert("COD Booking Confirmed ✅");
-      setStep(4);
     }
     setIsSubmitting(false);
   };
 
-
-
+  const StepIcon = ({ id, active, finished }) => {
+    const Icon = steps.find(s => s.id === id).icon;
+    return (
+      <div className={cn(
+        "relative flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 z-10",
+        active ? "border-orange-600 bg-orange-600 text-white shadow-[0_0_15px_rgba(234,88,12,0.4)]" :
+          finished ? "border-green-500 bg-green-500 text-white" :
+            "border-gray-200 bg-white text-gray-400"
+      )}>
+        {finished ? <CheckCircle className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+      </div>
+    );
+  };
 
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="bg-orange-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-4">Book a Pickup</h1>
-          <p className="text-lg max-w-3xl mx-auto">
-            Schedule a pickup for your parcel or request our shifting and moving
-            services
-          </p>
-        </div>
-      </section>
-
-      {/* Booking Form */}
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Progress Steps */}
-          {/* Progress Steps */}
-          <div className="mb-8">
-<div className="flex items-center justify-between">
-    {/* Step 1 */}
-    <div className={cn("flex flex-col items-center", step >= 1 ? "text-orange-600" : "text-gray-400")}>
-      <div className={cn(
-        "h-8 w-8 rounded-full flex items-center justify-center border-2",
-        step >= 1 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-      )}>
-        1
-      </div>
-      <span className="text-sm mt-1 text-center">Service Details</span>
-    </div>
-
-    <div className={cn("flex-1 h-1 mx-4", step >= 2 ? "bg-orange-600" : "bg-gray-300")}></div>
-
-    {/* Step 2 */}
-    <div className={cn("flex flex-col items-center", step >= 2 ? "text-orange-600" : "text-gray-400")}>
-      <div className={cn(
-        "h-8 w-8 rounded-full flex items-center justify-center border-2",
-        step >= 2 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-      )}>
-        2
-      </div>
-      <span className="text-sm mt-1 text-center">Pickup & Delivery</span>
-    </div>
-
-    <div className={cn("flex-1 h-1 mx-4", step >= 3 ? "bg-orange-600" : "bg-gray-300")}></div>
-
-    {/* Step 3 */}
-    <div className={cn("flex flex-col items-center", step >= 3 ? "text-orange-600" : "text-gray-400")}>
-      <div className={cn(
-        "h-8 w-8 rounded-full flex items-center justify-center border-2",
-        step >= 3 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-      )}>
-        3
-      </div>
-      <span className="text-sm mt-1 text-center">Contact Info</span>
-    </div>
-
-    <div className={cn("flex-1 h-1 mx-4", step >= 4 ? "bg-orange-600" : "bg-gray-300")}></div>
-
-    {/* Step 4 */}
-    <div className={cn("flex flex-col items-center", step >= 4 ? "text-orange-600" : "text-gray-400")}>
-      <div className={cn(
-        "h-8 w-8 rounded-full flex items-center justify-center border-2",
-        step >= 4 ? "border-orange-600 bg-orange-50" : "border-gray-300"
-      )}>
-        4
-      </div>
-      <span className="text-sm mt-1 text-center">Checkout</span>
-    </div>
-  </div>
-          </div>
-
-
-          <Card>
-            <CardContent className="pt-6">
-                {step === 0 && (
-                  <div>
-                    <Label className="text-base font-semibold">
-                      Select Service Type
-                    </Label>
-                    <RadioGroup
-                      value={formData.serviceType} // controlled value
-                      className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3"
-                      onValueChange={(value) => {
-                        setFormData({ ...formData, serviceType: value }); // update form data
-                        setStep(1); // go to step 1 automatically
-                      }}
-                    >
-                      <div>
-                        <RadioGroupItem
-                          value="courier"
-                          id="courier"
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor="courier"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                        >
-                          <div className="mb-2">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-6 w-6"
-                            >
-                              <path d="M5 7.5V7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5" />
-                              <rect
-                                width="8"
-                                height="8"
-                                x="2"
-                                y="14"
-                                rx="2"
-                              />
-                            </svg>
-                          </div>
-                          <div className="text-center">
-                            <span className="font-semibold">
-                              Courier Service
-                            </span>
-                            <p className="text-sm text-muted-foreground">
-                              Document & parcel delivery
-                            </p>
-                          </div>
-                        </Label>
-                      </div>
-                      <div>
-                        <RadioGroupItem
-                          value="shifting"
-                          id="shifting"
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor="shifting"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                        >
-                          <div className="mb-2">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-6 w-6"
-                            >
-                              <path d="M3 8h18M9 8v8m6-8v8" />
-                              <rect
-                                width="18"
-                                height="12"
-                                x="3"
-                                y="4"
-                                rx="2"
-                              />
-                              <path d="M3 20h18" />
-                            </svg>
-                          </div>
-                          <div className="text-center">
-                          <span className="font-semibold">
-                            Shifting & Moving
-                          </span>
-
-                          <p className="text-sm text-muted-foreground">
-                            Home & office relocation ·{" "}
-                            <Link
-                              href="/get-quote"
-                              className="text-orange-600 font-medium hover:underline"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Get Quote
-                            </Link>
-                          </p>
-                        </div>
-                        </Label>
-                      </div>
-                      <div>
-                        <RadioGroupItem
-                          value="local"
-                          id="local"
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor="local"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                        >
-                          <div className="mb-2">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-6 w-6"
-                            >
-                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-                            </svg>
-                          </div>
-                          <div className="text-center">
-                            <span className="font-semibold">
-                              Local Parcel
-                            </span>
-                            <p className="text-sm text-muted-foreground">
-                              Same-day local delivery
-                            </p>
-                          </div>
-                        </Label>
-                      </div>
-                      <div>
-                        <RadioGroupItem
-                          value="international"
-                          id="international"
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor="international"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-orange-600 [&:has([data-state=checked])]:border-orange-600"
-                        >
-                          <div className="mb-2">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-6 w-6"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-                              <path d="M2 12h20" />
-                            </svg>
-                          </div>
-                          <div className="text-center">
-                            <span className="font-semibold">
-                              International
-                            </span>
-                            <p className="text-sm text-muted-foreground">
-                              Worldwide shipping
-                            </p>
-                          </div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-
-                  </div>
-
-                )}
-              {step === 1 && (
-  <form
-    onSubmit={(e) => {
-      e.preventDefault();
-      handleNext();
-    }}
-  >
-    <div className="space-y-6">
-      {/* =================== PICKUP DETAILS =================== */}
-      <div className="space-y-4 p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm">
-        <h3 className="text-lg font-semibold text-orange-500">🚚 Pickup Details</h3>
-
-        <div className="space-y-3">
-          <div>
-            <Label htmlFor="pickupPincode">Pickup Pincode</Label>
-            <Input
-              type="text"
-              id="pickupPincode"
-              name="pickupPincode"
-              value={formData.pickupPincode}
-              onChange={handleChange}
-              placeholder="Enter pickup pincode"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="pickupAddress">Pickup Address</Label>
-            <Textarea
-              id="pickupAddress"
-              name="pickupAddress"
-              value={formData.pickupAddress}
-              onChange={handleChange}
-              placeholder="Enter complete pickup address"
-              rows={3}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="pickupLandmark">Pickup Landmark</Label>
-            <Input
-              type="text"
-              id="pickupLandmark"
-              name="pickupLandmark"
-              value={formData.pickupLandmark}
-              onChange={handleChange}
-              placeholder="Enter nearby landmark"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* =================== DELIVERY DETAILS =================== */}
-      <div className="space-y-4 p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm">
-        <h3 className="text-lg font-semibold text-orange-500">📦 Delivery Details</h3>
-
-        <div className="space-y-3">
-          <div>
-            <Label htmlFor="deliveryPincode">Delivery Pincode</Label>
-            <Input
-              type="text"
-              id="deliveryPincode"
-              name="deliveryPincode"
-              value={formData.deliveryPincode}
-              onChange={handleChange}
-              placeholder="Enter delivery pincode"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="deliveryAddress">Delivery Address</Label>
-            <Textarea
-              id="deliveryAddress"
-              name="deliveryAddress"
-              value={formData.deliveryAddress}
-              onChange={handleChange}
-              placeholder="Enter complete delivery address"
-              rows={3}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="deliveryLandmark">Delivery Landmark</Label>
-            <Input
-              type="text"
-              id="deliveryLandmark"
-              name="deliveryLandmark"
-              value={formData.deliveryLandmark}
-              onChange={handleChange}
-              placeholder="Enter nearby landmark"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* =================== PICKUP DATE & TIME =================== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Label htmlFor="pickupDate">Pickup Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Select date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-                disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-              />
-            </PopoverContent>
-          </Popover>
+    <div className="min-h-screen bg-[#fafafa] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+      {/* Header */}
+      <div className="bg-gradient-premium py-12 md:py-20 text-white text-center px-4 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+          <div className="absolute top-10 left-10 w-32 h-32 border-4 border-white rounded-full animate-float-slow" />
+          <div className="absolute bottom-10 right-10 w-24 h-24 border-4 border-white rotate-45 animate-float-slow" />
         </div>
 
-        <div>
-          <Label htmlFor="pickupTime">Preferred Pickup Time</Label>
-          <Select onValueChange={(value) => handleSelectChange("pickupTime", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select time slot" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="morning">Morning (9 AM - 12 PM)</SelectItem>
-              <SelectItem value="afternoon">Afternoon (12 PM - 3 PM)</SelectItem>
-              <SelectItem value="evening">Evening (3 PM - 6 PM)</SelectItem>
-              <SelectItem value="night">Night (6 PM - 9 PM)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* =================== PARCEL DETAILS =================== */}
-      {(formData.serviceType === "courier" ||
-        formData.serviceType === "local" ||
-        formData.serviceType === "international") && (
-        <div className="p-4 border border-gray-200 rounded-2xl bg-white/5 shadow-sm space-y-6">
-  <h3 className="text-lg font-semibold text-orange-500">📏 Parcel Details</h3>
-
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div className="space-y-2">
-      <Label htmlFor="weight">Actual Weight</Label>
-      <div className="flex items-center gap-3">
-       <Input
-  type="text"
-  id="weight"
-  placeholder="Enter weight (max. 30kgs / 1000g)"
-  value={formData.weight || ""}
-  onChange={(e) => {
-    let value = e.target.value;
-
-    // Allow only numeric or decimal
-    if (!/^\d*\.?\d*$/.test(value)) return;
-
-    const numValue = parseFloat(value);
-
-    // KG limit
-    if (formData.weightUnit === "kg" && numValue > 30) {
-      alert("Maximum 30 kg allowed");
-      value = ""; // reset value to max
-    }
-
-    // Gram limit
-    if (formData.weightUnit === "g" && numValue > 1000) {
-      alert("Above 1000g, use kg unit");
-      value = ""; // reset value to max
-    }
-
-    handleInputChange("weight", value);
-  }}
-  inputMode="decimal"
-/>
-
-
-        <Select
-          value={formData.weightUnit || "kg"}
-          onValueChange={(v) => handleSelectChange("weightUnit", v)}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl md:text-6xl font-black tracking-tight mb-4"
         >
-          <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder="Unit" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="kg">kg</SelectItem>
-            <SelectItem value="g">grams</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <p className="text-xs text-gray-400">
-        {/* 💡 Tip: Enter grams as is (e.g., 300g, 500g) — backend will handle price as minimum 1kg. */}
-      </p>
-    </div>
-
-    <div className="space-y-2">
-      <Label>Dimensions (in cm)</Label>
-      <div className="flex items-center gap-2">
-        <Input
-          type="number"
-          placeholder="Length"
-          value={formData.length || ""}
-          onChange={(e) => handleInputChange("length", e.target.value)}
-          min="0"
-        />
-        <Input
-          type="number"
-          placeholder="Width"
-          value={formData.width || ""}
-          onChange={(e) => handleInputChange("width", e.target.value)}
-          min="0"
-        />
-        <Input
-          type="number"
-          placeholder="Height"
-          value={formData.height || ""}
-          onChange={(e) => handleInputChange("height", e.target.value)}
-          min="0"
-        />
-      </div>
-      <p className="text-xs text-gray-400">(Leave blank if not applicable)</p>
-    </div>
-  </div>
-
-  <div>
-    <Label htmlFor="parcelContents">Parcel Contents</Label>
-    <Input
-      id="parcelContents"
-      name="parcelContents"
-      value={formData.parcelContents}
-      onChange={handleChange}
-      placeholder="Brief description of contents"
-    />
-  </div>
-
-  {/* Pricing Section */}
-  {/* {priceDetails && (
-    <div className="bg-green-50 p-4 rounded-xl border border-green-100 shadow-sm">
-      <h3 className="text-md md:text-lg font-semibold text-green-600 border-b border-green-200 pb-2 mb-2">
-        Pricing
-      </h3>
-      <ul className="space-y-1">
-        <li className="flex justify-between">
-          <span>Base Price:</span>
-          <span className="font-medium">₹{priceDetails.basePrice}</span>
-        </li>
-        <li className="flex justify-between">
-          <span>Tax (18% GST):</span>
-          <span className="font-medium">₹{priceDetails.tax}</span>
-        </li>
-      </ul>
-      <div className="mt-3 text-right">
-        <p className="text-sm text-gray-600">Subtotal: ₹{priceDetails.totalAmount}</p>
-        <p className="text-lg font-semibold text-orange-600 mt-1">
-          Final Total: ₹{priceDetails.totalAmount}
+          {step === 5 ? "You're All Set!" : "Book Your Shipment"}
+        </motion.h1>
+        <p className="text-orange-100 max-w-xl mx-auto text-lg">
+          {step === 5 ? "Your parcel is ready for its journey." : "Fast, reliable, and transparent shipping at your fingertips."}
         </p>
       </div>
-    </div>
-  )} */}
-</div>
-      )}
 
-      {/* =================== SPECIAL INSTRUCTIONS =================== */}
-      <div>
-        <Label htmlFor="specialInstructions">Special Instructions (Optional)</Label>
-        <Textarea
-          id="specialInstructions"
-          name="specialInstructions"
-          value={formData.specialInstructions}
-          onChange={handleChange}
-          placeholder="Any special handling instructions or requirements"
-          rows={3}
-        />
-      </div>
-
-      {/* =================== NEXT BUTTON =================== */}
-      <div className="flex justify-end">
-        <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
-          Next Step
-        </Button>
-      </div>
-    </div>
-  </form>
-)}
-
-
-              {step === 2 && (
-  <div className="space-y-6">
-    <div>
-      <Label htmlFor="name">Full Name</Label>
-      <Input
-        id="name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Your full name"
-        required
-      />
-    </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="email">Email Address</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Your email address"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="phone">Phone Number</Label>
-        <Input
-          id="phone"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="Your phone number"
-          required
-        />
-      </div>
-    </div>
-
-    {/* Receiver Section */}
-    <div className="border-t pt-4">
-      <h3 className="text-lg font-semibold mb-2">Receiver Details</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="receiverName">Receiver Name</Label>
-          <Input
-            id="receiverName"
-            name="receiverName"
-            value={formData.receiverName}
-            onChange={handleChange}
-            placeholder="Receiver's full name"
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="receiverEmail">Receiver Email</Label>
-          <Input
-            id="receiverEmail"
-            name="receiverEmail"
-            value={formData.receiverEmail}
-            onChange={handleChange}
-            placeholder="Receiver's email"
-          />
-        </div>
-        <div>
-          <Label htmlFor="receiverPhone">Receiver Phone</Label>
-          <Input
-            id="receiverPhone"
-            name="receiverPhone"
-            value={formData.receiverPhone}
-            onChange={handleChange}
-            placeholder="Receiver's phone"
-            required
-          />
-        </div>
-      </div>
-    </div>
-
-    <div className="flex justify-between">
-      <Button type="button" variant="outline" onClick={handleBack}>
-        Back
-      </Button>
-      <Button
-        type="button"
-        className="bg-orange-600 hover:bg-orange-700"
-        onClick={handleNext}
-      >
-        Proceed to Checkout
-      </Button>
-    </div>
-  </div>
-)}
-
-
-
-{step === 3 && (
-
-
-  <div className="space-y-6 max-w-md mx-auto px-4">
-    <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 text-center">
-      Review Your Booking
-    </h2>
-
-    <div className="space-y-4">
-
-                    {/* Service & Pickup */}
-                    <div className="bg-orange-50/20 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-orange-100">
-                      <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-                        Service & Pickup
-                      </h3>
-                      <div className="flex justify-between text-gray-700 mb-1">
-                        <span>Service Type:</span>
-                        <span className="font-medium capitalize">{formData.serviceType}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
-                        <span>Pickup Address:</span>
-                        <span className="font-medium max-w-full">{formData.pickupAddress}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Landmark:</span>
-                        <span className="font-medium">{formData.pickupLandmark || "-"}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Pincode:</span>
-                        <span className="font-medium">{formData.pickupPincode}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Date:</span>
-                        <span className="font-medium">{date ? format(date, "PPP") : "Not selected"}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700">
-                        <span>Time Slot:</span>
-                        <span className="font-medium">{formData.pickupTime || "Not selected"}</span>
-                      </div>
-                    </div>
-
-                    {/* Delivery */}
-                    <div className="bg-gray-50 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
-                      <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-                        Delivery Details
-                      </h3>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
-                        <span>Address:</span>
-                        <span className="font-medium max-w-full">{formData.deliveryAddress}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Landmark:</span>
-                        <span className="font-medium">{formData.deliveryLandmark || "-"}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700">
-                        <span>Pincode:</span>
-                        <span className="font-medium">{formData.deliveryPincode}</span>
-                      </div>
-                    </div>
-
-                    {/* Sender */}
-                    <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200">
-                      <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-                        Sender Details
-                      </h3>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Name:</span>
-                        <span className="font-medium">{formData.name}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Email:</span>
-                        <span className="font-medium">{formData.email || "-"}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700">
-                        <span>Phone:</span>
-                        <span className="font-medium">{formData.phone}</span>
-                      </div>
-                    </div>
-
-                    {/* Receiver */}
-                    <div className="bg-orange-50/20 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-orange-100">
-                      <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-                        Receiver Details
-                      </h3>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Name:</span>
-                        <span className="font-medium">{formData.receiverName}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-                        <span>Email:</span>
-                        <span className="font-medium">{formData.receiverEmail || "-"}</span>
-                      </div>
-                      <div className="flex flex-col md:flex-row justify-between text-gray-700">
-                        <span>Phone:</span>
-                        <span className="font-medium">{formData.receiverPhone}</span>
-                      </div>
-                    </div>
-
-                    {/* Parcel */}
-                    <div className="bg-gray-50 p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-100">
-  <h3 className="text-md md:text-lg font-semibold text-orange-600 border-b border-orange-200 pb-2 mb-2">
-    Parcel Details
-  </h3>
-  <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1">
-    <span>Weight:</span>
-<span className="font-medium">
-  {formData.weight} {formData.weightUnit || "kg"}
-</span>  </div>
-  <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-1 break-words">
-    <span>Contents:</span>
-    <span className="font-medium max-w-full">{formData.parcelContents || "-"}</span>
-  </div>
-  <div className="flex flex-col md:flex-row justify-between text-gray-700">
-    <span>Special Instructions:</span>
-    <span className="font-medium max-w-full">{formData.specialInstructions || "-"}</span>
-  </div>
-  <div className="flex flex-col md:flex-row justify-between text-gray-700 mt-1">
-    <span>Dimensions:</span>
-    <span className="font-medium max-w-full">
-      {formData.packageDetails?.dimensions
-        ? `${formData.packageDetails.dimensions.length} x ${formData.packageDetails.dimensions.width} x ${formData.packageDetails.dimensions.height} cm`
-        : "-"}
-    </span>
-  </div>
-</div>
-
-
-                    {/* Pricing */}
-                    {priceDetails ? (
-  <div className="bg-green-50 p-4 rounded-xl border border-green-100 shadow-sm">
-    {/* Section Title */}
-    <h3 className="text-md md:text-lg font-semibold text-green-600 border-b border-green-200 pb-2 mb-2">
-      Pricing
-    </h3>
-
-    {/* Base Price, Tax, Total Amount */}
-    <ul className="space-y-1">
-      <li className="flex justify-between">
-        <span>Base Price:</span>
-        <span className="font-medium">₹{priceDetails.basePrice}</span>
-      </li>
-      <li className="flex justify-between">
-        <span>Tax (18% GST):</span>
-        <span className="font-medium">₹{priceDetails.tax}</span>
-      </li>
-      {/* <li className="flex justify-between text-orange-600 font-semibold">
-        <span>Total Amount:</span>
-        <span className="font-medium">
-          ₹{(priceDetails.totalAmount - discountAmount).toFixed(2)}
-        </span>
-      </li> */}
-    </ul>
-
-    {/* Subtotal, Discount, Final Total */}
-    <div className="mt-3 text-right">
-      <p className="text-sm text-gray-600">Subtotal: ₹{priceDetails.totalAmount}</p>
-      {discountAmount > 0 && (
-        <p className="text-sm text-green-600">
-          Discount: -₹{discountAmount.toFixed(2)}
-        </p>
-      )}
-      <p className="text-lg font-semibold  text-orange-600 mt-1">
-        Final Total: ₹{(priceDetails.totalAmount - discountAmount).toFixed(2)}
-      </p>
-    </div>
-  </div>
-) : (
-  <p className="text-gray-500 text-center mt-2">Calculating price...</p>
-)}
-
-
-
+      <div className="max-w-5xl mx-auto px-4 -mt-10 pb-20">
+        {step < 5 && (
+          <div className="mb-10 overflow-x-auto pb-4 no-scrollbar">
+            <div className="flex items-center justify-between min-w-[600px] px-8">
+              {steps.map((s, idx) => (
+                <div key={s.id} className="flex relative items-center group">
+                  <div className="flex flex-col items-center">
+                    <StepIcon id={s.id} active={step === s.id} finished={step > s.id} />
+                    <span className={cn(
+                      "mt-2 text-xs font-bold uppercase tracking-wider",
+                      step === s.id ? "text-orange-600" : "text-gray-400"
+                    )}>
+                      {s.title}
+                    </span>
                   </div>
-{/* Apply Coupon Section */}
-<div className="mt-4">
-  {/* Button to toggle coupon list */}
-  <Button
-    variant="outline"
-    className="w-full bg-white text-orange-600 border-orange-400 hover:bg-orange-50"
-    onClick={() => setShowCouponPopup((prev) => !prev)}
-  >
-    {showCouponPopup ? "Hide Coupons" : "Apply Coupon"}
-  </Button>
-
-  {/* Show coupon popup */}
-  {showCouponPopup && (
-    <div className="mt-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
-      <h2 className="text-lg font-semibold text-orange-700 mb-3 text-center">
-        Apply a Coupon
-      </h2>
-
-      {/* Manual Coupon Input */}
-      <div className="flex gap-2 items-center mb-4">
-        <Input
-          type="text"
-          placeholder="Enter coupon code"
-          value={manualCoupon}
-          onChange={(e) => setManualCoupon(e.target.value.toUpperCase())}
-          className="flex-1"
-        />
-        <Button
-          className="bg-orange-600 hover:bg-orange-700 text-white"
-          onClick={async () => {
-            if (!manualCoupon.trim()) {
-              toast({
-                title: "Enter Coupon",
-                description: "Please enter a coupon code before applying.",
-                variant: "destructive",
-              });
-              return;
-            }
-
-            try {
-              const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`, {
-                code: manualCoupon,
-                orderTotal: priceDetails.totalAmount,
-              });
-
-              setAppliedCoupon(res.data.coupon);
-              setDiscountAmount(res.data.discount);
-
-              toast({
-                title: "Coupon Applied!",
-                description: `${manualCoupon} applied successfully. You saved ₹${res.data.discount}.`,
-                variant: "success",
-              });
-
-              setShowCouponPopup(false);
-              setManualCoupon("");
-            } catch (err) {
-              toast({
-                title: "Invalid Coupon",
-                description:
-                  err.response?.data?.message || "Coupon is not valid or expired.",
-                variant: "destructive",
-              });
-            }
-          }}
-        >
-          Apply
-        </Button>
-      </div>
-
-      {/* Available Coupons List */}
-      <h2 className="text-md font-semibold text-orange-700 mb-2 text-center">
-        Available Coupons
-      </h2>
-
-      {loadingCoupons ? (
-        <p className="text-center text-gray-500">Loading coupons...</p>
-      ) : coupons.length > 0 ? (
-        coupons.map((coupon) => (
-          <Card key={coupon._id} className="mb-3 border border-gray-200">
-            <CardContent className="p-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-orange-600">{coupon.code}</p>
-                  <p className="text-sm text-gray-700">{coupon.description}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Valid till: {new Date(coupon.validUntil).toLocaleDateString()}
-                  </p>
+                  {idx < steps.length - 1 && (
+                    <div className={cn(
+                      "w-32 md:w-48 h-[2px] mt-[-20px] mx-[-10px]",
+                      step > idx + 1 ? "bg-green-500" : "bg-gray-200"
+                    )} />
+                  )}
                 </div>
-                <Button
-                  size="sm"
-                  className="bg-orange-600 hover:bg-orange-700 text-white"
-                  onClick={() => handleApplyCoupon(coupon)}
-                >
-                  {appliedCoupon?._id === coupon._id ? "Applied" : "Apply"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      ) : (
-        <p className="text-center text-gray-500">No coupons available</p>
-      )}
-    </div>
-  )}
-
-  {/* Applied Coupon Display */}
-  {appliedCoupon && (
-    <div className="bg-green-50 border border-green-200 p-3 rounded-xl mt-3 flex justify-between items-center">
-      <div>
-        <p className="text-sm text-green-800">
-          ✅ <strong>{appliedCoupon.code}</strong> applied successfully!
-        </p>
-        <p className="text-xs text-gray-600">
-          Discount: ₹{discountAmount.toFixed(2)}
-        </p>
-      </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-red-500"
-        onClick={() => {
-          setAppliedCoupon(null);
-          setDiscountAmount(0);
-        }}
-      >
-        Remove
-      </Button>
-    </div>
-  )}
-</div>
-
-
-
-
-    <div className="flex flex-col md:flex-row justify-between mt-6 gap-3">
-  <Button
-    type="button"
-    variant="outline"
-    className="w-full md:w-auto"
-    onClick={handleBack}
-  >
-    Back
-  </Button>
-
-  {/* Pay on Pickup */}
-  <Button
-  type="button"
-  className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-  disabled={isSubmitting}
-  onClick={(e) => handleSubmit("COD", e)}
->
-  {isSubmitting ? "Submitting..." : "Pay on Pickup"}
-</Button>
-
-  {/* Pay Online */}
- <Button
-  type="button"
-  className="w-full md:w-auto bg-orange-600 hover:bg-orange-700"
-  disabled={isSubmitting}
-  onClick={async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // ✅ Make payload first
-      const payload = makeBookingPayload(formData); // custom helper (same logic as handleSubmit)
-      console.log("🟢 Payload Before Payment:", payload);
-
-      // ✅ Pass payload to Razorpay
-      await handleRazorpayPayment(payload);
-    } catch (error) {
-      console.error("Payment error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }}
->
-  {isSubmitting ? "Processing..." : "Pay Online"}
-</Button>
-
-
-</div>
-
-  </div>
-)}
-
-
-
-
-
-
-
-              {step === 4 && bookingData && (
-  <div className="text-center py-8">
-    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 text-green-600 mb-4">
-      <CheckCircle className="h-8 w-8" />
-    </div>
-    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-      Booking Confirmed!
-    </h2>
-    <p className="text-gray-600 mb-6">
-      Your booking has been successfully submitted. We'll update
-      you shortly to confirm the details and Estimated Time of
-      delivery.
-    </p>
-
-    {/* Booking Summary */}
-    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-left mb-6">
-      <h3 className="font-semibold text-gray-900 mb-2">
-        Booking Summary
-      </h3>
-      <ul className="space-y-1 text-sm text-gray-600">
-        <li className="flex justify-between">
-          <span>Service Type:</span>
-          <span className="font-medium">
-            {bookingData.serviceType
-              ? bookingData.serviceType.charAt(0).toUpperCase() +
-                bookingData.serviceType.slice(1)
-              : "N/A"}
-          </span>
-        </li>
-        <li className="flex justify-between">
-          <span>Pickup Date:</span>
-          <span className="font-medium">
-            {bookingData.pickupDate
-              ? format(new Date(bookingData.pickupDate), "PPP")
-              : "Not specified"}
-          </span>
-        </li>
-        <li className="flex justify-between">
-          <span className="text-orange-600 font-bold">TRACKING ID :</span>
-          <span className="font-bold text-orange-600">
-            {bookingData.bookingId || "N/A"}
-          </span>
-        </li>
-
-        {bookingData.pricing && (
-          <>
-            <li className="flex justify-between">
-              <span>Base Price:</span>
-              <span className="font-medium">
-                ₹{bookingData.pricing.basePrice}   
-              </span>
-            </li>
-            <li className="flex justify-between">
-              <span>Tax (18% GST):</span>
-              <span className="font-medium">
-                ₹{bookingData.pricing.tax}
-              </span>
-            </li>
-            <li className="flex justify-between text-orange-600 font-semibold">
-              <span>Total Amount:</span>
-              <span className="font-medium">
-                ₹{(priceDetails.totalAmount - discountAmount).toFixed(2)}
-              </span>
-            </li>
-          </>
+              ))}
+            </div>
+          </div>
         )}
-      </ul>
-    </div>
 
-    <Button asChild className="bg-orange-600 hover:bg-orange-700">
-      <a href="/">Return to Home</a>
-    </Button>
-  </div>
-)}
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="glass border-none overflow-hidden">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100">
+                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                      <Truck className="h-5 w-5 text-orange-600" /> Choose Service
+                    </h2>
+                  </div>
+                  <CardContent className="p-6">
+                    <RadioGroup
+                      value={formData.serviceType}
+                      onValueChange={(v) => handleSelectChange("serviceType", v)}
+                      className="grid grid-cols-1 gap-3"
+                    >
+                      {[
+                        { id: "courier", label: "Courier Service", desc: "Best for documents & small parcels", icon: Box },
+                        { id: "local", label: "Local Parcel", desc: "Same-day delivery within city", icon: Smartphone },
+                        { id: "international", label: "International", desc: "Global shipping & logistics", icon: CreditCard },
+                        { id: "shifting", label: "Shifting", desc: "Home & office relocation", icon: Package },
+                      ].map((s) => (
+                        <div key={s.id}>
+                          <RadioGroupItem value={s.id} id={s.id} className="peer sr-only" />
+                          <Label
+                            htmlFor={s.id}
+                            className="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 cursor-pointer transition-all hover:bg-orange-50 peer-data-[state=checked]:border-orange-600 peer-data-[state=checked]:bg-orange-50/50"
+                          >
+                            <div className="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
+                              <s.icon className="h-6 w-6" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-bold text-gray-900">{s.label}</p>
+                              <p className="text-sm text-gray-500">{s.desc}</p>
+                            </div>
+                            {formData.serviceType === s.id && <div className="h-4 w-4 rounded-full bg-orange-600 flex items-center justify-center"><CheckCircle className="h-3 w-3 text-white" /></div>}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </CardContent>
+                </Card>
 
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                <Card className="glass border-none h-fit">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100">
+                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                      <Box className="h-5 w-5 text-orange-600" /> Package Info
+                    </h2>
+                  </div>
+                  <CardContent className="p-6 space-y-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-bold ml-1">Actual Weight</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="weight"
+                            type="number"
+                            value={formData.weight}
+                            onChange={handleInputChange}
+                            className="h-12 border-gray-100 focus:border-orange-500 focus:ring-orange-500/20"
+                            placeholder="Enter Weight"
+                          />
+                          <Select value={formData.weightUnit} onValueChange={(v) => handleSelectChange("weightUnit", v)}>
+                            <SelectTrigger className="w-24 h-12 border-gray-100">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="kg">KG</SelectItem>
+                              <SelectItem value="g">GMS</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-bold ml-1">Dimensions (LxWxH in cm)</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <Input id="length" placeholder="L" value={formData.length} onChange={handleInputChange} className="h-11 text-center" />
+                          <Input id="width" placeholder="W" value={formData.width} onChange={handleInputChange} className="h-11 text-center" />
+                          <Input id="height" placeholder="H" value={formData.height} onChange={handleInputChange} className="h-11 text-center" />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 p-3 bg-blue-50/50 border border-blue-100/50 rounded-xl text-xs text-blue-700">
+                        <Info className="h-4 w-4" />
+                        Enter approx weight. Final weight will be verified on pickup.
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={handleNext}
+                      className="w-full h-12 bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-600/20 text-lg font-bold"
+                    >
+                      Continue <ChevronRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <Card className="glass border-none">
+                <CardContent className="p-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2 text-orange-600 mb-2">
+                        <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center font-bold">1</div>
+                        <h3 className="text-lg font-bold">Pickup Information</h3>
+                      </div>
+
+                      <div className="space-y-4 ml-10">
+                        <div className="space-y-2">
+                          <Label htmlFor="pickupPincode">Pincode</Label>
+                          <Input id="pickupPincode" value={formData.pickupPincode} onChange={handleInputChange} placeholder="826004" className="h-11" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pickupAddress">Street Address</Label>
+                          <Textarea id="pickupAddress" value={formData.pickupAddress} onChange={handleInputChange} placeholder="Flat/House No, Floor, Building Name" rows={3} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pickupLandmark">Landmark (Optional)</Label>
+                          <Input id="pickupLandmark" value={formData.pickupLandmark} onChange={handleInputChange} placeholder="Near City Mall" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2 text-orange-600 mb-2">
+                        <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center font-bold">2</div>
+                        <h3 className="text-lg font-bold">Delivery Information</h3>
+                      </div>
+
+                      <div className="space-y-4 ml-10">
+                        <div className="space-y-2">
+                          <Label htmlFor="deliveryPincode">Pincode</Label>
+                          <Input id="deliveryPincode" value={formData.deliveryPincode} onChange={handleInputChange} placeholder="700001" className="h-11" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="deliveryAddress">Street Address</Label>
+                          <Textarea id="deliveryAddress" value={formData.deliveryAddress} onChange={handleInputChange} placeholder="Flat/House No, Floor, Building Name" rows={3} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="deliveryLandmark">Landmark (Optional)</Label>
+                          <Input id="deliveryLandmark" value={formData.deliveryLandmark} onChange={handleInputChange} placeholder="Opposite State Bank" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-orange-600/5 rounded-2xl border border-orange-600/10">
+                    <div className="space-y-2">
+                      <Label>Pickup Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full h-11 justify-start text-left font-normal border-white/50 bg-white/50 backdrop-blur-sm">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Preferred Time Slot</Label>
+                      <Select value={formData.pickupTime} onValueChange={(v) => handleSelectChange("pickupTime", v)}>
+                        <SelectTrigger className="h-11 border-white/50 bg-white/50 backdrop-blur-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="morning">Morning (9 AM - 12 PM)</SelectItem>
+                          <SelectItem value="afternoon">Afternoon (12 PM - 3 PM)</SelectItem>
+                          <SelectItem value="evening">Evening (3 PM - 6 PM)</SelectItem>
+                          <SelectItem value="night">Night (6 PM - 9 PM)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 mt-8">
+                    <Button variant="outline" onClick={handleBack} className="h-12 px-8">Back</Button>
+                    <Button onClick={handleNext} className="h-12 flex-1 bg-orange-600 hover:bg-orange-700">Next <ChevronRight className="ml-2 h-4 w-4" /></Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="glass border-none">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100 flex items-center justify-between">
+                    <h2 className="text-xl font-bold flex items-center gap-2 tracking-tight">
+                      <User className="h-5 w-5 text-orange-600" /> Sender Info
+                    </h2>
+                  </div>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" value={formData.name} onChange={handleInputChange} placeholder="John Doe" className="h-11" />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="john@email.com" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input id="phone" value={formData.phone} onChange={handleInputChange} placeholder="9876543210" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass border-none">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100">
+                    <h2 className="text-xl font-bold flex items-center gap-2 tracking-tight">
+                      <Box className="h-5 w-5 text-orange-600" /> Receiver Info
+                    </h2>
+                  </div>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="receiverName">Full Name</Label>
+                      <Input id="receiverName" value={formData.receiverName} onChange={handleInputChange} placeholder="Jane Smith" className="h-11" />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="receiverEmail">Email (Optional)</Label>
+                        <Input id="receiverEmail" type="email" value={formData.receiverEmail} onChange={handleInputChange} placeholder="jane@email.com" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="receiverPhone">Phone</Label>
+                        <Input id="receiverPhone" value={formData.receiverPhone} onChange={handleInputChange} placeholder="9123456780" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="glass border-none">
+                <CardContent className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <Label className="font-bold flex items-center gap-2"><Info className="h-4 w-4 text-orange-600" /> Additional Details</Label>
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2 p-3 rounded-lg border border-gray-100 hover:bg-gray-50/50 transition-colors">
+                          <input
+                            type="checkbox"
+                            id="fragile"
+                            checked={formData.fragile}
+                            onChange={(e) => setFormData(prev => ({ ...prev, fragile: e.target.checked }))}
+                            className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-600"
+                          />
+                          <Label htmlFor="fragile" className="text-sm cursor-pointer font-medium">Handle with care (Fragile Item)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2 p-3 rounded-lg border border-gray-100 hover:bg-gray-50/50 transition-colors">
+                          <input
+                            type="checkbox"
+                            id="insuranceRequired"
+                            checked={formData.insuranceRequired}
+                            onChange={(e) => setFormData(prev => ({ ...prev, insuranceRequired: e.target.checked }))}
+                            className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-600"
+                          />
+                          <Label htmlFor="insuranceRequired" className="text-sm cursor-pointer font-medium">Add Shipping Insurance</Label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="specialInstructions">Special Instructions / Parcel Content</Label>
+                      <Textarea id="specialInstructions" value={formData.specialInstructions} onChange={handleInputChange} placeholder="Anything else we should know?" rows={4} />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 border-t pt-6">
+                    <Button variant="outline" onClick={handleBack} className="h-12 px-8">Back</Button>
+                    <Button onClick={handleNext} className="h-12 flex-1 bg-orange-600 hover:bg-orange-700">Review & Payment <ChevronRight className="ml-2 h-4 w-4" /></Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {step === 4 && (
+            <motion.div
+              key="step4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+            >
+              <div className="lg:col-span-2 space-y-6">
+                <Card className="glass border-none">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100 flex items-center justify-between">
+                    <h2 className="text-xl font-bold tracking-tight">Booking Summary</h2>
+                    <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="text-orange-600 hover:bg-orange-50 underline">Edit details</Button>
+                  </div>
+                  <CardContent className="p-8 space-y-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div className="space-y-1">
+                        <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Service Type</Label>
+                        <p className="text-2xl font-black capitalize text-gray-900 leading-tight">{formData.serviceType}</p>
+                        <p className="text-sm text-gray-500 font-medium">Actual Weight: {formData.weight} {formData.weightUnit}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Pickup Date</Label>
+                        <p className="text-2xl font-black text-gray-900 leading-tight">{date ? format(date, "MMM dd, yyyy") : "N/A"}</p>
+                        <p className="text-sm text-gray-500 font-medium capitalize">{formData.pickupTime} Slot</p>
+                      </div>
+                    </div>
+
+                    <div className="relative border-4 border-dashed border-gray-50 rounded-3xl p-8 bg-gray-50/30">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                        <div className="space-y-2 relative">
+                          <div className="absolute -left-12 top-0 bottom-0 w-8 flex flex-col items-center">
+                            <div className="h-4 w-4 rounded-full bg-orange-600 ring-4 ring-orange-100" />
+                            <div className="flex-1 w-1 bg-orange-200 mt-1" />
+                          </div>
+                          <Label className="block text-xs font-black text-orange-600 uppercase tracking-tighter">Sender</Label>
+                          <p className="font-black text-lg text-gray-900">{formData.name}</p>
+                          <p className="text-sm text-gray-600 leading-relaxed font-medium">{formData.pickupAddress}, {formData.pickupPincode}</p>
+                          <p className="text-xs text-gray-400 font-bold">{formData.phone}</p>
+                        </div>
+                        <div className="space-y-2 relative">
+                          <div className="absolute -left-12 top-0 bottom-0 w-8 flex flex-col items-center">
+                            <div className="h-4 w-4 rounded-full bg-blue-600 ring-4 ring-blue-100" />
+                            <div className="flex-1 w-1 border-2 border-dashed border-gray-200 mt-1" />
+                          </div>
+                          <Label className="block text-xs font-black text-blue-600 uppercase tracking-tighter">Receiver</Label>
+                          <p className="font-black text-lg text-gray-900">{formData.receiverName}</p>
+                          <p className="text-sm text-gray-600 leading-relaxed font-medium">{formData.deliveryAddress}, {formData.deliveryPincode}</p>
+                          <p className="text-xs text-gray-400 font-bold">{formData.receiverPhone}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="glass-orange border-none overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-8 opacity-20"><BadgePercent className="h-24 w-24" /></div>
+                  <CardContent className="p-8">
+                    <h3 className="text-xl font-black text-orange-950 mb-6 flex items-center gap-2">
+                      <BadgePercent className="h-6 w-6" /> Exclusive Offers
+                    </h3>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Input
+                        placeholder="ENTER COUPON CODE"
+                        value={manualCoupon}
+                        onChange={(e) => setManualCoupon(e.target.value.toUpperCase())}
+                        className="h-14 font-black tracking-widest uppercase border-orange-200 bg-white/60 focus:bg-white transition-all text-xl"
+                      />
+                      <Button
+                        onClick={() => applyCoupon(manualCoupon)}
+                        className="h-14 bg-orange-950 text-white hover:bg-black px-10 font-bold rounded-xl"
+                      >
+                        APPLY
+                      </Button>
+                    </div>
+                    <button
+                      onClick={() => setShowCoupons(!showCoupons)}
+                      className="mt-4 text-orange-800 font-black text-sm hover:underline flex items-center gap-1"
+                    >
+                      <Info className="h-4 w-4" /> OR VIEW ALL AVAILABLE OFFERS
+                    </button>
+
+                    {showCoupons && (
+                      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                        {loadingCoupons ? (
+                          <div className="col-span-2 flex justify-center p-4"><Loader2 className="animate-spin h-6 w-6 text-orange-600" /></div>
+                        ) : coupons.length > 0 ? (
+                          coupons.map(c => (
+                            <div key={c._id} className="bg-white/80 p-4 rounded-2xl border border-orange-100 flex justify-between items-center group hover:border-orange-400 transition-all cursor-pointer" onClick={() => applyCoupon(c.code)}>
+                              <div>
+                                <p className="text-sm font-black text-orange-600 tracking-tighter">{c.code}</p>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase">{c.description}</p>
+                              </div>
+                              <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-all">
+                                <ChevronRight className="h-4 w-4" />
+                              </div>
+                            </div>
+                          ))
+                        ) : <p className="col-span-2 text-center text-gray-500 py-4 text-xs font-bold">NO VALID COUPONS FOUND</p>}
+                      </div>
+                    )}
+
+                    {appliedCoupon && (
+                      <div className="mt-6 bg-white rounded-2xl p-4 flex items-center justify-between border-2 border-green-500 animate-pulse">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <CheckCircle className="h-8 w-8" />
+                          </div>
+                          <div>
+                            <p className="font-black text-green-900 leading-none">COUPON {appliedCoupon.code} APPLIED!</p>
+                            <p className="text-xs text-green-700 font-black">SAVED ₹{discountAmount.toFixed(2)} ON THIS ORDER</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => { setAppliedCoupon(null); setDiscountAmount(0); }} className="text-red-500 font-black hover:bg-red-50">REMOVE</Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <Card className="glass-dark border-none overflow-hidden">
+                  <div className="p-8 space-y-8">
+                    <h3 className="text-2xl font-black text-white text-center tracking-tight">Price Breakdown</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center text-gray-300">
+                        <span className="font-bold uppercase text-xs tracking-widest text-gray-400">Standard Rate</span>
+                        <span className="text-xl font-bold">₹{priceDetails?.basePrice || 0}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-gray-300">
+                        <span className="font-bold uppercase text-xs tracking-widest text-gray-400">GST (18%)</span>
+                        <span className="text-xl font-bold">₹{priceDetails?.tax || 0}</span>
+                      </div>
+                      {appliedCoupon && (
+                        <div className="flex justify-between items-center text-green-400">
+                          <span className="font-bold uppercase text-xs tracking-widest">Discount ({appliedCoupon.code})</span>
+                          <span className="text-xl font-bold">-₹{discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="h-px bg-white/10 my-4" />
+                      <div className="flex justify-between items-end">
+                        <div className="space-y-1">
+                          <span className="block font-black uppercase text-[10px] tracking-[0.2em] text-orange-400">Total Payable</span>
+                          <span className="text-5xl font-black text-white tracking-tighter">₹{((priceDetails?.totalAmount || 0) - discountAmount).toFixed(2)}</span>
+                        </div>
+                        <div className="text-right text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Inclusive of all taxes</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-4">
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => handleFinalSubmit("Online")}
+                        className="w-full h-16 bg-gradient-premium hover:shadow-[0_10px_30px_rgba(234,88,12,0.4)] transition-all text-xl font-black rounded-2xl flex items-center justify-center gap-3"
+                      >
+                        {isSubmitting ? <Loader2 className="animate-spin h-6 w-6" /> : <><CreditCard className="h-6 w-6" /> PAY ONLINE</>}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        disabled={isSubmitting}
+                        onClick={() => handleFinalSubmit("COD")}
+                        className="w-full h-14 text-white hover:bg-white/10 font-bold border-2 border-white/20 rounded-2xl"
+                      >
+                        {isSubmitting ? "PROCESSING..." : "PAY ON PICKUP (COD)"}
+                      </Button>
+                    </div>
+
+                    <div className="p-4 bg-gray-900 ring-1 ring-white/5 rounded-2xl flex items-center gap-3">
+                      <AlertCircle className="h-10 w-10 text-orange-500 shrink-0" />
+                      <p className="text-[10px] font-bold text-gray-400 leading-relaxed uppercase tracking-tighter">
+                        By proceeding, you agree to our <Link href="/terms" className="text-white underline">Service Terms</Link>. Pickup is usually scheduled within 24 business hours.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 5 && bookingData && (
+            <motion.div
+              key="step5"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="max-w-xl mx-auto"
+            >
+              <Card className="glass border-none overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-green-600" />
+                <CardContent className="p-10 text-center space-y-8">
+                  <div className="relative inline-block">
+                    <div className="h-24 w-24 rounded-3xl bg-green-500 text-white flex items-center justify-center shadow-2xl shadow-green-500/30 transform rotate-12 relative z-10">
+                      <CheckCircle className="h-14 w-14" />
+                    </div>
+                    <div className="absolute inset-0 h-24 w-24 rounded-3xl bg-green-200 animate-ping opacity-20" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <h2 className="text-4xl font-black text-gray-900 tracking-tight">Booking Confirmed!</h2>
+                    <p className="text-gray-500 font-bold text-lg uppercase tracking-tight">Reference ID: #{bookingData.bookingId}</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-3xl p-8 border-2 border-dashed border-gray-200 text-left space-y-6">
+                    <div>
+                      <Label className="uppercase text-[10px] font-black tracking-widest text-gray-400">What happens next?</Label>
+                      <ul className="mt-2 space-y-3">
+                        {[
+                          "Courier partner will call for pickup coordinate",
+                          "Package pickup usually within 24 hours",
+                          "Track using the ID above or registered phone"
+                        ].map((text, idx) => (
+                          <li key={idx} className="flex gap-3 items-start">
+                            <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0 mt-0.5"><CheckCircle className="h-3 w-3" /></div>
+                            <span className="text-sm font-bold text-gray-700 leading-tight">{text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="h-px bg-gray-200" />
+                    <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-gray-100">
+                      <div className="space-y-1">
+                        <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount Paid</span>
+                        <span className="text-2xl font-black text-orange-600">₹{bookingData.pricing?.totalAmount || "0"}</span>
+                      </div>
+                      <Button variant="outline" size="sm" asChild className="rounded-xl font-bold bg-gray-50 hover:bg-gray-100"><Link href="/dashboard">View in Dashboard</Link></Button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button asChild className="h-14 bg-orange-600 hover:bg-orange-700 font-bold rounded-2xl shadow-lg shadow-orange-600/20">
+                      <Link href="/">Back home</Link>
+                    </Button>
+                    <Button variant="outline" asChild className="h-14 font-black rounded-2xl hover:bg-gray-100">
+                      <Link href={`/track-order?id=${bookingData.bookingId}`}>Check Status <ChevronRight className="ml-2 h-4 w-4" /></Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <style jsx global>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0) rotate(0); }
+          50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fee2e2; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #fdba74; }
+      `}</style>
     </div>
   );
 }
