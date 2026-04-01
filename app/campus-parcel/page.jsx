@@ -56,10 +56,24 @@ export default function StudentMovePage() {
     const [couponError, setCouponError] = useState("")
     const [availableCoupons, setAvailableCoupons] = useState([])
     const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
-    const [showBoxDeliveryPopup, setShowBoxDeliveryPopup] = useState(false)
+    const [showPackagingPopup, setShowPackagingPopup] = useState(false)
+    const [showPickupPopup, setShowPickupPopup] = useState(false)
     const [paymentMethod, setPaymentMethod] = useState("online")
     const [isProcessing, setIsProcessing] = useState(false)
     const [bookingId, setBookingId] = useState("")
+
+    // ─── Helpers ───
+    const today = new Date().toISOString().split('T')[0]
+    
+    const addDays = (dateStr, days) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        d.setDate(d.getDate() + days);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
 
     const [formData, setFormData] = useState({
         name: "",
@@ -70,14 +84,21 @@ export default function StudentMovePage() {
         destCity: "",
         destState: "",
         destAddress: "",
-        boxDeliveryType: "self",
-        boxDeliveryDate: "",
-        boxDeliverySlot: "",
+        packagingType: null, // null | 'own' | 'preferred'
+        packagingDate: "",
+        packagingSlot: "",
+        pickupType: "self", // 'self' (Hub) or 'delivered' (Doorstep)
         pickupDate: "",
         pickupSlot: "Morning (9 AM - 12 PM)",
     })
     const [deliveryDays, setDeliveryDays] = useState("")
     const [edlValue, setEdlValue] = useState(0)
+    const [showEdlWarning, setShowEdlWarning] = useState(false)
+    const [edlPackages, setEdlPackages] = useState([
+        { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }
+    ])
+    const [edlContents, setEdlContents] = useState([])
+    const [edlStep, setEdlStep] = useState(0) // 0: Packages, 1: Contents
 
     // ─── Pincode Check State ───
     const [pincodeStatus, setPincodeStatus] = useState(null) // null | "checking" | "serviceable" | "not-serviceable"
@@ -85,22 +106,40 @@ export default function StudentMovePage() {
 
     // ─── Calculations ───
     const totalAmount = useMemo(() => {
-        let base = BOX_TYPES.reduce((sum, box) => {
-            const pricePerUnit = edlValue > 0 ? box.edlPrice : box.price;
-            return sum + pricePerUnit * quantities[box.id];
-        }, 0);
+        let base = 0;
         
-        // Add delivery fee if applicable
-        if (formData.boxDeliveryType === 'delivered') {
-            base += 49;
+        if (edlValue > 0) {
+            // EDL Pricing: Sum of (Max(Actual, Volumetric) * 80)
+            base = edlPackages.reduce((sum, pkg) => {
+                const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
+                const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
+                // Minimum weight 10kg as mentioned in user example? 
+                // Let's implement as regular weight for now, or user can clarify.
+                return sum + (chargeableWeight * 80);
+            }, 0);
+        } else {
+            base = BOX_TYPES.reduce((sum, box) => {
+                return sum + box.price * quantities[box.id];
+            }, 0);
+        }
+        
+        // Add packaging fee
+        if (formData.packagingType === 'preferred') {
+            base += 39;
+        }
+
+        // Add pickup fee if applicable
+        if (formData.pickupType === 'delivered') {
+            base += 29;
         }
 
         return Math.max(0, base - discount);
-    }, [quantities, edlValue, discount, formData.boxDeliveryType])
+    }, [quantities, edlValue, edlPackages, discount, formData.pickupType, formData.packagingType])
 
     const totalBoxes = useMemo(() => {
+        if (edlValue > 0) return edlPackages.length;
         return Object.values(quantities).reduce((a, b) => a + b, 0)
-    }, [quantities])
+    }, [quantities, edlPackages, edlValue])
 
     // ─── Handlers ───
     const updateQuantity = (id, delta) => {
@@ -108,12 +147,29 @@ export default function StudentMovePage() {
             ...prev,
             [id]: Math.max(0, prev[id] + delta),
         }))
+        // Trigger packaging popup if adding a box
+        if (delta > 0) {
+            setShowPackagingPopup(true)
+        }
     }
 
     const handleChange = (e) => {
         const { name, value } = e.target
         setFormData((prev) => ({ ...prev, [name]: value }))
     }
+
+    // Effect to clear pickupDate if it becomes invalid after packagingDate changes
+    useEffect(() => {
+        if (formData.packagingType === 'preferred' && formData.packagingDate && formData.pickupDate) {
+            if (formData.pickupDate < formData.packagingDate) {
+                setFormData(prev => ({ ...prev, pickupDate: "" }))
+            }
+            const maxDate = addDays(formData.packagingDate, 7);
+            if (formData.pickupDate > maxDate) {
+                setFormData(prev => ({ ...prev, pickupDate: "" }))
+            }
+        }
+    }, [formData.packagingDate])
 
     const handleApplyCoupon = async () => {
         if (!couponCode) return
@@ -281,10 +337,24 @@ export default function StudentMovePage() {
 
                         if (verifyData.success) {
                             // 4. Save booking to database
-                            const boxDescription = BOX_TYPES
-                                .filter((b) => quantities[b.id] > 0)
-                                .map((b) => `${b.name} x${quantities[b.id]}`)
-                                .join(", ")
+                            let boxDescription = "";
+                            let detailedPackageInfo = null;
+
+                            if (edlValue > 0) {
+                                boxDescription = `EDL Multi-package: ${edlPackages.length} items. Contents: ${edlContents.join(", ")}`;
+                                detailedPackageInfo = edlPackages.map((pkg, idx) => ({
+                                    id: idx + 1,
+                                    type: pkg.type,
+                                    dims: `${pkg.l}x${pkg.b}x${pkg.h}`,
+                                    weight: pkg.weight,
+                                    chargeable: Math.max(Number(pkg.weight), (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700).toFixed(2)
+                                }));
+                            } else {
+                                boxDescription = BOX_TYPES
+                                    .filter((b) => quantities[b.id] > 0)
+                                    .map((b) => `${b.name} x${quantities[b.id]}`)
+                                    .join(", ");
+                            }
 
                             const bookingData = {
                                 serviceType: "campus-parcel",
@@ -310,6 +380,9 @@ export default function StudentMovePage() {
                                     weight: totalBoxes,
                                     weightUnit: "kg",
                                     description: boxDescription,
+                                    isEdl: edlValue > 0,
+                                    edlItems: detailedPackageInfo,
+                                    edlContents: edlContents
                                 },
                                 boxDeliveryType: formData.boxDeliveryType,
                                 boxDeliveryDate: formData.boxDeliveryDate,
@@ -377,8 +450,7 @@ export default function StudentMovePage() {
         return () => document.body.removeChild(script)
     }, [])
 
-    // ─── Get today's date for min date ───
-    const today = new Date().toISOString().split("T")[0]
+    // ─── Component Render ───
 
     return (
         <>
@@ -612,7 +684,13 @@ export default function StudentMovePage() {
                                         )}
 
                                         <Button
-                                            onClick={() => setStep(1)}
+                                            onClick={() => {
+                                                if (edlValue > 0) {
+                                                    setShowEdlWarning(true)
+                                                } else {
+                                                    setStep(1)
+                                                }
+                                            }}
                                             disabled={pincodeStatus !== "serviceable" || (edlValue > 0 && edlStage !== 3)}
                                             className="w-full bg-gradient-premium h-14 text-lg font-black shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:grayscale"
                                         >
@@ -645,11 +723,212 @@ export default function StudentMovePage() {
                                 className="space-y-8"
                             >
                                 <div className="text-center">
-                                    <h2 className="text-4xl font-black text-gray-900">Choose Your Boxes</h2>
-                                    <p className="text-gray-500 mt-2">Select the box sizes and quantities you need for your move</p>
+                                    <h2 className="text-4xl font-black text-gray-900">
+                                        {edlValue > 0 ? "Manage Your Packages" : "Choose Your Boxes"}
+                                    </h2>
+                                    <p className="text-gray-500 mt-2">
+                                        {edlValue > 0 
+                                            ? "Add dimensions and weight for each item you want to ship" 
+                                            : "Select the box sizes and quantities you need for your move"}
+                                    </p>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {edlValue > 0 ? (
+                                    /* ───── EDL MULTI-PACKAGE MANAGER ───── */
+                                    <div className="space-y-6">
+                                        {edlStep === 0 ? (
+                                            <>
+                                                <div className="space-y-4">
+                                                    {edlPackages.map((pkg, index) => {
+                                                        const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
+                                                        const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
+                                                        
+                                                        return (
+                                                            <Card key={pkg.id} className="glass border-0 shadow-lg overflow-hidden transition-all hover:shadow-xl">
+                                                                <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-sm">
+                                                                            {index + 1}
+                                                                        </div>
+                                                                        <span className="font-bold uppercase tracking-wider text-xs">Package Details</span>
+                                                                    </div>
+                                                                    {edlPackages.length > 1 && (
+                                                                        <button 
+                                                                            onClick={() => setEdlPackages(prev => prev.filter(p => p.id !== pkg.id))}
+                                                                            className="text-red-400 hover:text-red-300 transition-colors"
+                                                                        >
+                                                                            <XCircle className="w-5 h-5" />
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                                <CardContent className="p-6 space-y-6">
+                                                                    {/* Packaging Type */}
+                                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                                        {["Box", "Suitcase", "Backpack", "Other"].map((type) => (
+                                                                            <div
+                                                                                key={type}
+                                                                                onClick={() => {
+                                                                                    const newPkgs = [...edlPackages];
+                                                                                    newPkgs[index].type = type;
+                                                                                    setEdlPackages(newPkgs);
+                                                                                    // Trigger packaging popup if selecting Box
+                                                                                    if (type === "Box") {
+                                                                                        setShowPackagingPopup(true);
+                                                                                    }
+                                                                                }}
+                                                                                className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all ${
+                                                                                    pkg.type === type 
+                                                                                        ? "border-orange-500 bg-orange-50 text-orange-700 shadow-sm" 
+                                                                                        : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
+                                                                                }`}
+                                                                            >
+                                                                                <div className="text-xl mb-1">
+                                                                                    {type === "Box" ? "📦" : type === "Suitcase" ? "💼" : type === "Backpack" ? "🎒" : "➕"}
+                                                                                </div>
+                                                                                <p className="text-[10px] font-black uppercase tracking-tighter">{type}</p>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+
+                                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                                                        {/* Dimensions */}
+                                                                        <div className="space-y-3">
+                                                                            <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                                                                                <Search className="w-3 h-3" /> Dimensions (L × B × H in cm)
+                                                                            </Label>
+                                                                            <div className="flex gap-2">
+                                                                                {['l', 'b', 'h'].map((dim) => (
+                                                                                    <Input
+                                                                                        key={dim}
+                                                                                        placeholder={dim.toUpperCase()}
+                                                                                        value={pkg[dim]}
+                                                                                        onChange={(e) => {
+                                                                                            const newPkgs = [...edlPackages];
+                                                                                            newPkgs[index][dim] = e.target.value.replace(/\D/g, "");
+                                                                                            setEdlPackages(newPkgs);
+                                                                                        }}
+                                                                                        className="h-12 text-center font-bold border-2 focus:border-blue-500"
+                                                                                    />
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {/* Weight */}
+                                                                        <div className="space-y-3">
+                                                                            <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
+                                                                                <Package className="w-3 h-3" /> Actual Weight (kg)
+                                                                            </Label>
+                                                                            <div className="relative">
+                                                                                <Input
+                                                                                    placeholder="0.00"
+                                                                                    value={pkg.weight}
+                                                                                    onChange={(e) => {
+                                                                                        const newPkgs = [...edlPackages];
+                                                                                        newPkgs[index].weight = e.target.value.replace(/[^\d.]/g, "");
+                                                                                        setEdlPackages(newPkgs);
+                                                                                    }}
+                                                                                    className="h-12 pl-12 font-bold border-2 focus:border-blue-500"
+                                                                                />
+                                                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">KG</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="bg-blue-50 rounded-2xl p-4 flex justify-between items-center border border-blue-100/50">
+                                                                        <div>
+                                                                            <p className="text-[10px] text-blue-400 uppercase font-black mb-0.5">Chargeable Weight</p>
+                                                                            <p className="text-xl font-black text-blue-900">
+                                                                                {chargeableWeight > 0 ? chargeableWeight.toFixed(2) : "0.00"} <span className="text-sm font-bold">Kgs</span>
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <p className="text-[10px] text-blue-400 uppercase font-black mb-0.5">Estimated Price</p>
+                                                                            <p className="text-xl font-black text-blue-900">₹{(chargeableWeight * 80).toLocaleString("en-IN")}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </CardContent>
+                                                            </Card>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                <Button 
+                                                    variant="outline" 
+                                                    onClick={() => setEdlPackages(prev => [...prev, { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }])}
+                                                    className="w-full h-14 border-2 border-dashed border-gray-300 hover:border-orange-500 hover:bg-orange-50 text-gray-500 font-bold rounded-2xl flex items-center justify-center gap-2"
+                                                >
+                                                    <Plus className="w-5 h-5" /> Add Another Package
+                                                </Button>
+
+                                                <div className="pt-6">
+                                                    <Button 
+                                                        onClick={() => setEdlStep(1)}
+                                                        disabled={edlPackages.some(p => !p.l || !p.b || !p.h || !p.weight)}
+                                                        className="w-full bg-gradient-premium h-16 text-xl font-black shadow-2xl shadow-orange-500/20 rounded-2xl"
+                                                    >
+                                                        Next: Package Contents <ArrowRight className="ml-2 w-6 h-6" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            /* ───── EDL PACKAGE CONTENTS (MULTI-SELECT) ───── */
+                                            <div className="space-y-8">
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                                    {[
+                                                        { label: "Books & Docs", icon: "📚" },
+                                                        { label: "Clothes & Items", icon: "👕" },
+                                                        { label: "Consumables", icon: "🍪" },
+                                                        { label: "Electronics", icon: "📱" },
+                                                        { label: "Household Items", icon: "🍳" },
+                                                        { label: "Other", icon: "📦" }
+                                                    ].map((item) => {
+                                                        const isSelected = edlContents.includes(item.label);
+                                                        return (
+                                                            <div
+                                                                key={item.label}
+                                                                onClick={() => {
+                                                                    setEdlContents(prev => 
+                                                                        prev.includes(item.label) 
+                                                                            ? prev.filter(i => i !== item.label)
+                                                                            : [...prev, item.label]
+                                                                    );
+                                                                }}
+                                                                className={`p-6 rounded-3xl border-2 transition-all cursor-pointer text-center relative group ${
+                                                                    isSelected 
+                                                                        ? "border-orange-500 bg-orange-50 ring-4 ring-orange-500/10 shadow-lg" 
+                                                                        : "border-gray-100 bg-white hover:border-gray-200"
+                                                                }`}
+                                                            >
+                                                                {isSelected && (
+                                                                    <div className="absolute top-3 right-3 bg-orange-500 text-white p-1 rounded-full shadow-md scale-110">
+                                                                        <Check className="w-3 h-3" />
+                                                                    </div>
+                                                                )}
+                                                                <div className={`text-4xl mb-4 transition-transform duration-300 group-hover:scale-110`}>{item.icon}</div>
+                                                                <p className="text-sm font-black text-gray-900 group-hover:text-orange-600 transition-colors uppercase tracking-tight">{item.label}</p>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                <div className="flex gap-4 pt-4">
+                                                    <Button variant="outline" onClick={() => setEdlStep(0)} className="h-14 px-8 border-2 rounded-2xl font-bold">
+                                                        Back to Packages
+                                                    </Button>
+                                                    <Button 
+                                                        onClick={() => setShowPickupPopup(true)}
+                                                        disabled={edlContents.length === 0}
+                                                        className="flex-1 bg-gradient-premium h-14 text-lg font-black shadow-xl shadow-orange-500/20 rounded-2xl"
+                                                    >
+                                                        Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    /* ───── STANDARD BOX SELECTOR ───── */
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {BOX_TYPES.map((box) => (
                                         <Card
                                             key={box.id}
@@ -697,27 +976,30 @@ export default function StudentMovePage() {
                                         </Card>
                                     ))}
                                 </div>
+                                )}
 
-                                {/* Total Bar */}
-                                <Card className="border-0 shadow-xl bg-gray-900 text-white">
-                                    <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                                        <div>
-                                            <p className="text-gray-400 text-sm">
-                                                {totalBoxes} box{totalBoxes !== 1 ? "es" : ""} selected
-                                            </p>
-                                            <p className="text-3xl font-black">
-                                                Total: ₹{totalAmount.toLocaleString("en-IN")}
-                                            </p>
-                                        </div>
-                                        <Button
-                                            onClick={() => setShowBoxDeliveryPopup(true)}
-                                            disabled={totalBoxes === 0}
-                                            className="w-full md:w-auto bg-gradient-premium h-14 px-10 text-lg font-black shadow-2xl shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 rounded-2xl"
-                                        >
-                                            Next: Your Details <ArrowRight className="ml-2 w-5 h-5" />
-                                        </Button>
-                                    </CardContent>
-                                </Card>
+                                {edlValue === 0 && (
+                                    /* Total Bar (Standard) */
+                                    <Card className="border-0 shadow-xl bg-gray-900 text-white mt-8">
+                                        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                                            <div>
+                                                <p className="text-gray-400 text-sm">
+                                                    {totalBoxes} box{totalBoxes !== 1 ? "es" : ""} selected
+                                                </p>
+                                                <p className="text-3xl font-black">
+                                                    Total: ₹{totalAmount.toLocaleString("en-IN")}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                onClick={() => setShowPickupPopup(true)}
+                                                disabled={totalBoxes === 0}
+                                                className="w-full md:w-auto bg-gradient-premium h-14 px-10 text-lg font-black shadow-2xl shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 rounded-2xl"
+                                            >
+                                                Next: Your Details <ArrowRight className="ml-2 w-5 h-5" />
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                )}
                             </motion.div>
                         )}
 
@@ -939,18 +1221,55 @@ export default function StudentMovePage() {
                                 <Card className="glass shadow-2xl border-0 overflow-hidden">
                                     <CardContent className="p-6 md:p-8 space-y-6">
                                         <h3 className="font-bold text-lg text-gray-900 border-b pb-3">📦 Items</h3>
-                                        {BOX_TYPES.filter((b) => quantities[b.id] > 0).map((box) => {
-                                            const displayPrice = edlValue > 0 ? box.edlPrice : box.price;
-                                            return (
-                                                <div key={box.id} className="flex items-center justify-between py-2">
-                                                    <div>
-                                                        <p className="font-semibold text-gray-900">{box.name}</p>
-                                                        <p className="text-sm text-gray-500">₹{displayPrice} × {quantities[box.id]}</p>
+                                        {edlValue > 0 ? (
+                                            /* EDL Items Summary */
+                                            <div className="space-y-4">
+                                                {edlPackages.map((pkg, idx) => {
+                                                    const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
+                                                    const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
+                                                    return (
+                                                        <div key={pkg.id} className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                                                            <div className="flex justify-between items-start mb-2">
+                                                                <div>
+                                                                    <p className="font-black text-gray-900 text-sm uppercase tracking-tight">Package #{idx + 1}: {pkg.type}</p>
+                                                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{pkg.l}x{pkg.b}x{pkg.h} cm • {pkg.weight} kg</p>
+                                                                </div>
+                                                                <p className="font-black text-orange-600 text-sm">₹{(chargeableWeight * 80).toLocaleString("en-IN")}</p>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[9px] font-black uppercase">
+                                                                    Chargeable: {chargeableWeight.toFixed(2)} kg
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                                <div className="pt-2">
+                                                    <p className="text-[10px] text-gray-400 uppercase font-black mb-2">Package Contents</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {edlContents.map(c => (
+                                                            <span key={c} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-[10px] font-bold border border-gray-200">
+                                                                {c}
+                                                            </span>
+                                                        ))}
                                                     </div>
-                                                    <p className="font-bold text-gray-900">₹{(displayPrice * quantities[box.id]).toLocaleString("en-IN")}</p>
                                                 </div>
-                                            );
-                                        })}
+                                            </div>
+                                        ) : (
+                                            /* Standard Items Summary */
+                                            BOX_TYPES.filter((b) => quantities[b.id] > 0).map((box) => {
+                                                const displayPrice = box.price;
+                                                return (
+                                                    <div key={box.id} className="flex items-center justify-between py-2">
+                                                        <div>
+                                                            <p className="font-semibold text-gray-900">{box.name}</p>
+                                                            <p className="text-sm text-gray-500">₹{displayPrice} × {quantities[box.id]}</p>
+                                                        </div>
+                                                        <p className="font-bold text-gray-900">₹{(displayPrice * quantities[box.id]).toLocaleString("en-IN")}</p>
+                                                    </div>
+                                                );
+                                            })
+                                        )}
 
                                         {/* Coupon Section (EDL Only) */}
                                         {edlValue > 0 && (
@@ -1058,13 +1377,21 @@ export default function StudentMovePage() {
                                                     <p className="font-bold text-gray-800">{formData.hostelAddress}</p>
                                                 </div>
                                                 <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
-                                                    <p className="text-[10px] text-orange-400 uppercase tracking-widest font-black mb-1">Empty Box Delivery</p>
-                                                    <p className="font-bold text-orange-900">
-                                                        {formData.boxDeliveryType === 'self' ? 'Pickup from Hub' : 'Doorstep Delivery'}
+                                                    <p className="text-[10px] text-orange-400 uppercase tracking-widest font-black mb-1">Packaging & Pickup</p>
+                                                    <p className="font-bold text-orange-900 leading-tight">
+                                                        {formData.packagingType === 'preferred' ? '📦 Preferred Box (+₹39)' : '🛍️ Own Packaging'}
                                                     </p>
-                                                    {formData.boxDeliveryType === 'delivered' && (
-                                                        <p className="text-xs text-orange-700 font-medium mt-1">
-                                                            📅 {formData.boxDeliveryDate} • ⏰ {formData.boxDeliverySlot}
+                                                    <p className="font-bold text-orange-800 mt-1">
+                                                        {formData.pickupType === 'self' ? '📍 Drop at Hub' : '🚚 Doorstep Pickup (+₹29)'}
+                                                    </p>
+                                                    {formData.packagingType === 'preferred' && (
+                                                        <p className="text-xs text-orange-700 font-medium mt-1 italic border-t pt-1 border-orange-200">
+                                                            Empty Box Delivery: {formData.packagingDate} ({formData.packagingSlot})
+                                                        </p>
+                                                    )}
+                                                    {formData.pickupType === 'delivered' && (
+                                                        <p className="text-xs text-orange-700 font-medium mt-1 italic border-t pt-1 border-orange-200">
+                                                            Parcel Collection: {formData.pickupDate} ({formData.pickupSlot})
                                                         </p>
                                                     )}
                                                 </div>
@@ -1237,133 +1564,240 @@ Please confirm my pickup! 🙏`;
             </section>
         </div>
 
-            {/* ═══════ BOX DELIVERY POPUP MODAL ═══════ */}
+             {/* ═══════ MODAL 1: PACKAGING CHOICE ═══════ */}
             <AnimatePresence>
-                {showBoxDeliveryPopup && (
+                {showPackagingPopup && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-                        onClick={() => setShowBoxDeliveryPopup(false)}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setShowPackagingPopup(false)}
                     >
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden"
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100"
                         >
-                            {/* Header */}
-                            <div className="bg-gradient-premium p-6 text-center">
-                                <div className="w-14 h-14 mx-auto bg-white/20 rounded-2xl flex items-center justify-center mb-3">
-                                    <Truck className="w-7 h-7 text-white" />
-                                </div>
-                                <h3 className="text-2xl font-black text-white">How do you want your boxes?</h3>
-                                <p className="text-orange-100 text-sm mt-1">Select your preferred collection method</p>
+                            <div className="bg-gradient-premium p-6 text-center text-white">
+                                <Package className="w-10 h-10 mx-auto mb-3" />
+                                <h3 className="text-xl font-black">Need a Box?</h3>
+                                <p className="text-orange-100 text-xs mt-1">Would you like us to provide packaging or do you have your own?</p>
                             </div>
 
-                            {/* Body */}
-                            <div className="p-6 space-y-5">
+                            <div className="p-6 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div
-                                        onClick={() => setFormData(prev => ({ ...prev, boxDeliveryType: 'self', boxDeliveryDate: '', boxDeliverySlot: '' }))}
-                                        className={`group relative p-5 rounded-2xl border-2 transition-all cursor-pointer text-center ${formData.boxDeliveryType === 'self'
-                                                ? "border-orange-500 bg-orange-50 shadow-lg shadow-orange-500/10"
-                                                : "border-gray-100 hover:border-gray-200 bg-white"
-                                            }`}
+                                        onClick={() => setFormData(prev => ({ ...prev, packagingType: 'own' }))}
+                                        className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.packagingType === 'own' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
-                                        {formData.boxDeliveryType === 'self' && (
-                                            <div className="absolute top-3 right-3 bg-orange-500 text-white p-1 rounded-full">
-                                                <Check className="w-3 h-3" />
-                                            </div>
-                                        )}
-                                        <div className={`w-12 h-12 mx-auto rounded-2xl flex items-center justify-center mb-3 ${formData.boxDeliveryType === 'self' ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-400"}`}>
-                                            <MapPin className="w-6 h-6" />
-                                        </div>
-                                        <p className="font-black text-gray-900">Pick from Hub</p>
-                                        <p className="text-xs text-gray-500 mt-1">Free</p>
+                                        <div className="text-3xl mb-2">🛍️</div>
+                                        <p className="font-black text-gray-900 text-sm">Have my own</p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Free</p>
                                     </div>
-
                                     <div
-                                        onClick={() => setFormData(prev => ({ ...prev, boxDeliveryType: 'delivered' }))}
-                                        className={`group relative p-5 rounded-2xl border-2 transition-all cursor-pointer text-center ${formData.boxDeliveryType === 'delivered'
-                                                ? "border-orange-500 bg-orange-50 shadow-lg shadow-orange-500/10"
-                                                : "border-gray-100 hover:border-gray-200 bg-white"
-                                            }`}
+                                        onClick={() => setFormData(prev => ({ ...prev, packagingType: 'preferred' }))}
+                                        className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.packagingType === 'preferred' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
-                                        {formData.boxDeliveryType === 'delivered' && (
-                                            <div className="absolute top-3 right-3 bg-orange-500 text-white p-1 rounded-full">
-                                                <Check className="w-3 h-3" />
-                                            </div>
-                                        )}
-                                        <div className={`w-12 h-12 mx-auto rounded-2xl flex items-center justify-center mb-3 ${formData.boxDeliveryType === 'delivered' ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-400"}`}>
-                                            <Truck className="w-6 h-6" />
-                                        </div>
-                                        <p className="font-black text-gray-900">Doorstep</p>
-                                        <p className="text-xs text-gray-500 mt-1">₹49</p>
+                                        <div className="text-3xl mb-2">📦</div>
+                                        <p className="font-black text-gray-900 text-sm">Preferred Box</p>
+                                        <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mt-1">+₹39 / item</p>
                                     </div>
                                 </div>
 
-                                {/* Delivery date/slot picker */}
                                 <AnimatePresence>
-                                    {formData.boxDeliveryType === 'delivered' && (
+                                    {formData.packagingType === 'preferred' && (
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: "auto" }}
                                             exit={{ opacity: 0, height: 0 }}
-                                            className="overflow-hidden"
+                                            className="overflow-hidden bg-gray-50 p-4 rounded-xl border border-gray-200"
                                         >
-                                            <div className="grid grid-cols-2 gap-3 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                                <div className="space-y-1.5">
-                                                    <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
-                                                        <Calendar className="w-3 h-3" /> Date
-                                                    </Label>
-                                                    <Input
-                                                        name="boxDeliveryDate"
-                                                        type="date"
-                                                        min={today}
-                                                        max={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
-                                                        value={formData.boxDeliveryDate}
-                                                        onChange={handleChange}
-                                                        className="h-11 border-2 rounded-xl focus:border-orange-500 font-bold text-sm"
-                                                    />
-                                                </div>
-                                                <div className="space-y-1.5">
-                                                    <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-1">
-                                                        <Clock className="w-3 h-3" /> Slot
-                                                    </Label>
-                                                    <select
-                                                        name="boxDeliverySlot"
-                                                        value={formData.boxDeliverySlot}
-                                                        onChange={handleChange}
-                                                        className="w-full h-11 rounded-xl border-2 border-gray-200 px-3 bg-white font-bold text-sm focus:border-orange-500 appearance-none"
-                                                    >
-                                                        <option value="">Select</option>
-                                                        <option value="9 AM - 12 PM">9 AM – 12 PM</option>
-                                                        <option value="12 PM - 3 PM">12 PM – 3 PM</option>
-                                                        <option value="3 PM - 6 PM">3 PM – 6 PM</option>
-                                                    </select>
-                                                </div>
+                                            <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">When should we deliver empty box?</p>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                <Input
+                                                    name="packagingDate"
+                                                    type="date"
+                                                    min={today}
+                                                    value={formData.packagingDate}
+                                                    onChange={handleChange}
+                                                    className="h-10 border-2 rounded-lg font-bold text-xs"
+                                                />
+                                                <select
+                                                    name="packagingSlot"
+                                                    value={formData.packagingSlot}
+                                                    onChange={handleChange}
+                                                    className="w-full h-10 rounded-lg border-2 border-gray-200 px-3 bg-white text-xs font-bold"
+                                                >
+                                                    <option value="">Select Time Slot</option>
+                                                    <option value="9 AM - 12 PM">9 AM – 12 PM</option>
+                                                    <option value="12 PM - 3 PM">12 PM – 3 PM</option>
+                                                    <option value="3 PM - 6 PM">3 PM – 6 PM</option>
+                                                </select>
                                             </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
+
+                                <Button
+                                    onClick={() => setShowPackagingPopup(false)}
+                                    disabled={!formData.packagingType || (formData.packagingType === 'preferred' && (!formData.packagingDate || !formData.packagingSlot))}
+                                    className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
+                                >
+                                    Confirm Choice
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════ MODAL 2: PICKUP METHOD ═══════ */}
+            <AnimatePresence>
+                {showPickupPopup && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setShowPickupPopup(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100"
+                        >
+                            <div className="bg-gradient-premium p-6 text-center text-white">
+                                <Truck className="w-10 h-10 mx-auto mb-3" />
+                                <h3 className="text-xl font-black">Shipment Pickup</h3>
+                                <p className="text-orange-100 text-xs mt-1">How should we receive your final packed shipment?</p>
                             </div>
 
-                            {/* Footer */}
-                            <div className="p-6 pt-0">
+                            <div className="p-6 space-y-6">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div
+                                        onClick={() => setFormData(prev => ({ ...prev, pickupType: 'self' }))}
+                                        className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.pickupType === 'self' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
+                                    >
+                                        <div className="text-3xl mb-2">📍</div>
+                                        <p className="font-black text-gray-900 text-sm">Drop to Hub</p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Free</p>
+                                        <a href="https://maps.app.goo.gl/YourHubLocationLink" target="_blank" rel="noopener noreferrer" className="block text-[8px] mt-1 underline text-orange-600" onClick={(e) => e.stopPropagation()}>View Map</a>
+                                    </div>
+                                    <div
+                                        onClick={() => setFormData(prev => ({ ...prev, pickupType: 'delivered' }))}
+                                        className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.pickupType === 'delivered' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
+                                    >
+                                        <div className="text-3xl mb-2">🏠</div>
+                                        <p className="font-black text-gray-900 text-sm">Home Pickup</p>
+                                        <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mt-1">+₹29 fee</p>
+                                    </div>
+                                </div>
+
+                                <AnimatePresence>
+                                    {formData.pickupType === 'delivered' && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: "auto" }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="overflow-hidden bg-gray-50 p-4 rounded-xl border border-gray-200"
+                                        >
+                                            <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">When should we collect your parcel?</p>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Input
+                                                    name="pickupDate"
+                                                    type="date"
+                                                    min={formData.packagingType === 'preferred' && formData.packagingDate ? formData.packagingDate : today}
+                                                    max={formData.packagingType === 'preferred' && formData.packagingDate ? addDays(formData.packagingDate, 7) : addDays(today, 14)}
+                                                    value={formData.pickupDate}
+                                                    onChange={handleChange}
+                                                    className="h-10 border-2 rounded-lg font-bold text-xs"
+                                                />
+                                                <select
+                                                    name="pickupSlot"
+                                                    value={formData.pickupSlot}
+                                                    onChange={handleChange}
+                                                    className="w-full h-10 rounded-lg border-2 border-gray-200 px-3 bg-white text-xs font-bold"
+                                                >
+                                                    <option value="">Slot</option>
+                                                    <option value="9 AM - 12 PM">9 AM – 12 PM</option>
+                                                    <option value="12 PM - 3 PM">12 PM – 3 PM</option>
+                                                    <option value="3 PM - 6 PM">3 PM – 6 PM</option>
+                                                </select>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
                                 <Button
                                     onClick={() => {
-                                        setShowBoxDeliveryPopup(false)
+                                        setShowPickupPopup(false)
                                         setStep(2)
                                     }}
-                                    disabled={!formData.boxDeliveryType || (formData.boxDeliveryType === 'delivered' && (!formData.boxDeliveryDate || !formData.boxDeliverySlot))}
-                                    className="w-full bg-gradient-premium h-14 text-lg font-black shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 rounded-2xl"
+                                    disabled={formData.pickupType === 'delivered' && (!formData.pickupDate || !formData.pickupSlot)}
+                                    className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
                                 >
-                                    Continue <ArrowRight className="ml-2 w-5 h-5" />
+                                    Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════ EDL WARNING MODAL ═══════ */}
+            <AnimatePresence>
+                {showEdlWarning && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-orange-100"
+                        >
+                            <div className="bg-orange-500 p-8 text-center text-white relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl font-black" />
+                                <AlertTriangle className="w-16 h-16 mx-auto mb-4 animate-bounce" />
+                                <h3 className="text-2xl font-black mb-2">Attention Required !</h3>
+                                <p className="text-orange-50 text-sm opacity-90">Please read carefully before proceeding</p>
+                            </div>
+                            <div className="p-8 space-y-6">
+                                <div className="bg-orange-50 border-l-4 border-orange-500 p-5 rounded-r-2xl">
+                                    <p className="text-gray-800 font-bold leading-relaxed">
+                                        "We can't deliver directly to this, but we have an alternative and maybe the offer is not applicable for you."
+                                    </p>
+                                </div>
+                                <div className="space-y-3">
+                                    <Button
+                                        onClick={() => {
+                                            setShowEdlWarning(false)
+                                            setStep(1)
+                                        }}
+                                        className="w-full bg-orange-600 hover:bg-orange-700 h-14 text-lg font-black shadow-lg shadow-orange-200 rounded-2xl"
+                                    >
+                                        Continue Anyway
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setShowEdlWarning(false)
+                                            setFormData(prev => ({ ...prev, destPincode: "" }))
+                                            setPincodeStatus(null)
+                                        }}
+                                        className="w-full h-12 text-gray-500 font-bold border-2 rounded-2xl"
+                                    >
+                                        Try with another pincode
+                                    </Button>
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>
