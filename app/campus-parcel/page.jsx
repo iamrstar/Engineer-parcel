@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react"
 import {
     GraduationCap, Package, Plus, Minus, CreditCard, ArrowRight,
     CheckCircle, XCircle, MapPin, Phone, Mail, User, Calendar,
-    Truck, Shield, Clock, AlertTriangle, Sparkles, Box, Search, Check, Bot
+    Truck, Shield, Clock, AlertTriangle, Sparkles, Box, Search, Check, Bot, Info
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -61,6 +61,7 @@ export default function StudentMovePage() {
     const [paymentMethod, setPaymentMethod] = useState("online")
     const [isProcessing, setIsProcessing] = useState(false)
     const [bookingId, setBookingId] = useState("")
+    const [showProhibitedWarning, setShowProhibitedWarning] = useState(false)
 
     // ─── Helpers ───
     const today = new Date().toISOString().split('T')[0]
@@ -98,6 +99,7 @@ export default function StudentMovePage() {
         { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }
     ])
     const [edlContents, setEdlContents] = useState([])
+    const [otherItemText, setOtherItemText] = useState("")
     const [edlStep, setEdlStep] = useState(0) // 0: Packages, 1: Contents
 
     // ─── Pincode Check State ───
@@ -105,7 +107,7 @@ export default function StudentMovePage() {
     const [pincodeError, setPincodeError] = useState("")
 
     // ─── Calculations ───
-    const totalAmount = useMemo(() => {
+    const pricingSummary = useMemo(() => {
         let base = 0;
         
         if (edlValue > 0) {
@@ -113,8 +115,6 @@ export default function StudentMovePage() {
             base = edlPackages.reduce((sum, pkg) => {
                 const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
                 const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
-                // Minimum weight 10kg as mentioned in user example? 
-                // Let's implement as regular weight for now, or user can clarify.
                 return sum + (chargeableWeight * 80);
             }, 0);
         } else {
@@ -133,8 +133,20 @@ export default function StudentMovePage() {
             base += 29;
         }
 
-        return Math.max(0, base - discount);
+        const subtotal = Math.max(0, base - discount);
+        const tax = subtotal * 0.18;
+        const total = subtotal + tax;
+
+        return {
+            base,
+            discount,
+            subtotal,
+            tax,
+            total
+        };
     }, [quantities, edlValue, edlPackages, discount, formData.pickupType, formData.packagingType])
+
+    const totalAmount = pricingSummary.total;
 
     const totalBoxes = useMemo(() => {
         if (edlValue > 0) return edlPackages.length;
@@ -181,10 +193,15 @@ export default function StudentMovePage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     code: couponCode,
-                    orderTotal: BOX_TYPES.reduce((sum, box) => {
-                        const pricePerUnit = edlValue > 0 ? box.edlPrice : box.price;
-                        return sum + pricePerUnit * quantities[box.id];
-                    }, 0)
+                    orderTotal: edlValue > 0 
+                        ? edlPackages.reduce((sum, pkg) => {
+                            const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
+                            const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
+                            return sum + (chargeableWeight * 80);
+                          }, 0)
+                        : BOX_TYPES.reduce((sum, box) => {
+                            return sum + box.price * quantities[box.id];
+                          }, 0)
                 }),
             })
             const data = await res.json()
@@ -382,20 +399,22 @@ export default function StudentMovePage() {
                                     description: boxDescription,
                                     isEdl: edlValue > 0,
                                     edlItems: detailedPackageInfo,
-                                    edlContents: edlContents
+                                    edlContents: edlContents,
+                                    otherContentText: otherItemText
                                 },
-                                boxDeliveryType: formData.boxDeliveryType,
-                                boxDeliveryDate: formData.boxDeliveryDate,
-                                boxDeliverySlot: formData.boxDeliverySlot,
+                                boxDeliveryType: formData.packagingType === 'preferred' ? 'delivered' : 'self',
+                                boxDeliveryDate: formData.packagingDate,
+                                boxDeliverySlot: formData.packagingSlot,
+                                pickupMethod: formData.pickupType === 'delivered' ? 'doorstep' : 'hub',
                                 pickupDate: formData.pickupDate,
                                 pickupSlot: formData.pickupSlot,
                                 pricing: {
-                                    basePrice: totalAmount + discount,
-                                    additionalCharges: 0,
-                                    discount: discount,
+                                    basePrice: pricingSummary.base,
+                                    additionalCharges: (formData.packagingType === 'preferred' ? 39 : 0) + (formData.pickupType === 'delivered' ? 29 : 0),
+                                    discount: pricingSummary.discount,
                                     couponCode: appliedCoupon,
-                                    tax: 0,
-                                    totalAmount: totalAmount,
+                                    tax: pricingSummary.tax,
+                                    totalAmount: pricingSummary.total,
                                 },
                                 notes: `Campus Parcel Booking — ${boxDescription}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
                             }
@@ -862,7 +881,7 @@ export default function StudentMovePage() {
 
                                                 <div className="pt-6">
                                                     <Button 
-                                                        onClick={() => setEdlStep(1)}
+                                                        onClick={() => setShowProhibitedWarning(true)}
                                                         disabled={edlPackages.some(p => !p.l || !p.b || !p.h || !p.weight)}
                                                         className="w-full bg-gradient-premium h-16 text-xl font-black shadow-2xl shadow-orange-500/20 rounded-2xl"
                                                     >
@@ -906,6 +925,22 @@ export default function StudentMovePage() {
                                                                 )}
                                                                 <div className={`text-4xl mb-4 transition-transform duration-300 group-hover:scale-110`}>{item.icon}</div>
                                                                 <p className="text-sm font-black text-gray-900 group-hover:text-orange-600 transition-colors uppercase tracking-tight">{item.label}</p>
+                                                                
+                                                                {item.label === "Other" && isSelected && (
+                                                                    <motion.div 
+                                                                        initial={{ opacity: 0, y: 10 }}
+                                                                        animate={{ opacity: 1, y: 0 }}
+                                                                        className="mt-4"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <Input 
+                                                                            placeholder="Specify items..."
+                                                                            value={otherItemText}
+                                                                            onChange={(e) => setOtherItemText(e.target.value)}
+                                                                            className="h-10 border-2 border-orange-200 focus:border-orange-500 bg-white text-xs font-bold"
+                                                                        />
+                                                                    </motion.div>
+                                                                )}
                                                             </div>
                                                         );
                                                     })}
@@ -1349,10 +1384,28 @@ export default function StudentMovePage() {
                                             </div>
                                         )}
 
-                                        <div className="border-t pt-4 flex flex-col gap-2">
-                                            <div className="flex justify-between items-center">
-                                                <p className="text-lg font-bold text-gray-900">Total Amount</p>
-                                                <p className="text-2xl font-black text-orange-600">₹{totalAmount.toLocaleString("en-IN")}</p>
+                                        <div className="border-t pt-4 flex flex-col gap-2 bg-gray-50 -mx-6 px-6 py-4">
+                                            <div className="flex justify-between items-center text-sm font-bold text-gray-500">
+                                                <p>Base Amount</p>
+                                                <p>₹{pricingSummary.base.toLocaleString("en-IN")}</p>
+                                            </div>
+                                            {pricingSummary.discount > 0 && (
+                                                <div className="flex justify-between items-center text-sm font-bold text-green-600">
+                                                    <p>Discount</p>
+                                                    <p>- ₹{pricingSummary.discount.toLocaleString("en-IN")}</p>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-center text-sm font-bold text-gray-500 border-t border-gray-100 pt-2">
+                                                <p>Subtotal</p>
+                                                <p>₹{pricingSummary.subtotal.toLocaleString("en-IN")}</p>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm font-bold text-blue-600">
+                                                <p>GST (18%)</p>
+                                                <p>+ ₹{pricingSummary.tax.toLocaleString("en-IN")}</p>
+                                            </div>
+                                            <div className="flex justify-between items-center pt-2 border-t border-gray-200 mt-2">
+                                                <p className="text-xl font-black text-gray-900 uppercase tracking-tighter">Amount to pay</p>
+                                                <p className="text-3xl font-black text-orange-600">₹{pricingSummary.total.toLocaleString("en-IN")}</p>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -1749,30 +1802,30 @@ Please confirm my pickup! 🙏`;
                 )}
             </AnimatePresence>
 
-            {/* ═══════ EDL WARNING MODAL ═══════ */}
+            {/* ═══════ EDL WARNING MODAL (Subtle Service Info) ═══════ */}
             <AnimatePresence>
                 {showEdlWarning && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
                     >
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-orange-100"
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-blue-100"
                         >
-                            <div className="bg-orange-500 p-8 text-center text-white relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl font-black" />
-                                <AlertTriangle className="w-16 h-16 mx-auto mb-4 animate-bounce" />
-                                <h3 className="text-2xl font-black mb-2">Attention Required !</h3>
-                                <p className="text-orange-50 text-sm opacity-90">Please read carefully before proceeding</p>
+                            <div className="bg-blue-600 p-8 text-center text-white relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+                                <Info className="w-16 h-16 mx-auto mb-4 opacity-90" />
+                                <h3 className="text-2xl font-black mb-2">Service Information</h3>
+                                <p className="text-blue-50 text-sm opacity-90">Please review this update regarding your location</p>
                             </div>
                             <div className="p-8 space-y-6">
-                                <div className="bg-orange-50 border-l-4 border-orange-500 p-5 rounded-r-2xl">
-                                    <p className="text-gray-800 font-bold leading-relaxed">
+                                <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-2xl">
+                                    <p className="text-blue-900 font-bold leading-relaxed">
                                         "We can't deliver directly to this, but we have an alternative and maybe the offer is not applicable for you."
                                     </p>
                                 </div>
@@ -1782,7 +1835,7 @@ Please confirm my pickup! 🙏`;
                                             setShowEdlWarning(false)
                                             setStep(1)
                                         }}
-                                        className="w-full bg-orange-600 hover:bg-orange-700 h-14 text-lg font-black shadow-lg shadow-orange-200 rounded-2xl"
+                                        className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-lg font-black shadow-lg shadow-blue-200 rounded-2xl transition-all active:scale-95"
                                     >
                                         Continue Anyway
                                     </Button>
@@ -1793,11 +1846,62 @@ Please confirm my pickup! 🙏`;
                                             setFormData(prev => ({ ...prev, destPincode: "" }))
                                             setPincodeStatus(null)
                                         }}
-                                        className="w-full h-12 text-gray-500 font-bold border-2 rounded-2xl"
+                                        className="w-full h-12 text-gray-400 font-bold border-2 border-gray-100 hover:border-blue-200 hover:text-blue-600 rounded-2xl transition-all"
                                     >
                                         Try with another pincode
                                     </Button>
                                 </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════ PROHIBITED ITEMS WARNING MODAL ═══════ */}
+            <AnimatePresence>
+                {showProhibitedWarning && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-red-100"
+                        >
+                            <div className="bg-red-600 p-8 text-center text-white relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+                                <AlertTriangle className="w-16 h-16 mx-auto mb-4 animate-bounce" />
+                                <h3 className="text-2xl font-black mb-2">Prohibited Items!</h3>
+                                <p className="text-red-50 text-sm opacity-90 uppercase tracking-widest font-black">Strict Regulation Policy</p>
+                            </div>
+                            <div className="p-8 space-y-6">
+                                <div className="bg-red-50 border-l-4 border-red-500 p-5 rounded-r-2xl">
+                                    <h4 className="text-red-900 font-black text-sm uppercase mb-2">Do not include:</h4>
+                                    <ul className="text-red-900/80 font-bold space-y-2 list-disc ml-5">
+                                        <li>Medicines of any kind</li>
+                                        <li>Alcoholic items / Beverages</li>
+                                        <li>Hazardous or Flammable things</li>
+                                        <li>Explosives / Chemicals</li>
+                                    </ul>
+                                </div>
+                                <div className="bg-gray-100 p-4 rounded-xl">
+                                    <p className="text-gray-600 text-xs font-bold leading-relaxed">
+                                        ⚠️ <span className="text-red-600 font-black">Warning:</span> Strict inspection will be done. Legal action may be taken by authorities if such items are found during scanning.
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={() => {
+                                        setShowProhibitedWarning(false)
+                                        setEdlStep(1)
+                                    }}
+                                    className="w-full bg-red-600 hover:bg-red-700 h-14 text-lg font-black shadow-lg shadow-red-200 rounded-2xl transition-all active:scale-95"
+                                >
+                                    I Understand & Confirm
+                                </Button>
                             </div>
                         </motion.div>
                     </motion.div>
