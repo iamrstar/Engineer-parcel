@@ -69,9 +69,9 @@ export default function Home() {
                   <Link href="/booking">Start Shipping <ArrowRight className="ml-2 w-5 h-5" /></Link>
                 </Button>
                 <div className="flex -space-x-3 items-center">
-                  {[1, 2, 3, 4].map((i) => (
+                  {['/avatars/hero_avatar_1.png', '/avatars/hero_avatar_2.png', '/avatars/hero_avatar_3.png', '/avatars/hero_avatar_4.png'].map((src, i) => (
                     <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden ring-2 ring-orange-50">
-                      <Image src={`https://i.pravatar.cc/100?u=${i}`} alt="user" width={40} height={40} />
+                      <Image src={src} alt="user" width={40} height={40} className="object-cover" />
                     </div>
                   ))}
                   <div className="pl-6 text-sm">
@@ -356,9 +356,9 @@ function TestimonialsSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { name: "Rahul Kumar", place: "Dhanbad", text: "Team was professional and delivery was on time. The glassmorphism UI even made the booking process feel premium!", avatar: "https://i.pravatar.cc/100?u=12" },
-            { name: "Sneha Patel", place: "Ranchi", text: "Great shifting service, everything safe! I used their campus parcel service for my IIT graduation moving.", avatar: "https://i.pravatar.cc/100?u=15" },
-            { name: "Amit Mishra", place: "Kolkata", text: "Package reached the US in just 5 days! Their international tracking is real-time and very reliable.", avatar: "https://i.pravatar.cc/100?u=18" }
+            { name: "Rahul Kumar", place: "Dhanbad", text: "Team was professional and delivery was on time. The glassmorphism UI even made the booking process feel premium!", avatar: "/avatars/rahul_avatar.png" },
+            { name: "Sneha Patel", place: "Ranchi", text: "Great shifting service, everything safe! I used their campus parcel service for my IIT graduation moving.", avatar: "/avatars/sneha_avatar.png" },
+            { name: "Amit Mishra", place: "Kolkata", text: "Package reached the US in just 5 days! Their international tracking is real-time and very reliable.", avatar: "/avatars/amit_avatar.png" }
           ].map((t, i) => (
             <motion.div
               key={i}
