@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import {
   Award, Clock, Shield, Truck, Users, MessageCircle,
   IndianRupee, BrainCircuit, ChartCandlestick, Cpu,
-  QrCode, Cog, ArrowRight, Star, Zap, Globe, Package
+  QrCode, Cog, ArrowRight, Star, Zap, Globe, Package, User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -436,14 +436,9 @@ function TeamMember({ name, role, delay }) {
       transition={{ delay, duration: 0.5 }}
       className="group"
     >
-      <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 bg-gray-800 border border-white/10">
-        <Image
-          src={`https://i.pravatar.cc/400?u=${name}`}
-          alt={name}
-          fill
-          className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60"></div>
+      <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 bg-[#0B2434] border border-white/5 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-blue-900/20">
+        <Users className="w-1/2 h-1/2 text-[#38BDF8] drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B2434] to-transparent opacity-40"></div>
       </div>
       <h3 className="text-xl font-black text-white mb-1">{name}</h3>
       <p className="text-orange-500 font-bold uppercase tracking-widest text-xs">{role}</p>
