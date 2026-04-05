@@ -159,8 +159,8 @@ export default function StudentMovePage() {
             ...prev,
             [id]: Math.max(0, prev[id] + delta),
         }))
-        // Trigger packaging popup if adding a box
-        if (delta > 0) {
+        // Trigger packaging popup if adding a box and standard flow
+        if (delta > 0 && edlValue === 0) {
             setShowPackagingPopup(true)
         }
     }
@@ -205,8 +205,8 @@ export default function StudentMovePage() {
                 }),
             })
             const data = await res.json()
-            if (data.success) {
-                setAppliedCoupon(data.couponCode)
+            if (data.success || data.discount > 0) {
+                setAppliedCoupon(data.couponCode || couponCode)
                 setDiscount(data.discount)
                 setCouponError("")
             } else {
@@ -881,7 +881,9 @@ export default function StudentMovePage() {
 
                                                 <div className="pt-6">
                                                     <Button 
-                                                        onClick={() => setShowProhibitedWarning(true)}
+                                                        onClick={() => {
+                                                            setShowPackagingPopup(true)
+                                                        }}
                                                         disabled={edlPackages.some(p => !p.l || !p.b || !p.h || !p.weight)}
                                                         className="w-full bg-gradient-premium h-16 text-xl font-black shadow-2xl shadow-orange-500/20 rounded-2xl"
                                                     >
@@ -1636,8 +1638,14 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Package className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Need a Box?</h3>
-                                <p className="text-orange-100 text-xs mt-1">Would you like us to provide packaging or do you have your own?</p>
+                                <h3 className="text-xl font-black">
+                                    {edlValue === 0 ? "Box Logistics" : "Need a Box?"}
+                                </h3>
+                                <p className="text-orange-100 text-xs mt-1">
+                                    {edlValue === 0 
+                                        ? "How would you like to receive your boxes?" 
+                                        : "Would you like us to provide packaging or do you have your own?"}
+                                </p>
                             </div>
 
                             <div className="p-6 space-y-6">
@@ -1646,16 +1654,24 @@ Please confirm my pickup! 🙏`;
                                         onClick={() => setFormData(prev => ({ ...prev, packagingType: 'own' }))}
                                         className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.packagingType === 'own' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
-                                        <div className="text-3xl mb-2">🛍️</div>
-                                        <p className="font-black text-gray-900 text-sm">Have my own</p>
+                                        <div className="text-3xl mb-2">
+                                            {edlValue === 0 ? "📍" : "🛍️"}
+                                        </div>
+                                        <p className="font-black text-gray-900 text-sm">
+                                            {edlValue === 0 ? "Fetch from Hub" : "Have my own"}
+                                        </p>
                                         <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Free</p>
                                     </div>
                                     <div
                                         onClick={() => setFormData(prev => ({ ...prev, packagingType: 'preferred' }))}
                                         className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.packagingType === 'preferred' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
-                                        <div className="text-3xl mb-2">📦</div>
-                                        <p className="font-black text-gray-900 text-sm">Preferred Box</p>
+                                        <div className="text-3xl mb-2">
+                                            {edlValue === 0 ? "🏠" : "📦"}
+                                        </div>
+                                        <p className="font-black text-gray-900 text-sm">
+                                            {edlValue === 0 ? "Deliver to Room" : "Preferred Box"}
+                                        </p>
                                         <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mt-1">+₹39 / item</p>
                                     </div>
                                 </div>
@@ -1668,7 +1684,9 @@ Please confirm my pickup! 🙏`;
                                             exit={{ opacity: 0, height: 0 }}
                                             className="overflow-hidden bg-gray-50 p-4 rounded-xl border border-gray-200"
                                         >
-                                            <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">When should we deliver empty box?</p>
+                                            <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">
+                                                {edlValue === 0 ? "When should we deliver your boxes?" : "When should we deliver empty box?"}
+                                            </p>
                                             <div className="grid grid-cols-1 gap-3">
                                                 <Input
                                                     name="packagingDate"
