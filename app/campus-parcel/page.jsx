@@ -123,14 +123,14 @@ export default function StudentMovePage() {
             }, 0);
         }
         
-        // Add packaging fee
+        // Add packaging fee (Free for now)
         if (formData.packagingType === 'preferred') {
-            base += 39;
+            base += 0;
         }
 
-        // Add pickup fee if applicable
+        // Add pickup fee if applicable (Free for now)
         if (formData.pickupType === 'delivered') {
-            base += 29;
+            base += 0;
         }
 
         const subtotal = Math.max(0, base - discount);
@@ -410,7 +410,7 @@ export default function StudentMovePage() {
                                 pickupSlot: formData.pickupSlot,
                                 pricing: {
                                     basePrice: pricingSummary.base,
-                                    additionalCharges: (formData.packagingType === 'preferred' ? 39 : 0) + (formData.pickupType === 'delivered' ? 29 : 0),
+                                    additionalCharges: 0, // Packaging/Pickup are now free
                                     discount: pricingSummary.discount,
                                     couponCode: appliedCoupon,
                                     tax: pricingSummary.tax,
@@ -983,7 +983,7 @@ export default function StudentMovePage() {
 
                                                 <div className="text-center">
                                                     <span className="text-3xl font-black text-gray-900">₹{edlValue > 0 ? box.edlPrice : box.price}</span>
-                                                    <span className="text-sm text-gray-400 ml-1">/ box</span>
+                                                    <span className="text-sm text-gray-400 ml-1">+ GST</span>
                                                 </div>
 
                                                 {/* Quantity Selector */}
@@ -1672,7 +1672,10 @@ Please confirm my pickup! 🙏`;
                                         <p className="font-black text-gray-900 text-sm">
                                             {edlValue === 0 ? "Deliver to Room" : "Preferred Box"}
                                         </p>
-                                        <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mt-1">+₹39 / item</p>
+                                        <div className="flex flex-col items-center mt-1">
+                                            <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹39 / item</p>
+                                            <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Free (Limited Time)</p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1765,7 +1768,10 @@ Please confirm my pickup! 🙏`;
                                     >
                                         <div className="text-3xl mb-2">🏠</div>
                                         <p className="font-black text-gray-900 text-sm">Home Pickup</p>
-                                        <p className="text-[10px] text-orange-600 font-black uppercase tracking-widest mt-1">+₹29 fee</p>
+                                        <div className="flex flex-col items-center mt-1">
+                                            <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹29 fee</p>
+                                            <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Free (Limited Time)</p>
+                                        </div>
                                     </div>
                                 </div>
 
