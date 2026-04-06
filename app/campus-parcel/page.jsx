@@ -138,11 +138,11 @@ export default function StudentMovePage() {
         const total = subtotal + tax;
 
         return {
-            base,
-            discount,
-            subtotal,
-            tax,
-            total
+            base: Number(base.toFixed(2)),
+            discount: Number(discount.toFixed(2)),
+            subtotal: Number(subtotal.toFixed(2)),
+            tax: Number(tax.toFixed(2)),
+            total: Number(total.toFixed(2))
         };
     }, [quantities, edlValue, edlPackages, discount, formData.pickupType, formData.packagingType])
 
@@ -159,10 +159,7 @@ export default function StudentMovePage() {
             ...prev,
             [id]: Math.max(0, prev[id] + delta),
         }))
-        // Trigger packaging popup if adding a box and standard flow
-        if (delta > 0 && edlValue === 0) {
-            setShowPackagingPopup(true)
-        }
+        // Popup trigger removed: asked globally in next step
     }
 
     const handleChange = (e) => {
@@ -790,10 +787,7 @@ export default function StudentMovePage() {
                                                                                     const newPkgs = [...edlPackages];
                                                                                     newPkgs[index].type = type;
                                                                                     setEdlPackages(newPkgs);
-                                                                                    // Trigger packaging popup if selecting Box
-                                                                                    if (type === "Box") {
-                                                                                        setShowPackagingPopup(true);
-                                                                                    }
+                                                                                    // Popup trigger removed: asked globally in next step
                                                                                 }}
                                                                                 className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all ${
                                                                                     pkg.type === type 
@@ -953,7 +947,7 @@ export default function StudentMovePage() {
                                                         Back to Packages
                                                     </Button>
                                                     <Button 
-                                                        onClick={() => setShowPickupPopup(true)}
+                                                        onClick={() => setShowPackagingPopup(true)}
                                                         disabled={edlContents.length === 0}
                                                         className="flex-1 bg-gradient-premium h-14 text-lg font-black shadow-xl shadow-orange-500/20 rounded-2xl"
                                                     >
@@ -1028,7 +1022,7 @@ export default function StudentMovePage() {
                                                 </p>
                                             </div>
                                             <Button
-                                                onClick={() => setShowPickupPopup(true)}
+                                                onClick={() => setShowPackagingPopup(true)}
                                                 disabled={totalBoxes === 0}
                                                 className="w-full md:w-auto bg-gradient-premium h-14 px-10 text-lg font-black shadow-2xl shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 rounded-2xl"
                                             >
@@ -1434,10 +1428,18 @@ export default function StudentMovePage() {
                                                 <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
                                                     <p className="text-[10px] text-orange-400 uppercase tracking-widest font-black mb-1">Packaging & Pickup</p>
                                                     <p className="font-bold text-orange-900 leading-tight">
-                                                        {formData.packagingType === 'preferred' ? '📦 Preferred Box (+₹39)' : '🛍️ Own Packaging'}
+                                                        {formData.packagingType === 'preferred' ? (
+                                                            <span>
+                                                                📦 Preferred Box (<span className="line-through opacity-70">+₹39</span> <span className="text-green-600 font-black">Free</span>)
+                                                            </span>
+                                                        ) : '🛍️ Own Packaging'}
                                                     </p>
                                                     <p className="font-bold text-orange-800 mt-1">
-                                                        {formData.pickupType === 'self' ? '📍 Drop at Hub' : '🚚 Doorstep Pickup (+₹29)'}
+                                                        {formData.pickupType === 'self' ? '📍 Drop at Hub' : (
+                                                            <span>
+                                                                🚚 Doorstep Pickup (<span className="line-through opacity-70">+₹29</span> <span className="text-green-600 font-black">Free</span>)
+                                                            </span>
+                                                        )}
                                                     </p>
                                                     {formData.packagingType === 'preferred' && (
                                                         <p className="text-xs text-orange-700 font-medium mt-1 italic border-t pt-1 border-orange-200">
@@ -1716,7 +1718,10 @@ Please confirm my pickup! 🙏`;
                                 </AnimatePresence>
 
                                 <Button
-                                    onClick={() => setShowPackagingPopup(false)}
+                                    onClick={() => {
+                                        setShowPackagingPopup(false)
+                                        setShowPickupPopup(true)
+                                    }}
                                     disabled={!formData.packagingType || (formData.packagingType === 'preferred' && (!formData.packagingDate || !formData.packagingSlot))}
                                     className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
                                 >
