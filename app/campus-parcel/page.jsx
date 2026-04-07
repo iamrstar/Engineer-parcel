@@ -391,8 +391,8 @@ export default function StudentMovePage() {
                                     state: formData.destState,
                                 },
                                 packageDetails: {
-                                    weight: totalBoxes,
-                                    weightUnit: "kg",
+                                    weight: edlValue > 0 ? edlPackages.reduce((sum, pkg) => sum + Number(pkg.weight), 0) : undefined,
+                                    weightUnit: edlValue > 0 ? "kg" : undefined,
                                     description: boxDescription,
                                     isEdl: edlValue > 0,
                                     edlItems: detailedPackageInfo,
@@ -1165,46 +1165,7 @@ export default function StudentMovePage() {
                                             />
                                         </div>
 
-                                        {/* Pickup Date */}
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" /> Preferred Pickup Date
-                                            </Label>
-                                            <Input
-                                                name="pickupDate"
-                                                type="date"
-                                                min={formData.boxDeliveryType === 'delivered' && formData.boxDeliveryDate ? formData.boxDeliveryDate : today}
-                                                max={new Date((formData.boxDeliveryType === 'delivered' && formData.boxDeliveryDate ? new Date(formData.boxDeliveryDate).getTime() : Date.now()) + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
-                                                value={formData.pickupDate}
-                                                onChange={handleChange}
-                                                className="h-12 border-2 focus:border-orange-500"
-                                            />
-                                        </div>
 
-                                        {/* Pickup Slot */}
-                                        <div className="space-y-3">
-                                            <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4" /> Preferred Time Slot
-                                            </Label>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                                {[
-                                                    "Morning (9 AM - 12 PM)",
-                                                    "Afternoon (12 PM - 4 PM)",
-                                                    "Evening (4 PM - 7 PM)"
-                                                ].map((slot) => (
-                                                    <div
-                                                        key={slot}
-                                                        onClick={() => setFormData(prev => ({ ...prev, pickupSlot: slot }))}
-                                                        className={`px-3 py-2.5 rounded-lg border-2 text-xs font-semibold cursor-pointer transition-all text-center flex items-center justify-center ${formData.pickupSlot === slot
-                                                            ? "border-orange-500 bg-orange-50 text-orange-700 shadow-sm"
-                                                            : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
-                                                            }`}
-                                                    >
-                                                        {slot}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
 
                                         {/* Delivery Estimate */}
                                         {deliveryDays && (
