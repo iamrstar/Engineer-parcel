@@ -22,7 +22,7 @@ const BOX_TYPES = [
         price: 499,
         edlPrice: 1800,
         description: "Books, clothes & study materials",
-        dimensions: "18\" × 12\" × 12\"",
+        dimensions: "42\" × 42\" × 27\" cm",
         capacity: "Up to 30 kg",
         icon: "📦",
         color: "from-blue-500 to-blue-600",
@@ -34,8 +34,8 @@ const BOX_TYPES = [
         name: "Nova Box",
         price: 1049,
         edlPrice: 4500,
-        description: "Full room items, electronics & furniture",
-        dimensions: "24\" × 18\" × 18\"",
+        description: "large amount of stuff",
+        dimensions: "60\" × 35\" × 40\" cm",
         capacity: "Up to 75 kg",
         icon: "📦",
         color: "from-orange-500 to-orange-600",
@@ -44,9 +44,40 @@ const BOX_TYPES = [
     },
 ]
 
+const OTHER_ITEMS_TYPES = [
+    { id: "laptop", name: "Laptop", price: 1800, icon: "💻", color: "from-purple-500 to-purple-600" },
+    { id: "bicycle", name: "Bicycle", price: 1200, icon: "🚲", color: "from-green-500 to-green-600" },
+    { id: "studyTable", name: "Study Table (Regular)", price: 800, icon: "🏷️", color: "from-teal-500 to-teal-600" },
+    { id: "studyTableSmall", name: "Study Table (Small/Bed)", price: 275, icon: "🛌", color: "from-emerald-400 to-emerald-500" },
+    { id: "mattress", name: "Mattress", price: 1500, icon: "🛏️", color: "from-rose-500 to-rose-600" },
+    { id: "cooler", name: "Cooler", price: 1500, icon: "🌬️", color: "from-cyan-500 to-cyan-600" },
+    { id: "trolleySmall", name: "Trolley (Small)", price: 1200, icon: "🧳", color: "from-amber-400 to-amber-500" },
+    { id: "trolleyMedium", name: "Trolley (Medium)", price: 1500, icon: "🧳", color: "from-amber-500 to-amber-600" },
+    { id: "trolleyLarge", name: "Trolley (Large)", price: 1800, icon: "🧳", color: "from-amber-600 to-amber-700" },
+    { id: "pcKit14", name: "PC & Kit (14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500" },
+    { id: "pcKit24", name: "PC & Kit (24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600" },
+    { id: "pcKitAbove", name: "PC & Kit (>24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700" },
+    { id: "cpu", name: "CPU", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600" },
+]
+
 export default function StudentMovePage() {
     // ─── State ───
     const [quantities, setQuantities] = useState({ alpha: 0, nova: 0 })
+    const [otherItems, setOtherItems] = useState({
+        laptop: 0,
+        bicycle: 0,
+        studyTable: 0,
+        studyTableSmall: 0,
+        mattress: 0,
+        cooler: 0,
+        trolleySmall: 0,
+        trolleyMedium: 0,
+        trolleyLarge: 0,
+        pcKit14: 0,
+        pcKit24: 0,
+        pcKitAbove: 0,
+        cpu: 0
+    })
     const [step, setStep] = useState(0) // 0=pincode, 1=boxes, 2=details, 3=summary, 4=success
     const [edlStage, setEdlStage] = useState(0) // 0=none, 1=initial-fail, 2=searching, 3=resolved
     const [couponCode, setCouponCode] = useState("")
@@ -58,6 +89,7 @@ export default function StudentMovePage() {
     const [isLoadingCoupons, setIsLoadingCoupons] = useState(false)
     const [showPackagingPopup, setShowPackagingPopup] = useState(false)
     const [showPickupPopup, setShowPickupPopup] = useState(false)
+    const [showOtherItemsPopup, setShowOtherItemsPopup] = useState(false)
     const [paymentMethod, setPaymentMethod] = useState("online")
     const [isProcessing, setIsProcessing] = useState(false)
     const [bookingId, setBookingId] = useState("")
@@ -85,6 +117,7 @@ export default function StudentMovePage() {
         destCity: "",
         destState: "",
         destAddress: "",
+        destLandmark: "",
         packagingType: null, // null | 'own' | 'preferred'
         packagingDate: "",
         packagingSlot: "",
@@ -121,6 +154,11 @@ export default function StudentMovePage() {
             base = BOX_TYPES.reduce((sum, box) => {
                 return sum + box.price * quantities[box.id];
             }, 0);
+            
+            // Add other items cost
+            base += OTHER_ITEMS_TYPES.reduce((sum, item) => {
+                return sum + item.price * otherItems[item.id];
+            }, 0);
         }
         
         // Add packaging fee (Free for now)
@@ -144,14 +182,20 @@ export default function StudentMovePage() {
             tax: Number(tax.toFixed(2)),
             total: Number(total.toFixed(2))
         };
-    }, [quantities, edlValue, edlPackages, discount, formData.pickupType, formData.packagingType])
+    }, [quantities, otherItems, edlValue, edlPackages, discount, formData.pickupType, formData.packagingType])
 
     const totalAmount = pricingSummary.total;
 
     const totalBoxes = useMemo(() => {
         if (edlValue > 0) return edlPackages.length;
-        return Object.values(quantities).reduce((a, b) => a + b, 0)
-    }, [quantities, edlPackages, edlValue])
+        const standardBoxes = Object.values(quantities).reduce((a, b) => a + b, 0);
+        const extraItems = Object.values(otherItems).reduce((a, b) => a + b, 0);
+        return standardBoxes + extraItems;
+    }, [quantities, otherItems, edlPackages, edlValue])
+
+    const totalOtherItemsCount = useMemo(() => {
+        return Object.values(otherItems).reduce((a, b) => a + b, 0);
+    }, [otherItems])
 
     // ─── Handlers ───
     const updateQuantity = (id, delta) => {
@@ -160,6 +204,13 @@ export default function StudentMovePage() {
             [id]: Math.max(0, prev[id] + delta),
         }))
         // Popup trigger removed: asked globally in next step
+    }
+
+    const updateOtherItemQuantity = (id, delta) => {
+        setOtherItems((prev) => ({
+            ...prev,
+            [id]: Math.max(0, prev[id] + delta),
+        }))
     }
 
     const handleChange = (e) => {
@@ -296,7 +347,7 @@ export default function StudentMovePage() {
 
     // ─── Form Validation ───
     const isFormValid = () => {
-        return (
+        const basicInfoValid = 
             formData.name &&
             formData.phone &&
             /^\d{10}$/.test(formData.phone) &&
@@ -304,10 +355,17 @@ export default function StudentMovePage() {
             formData.hostelAddress &&
             formData.destPincode &&
             pincodeStatus === "serviceable" &&
-            formData.destAddress &&
-            formData.pickupDate &&
-            formData.pickupSlot
-        )
+            formData.destAddress;
+
+        const packagingValid = 
+            formData.packagingType === 'own' || 
+            (formData.packagingType === 'preferred' && formData.packagingDate && formData.packagingSlot);
+
+        const pickupValid = 
+            formData.pickupType === 'self' || 
+            (formData.pickupType === 'delivered' && formData.pickupDate && formData.pickupSlot);
+
+        return basicInfoValid && packagingValid && pickupValid;
     }
 
     // ─── Razorpay Payment ───
@@ -321,7 +379,7 @@ export default function StudentMovePage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: 100, // ⚠️ TEST MODE: ₹1 only for testing the full flow.
+                    amount: Math.round(totalAmount * 100), // Actual amount in paise
                     currency: "INR",
                 }),
             })
@@ -366,9 +424,18 @@ export default function StudentMovePage() {
                             } else {
                                 boxDescription = BOX_TYPES
                                     .filter((b) => quantities[b.id] > 0)
-                                    .map((b) => `${b.name} x${quantities[b.id]}`)
-                                    .join(", ");
+                                    .map((b) => `${b.name} x${quantities[b.id]}`);
                             }
+
+                            // Add other items to summary string
+                            const selectedExtraItems = OTHER_ITEMS_TYPES
+                                .filter(item => otherItems[item.id] > 0)
+                                .map(item => `${item.name} x${otherItems[item.id]}`);
+                            
+                            const fullItemSummary = [
+                                ...(Array.isArray(boxDescription) ? boxDescription : [boxDescription]), 
+                                ...selectedExtraItems
+                            ].filter(Boolean).join(", ");
 
                             const bookingData = {
                                 serviceType: "campus-parcel",
@@ -377,6 +444,7 @@ export default function StudentMovePage() {
                                     phone: formData.phone,
                                     email: formData.email,
                                     address: formData.hostelAddress,
+                                    landmark: "", // Not required for hostel
                                     pincode: "826004", // IIT ISM Dhanbad pincode
                                     city: "Dhanbad",
                                     state: "Jharkhand",
@@ -385,15 +453,20 @@ export default function StudentMovePage() {
                                     name: formData.name,
                                     phone: formData.phone,
                                     email: formData.email,
-                                    address: formData.destAddress,
+                                    address: formData.destLandmark 
+                                        ? `${formData.destAddress}, ${formData.destLandmark}` 
+                                        : formData.destAddress,
+                                    landmark: formData.destLandmark,
                                     pincode: formData.destPincode,
                                     city: formData.destCity,
                                     state: formData.destState,
                                 },
                                 packageDetails: {
+                                    items: fullItemSummary,
+                                    totalItems: totalBoxes,
                                     weight: edlValue > 0 ? edlPackages.reduce((sum, pkg) => sum + Number(pkg.weight), 0) : undefined,
                                     weightUnit: edlValue > 0 ? "kg" : undefined,
-                                    description: boxDescription,
+                                    description: fullItemSummary,
                                     isEdl: edlValue > 0,
                                     edlItems: detailedPackageInfo,
                                     edlContents: edlContents,
@@ -413,7 +486,7 @@ export default function StudentMovePage() {
                                     tax: pricingSummary.tax,
                                     totalAmount: pricingSummary.total,
                                 },
-                                notes: `Campus Parcel Booking — ${boxDescription}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
+                                notes: `Campus Parcel — ${fullItemSummary}. Razorpay ID: ${response.razorpay_payment_id}`,
                             }
 
                             const bookingRes = await fetch(`${API_BASE_URL}/api/bookings/confirm-booking`, {
@@ -1006,8 +1079,41 @@ export default function StudentMovePage() {
                                             </CardContent>
                                         </Card>
                                     ))}
+
+                                    {/* ───── OTHER ITEMS CARD (POPUP TRIGGER) ───── */}
+                                    {edlValue === 0 && (
+                                        <Card
+                                            onClick={() => setShowOtherItemsPopup(true)}
+                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 cursor-pointer group ${totalOtherItemsCount > 0 ? " ring-4 ring-purple-500/20" : ""}`}
+                                        >
+                                            <div className={`bg-gradient-to-br from-gray-800 to-gray-900 p-5 text-white text-center group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-500`}>
+                                                <div className="relative inline-block">
+                                                    <span className="text-4xl">🔌</span>
+                                                    {totalOtherItemsCount > 0 && (
+                                                        <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                                                            {totalOtherItemsCount}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <h3 className="text-xl font-bold mt-2">Special Items</h3>
+                                                <p className="text-white/60 text-[10px] uppercase font-black tracking-widest mt-1">Electronics & More</p>
+                                            </div>
+                                            <CardContent className="p-5 space-y-4 text-center">
+                                                <p className="text-sm text-gray-500 leading-relaxed">
+                                                    For items like <span className="text-gray-900 font-bold">Laptops</span>, <span className="text-gray-900 font-bold">Bicycles</span>, <span className="text-gray-900 font-bold">CPUs</span>, and furniture.
+                                                </p>
+                                                <div className="pt-2">
+                                                    <Button className="w-full bg-gray-100 hover:bg-purple-600 hover:text-white text-gray-900 rounded-xl font-bold transition-all border-0 shadow-none">
+                                                        {totalOtherItemsCount > 0 ? "Edit Selection" : "Select Items"}
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )}
                                 </div>
                                 )}
+
+
 
                                 {edlValue === 0 && (
                                     /* Total Bar (Standard) */
@@ -1022,7 +1128,16 @@ export default function StudentMovePage() {
                                                 </p>
                                             </div>
                                             <Button
-                                                onClick={() => setShowPackagingPopup(true)}
+                                                onClick={() => {
+                                                    const hasStandardBoxes = quantities.alpha > 0 || quantities.nova > 0;
+                                                    if (hasStandardBoxes) {
+                                                        setShowPackagingPopup(true);
+                                                    } else {
+                                                        // Auto-set to own packaging for special items
+                                                        setFormData(prev => ({ ...prev, packagingType: 'own' }));
+                                                        setShowPickupPopup(true);
+                                                    }
+                                                }}
                                                 disabled={totalBoxes === 0}
                                                 className="w-full md:w-auto bg-gradient-premium h-14 px-10 text-lg font-black shadow-2xl shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 rounded-2xl"
                                             >
@@ -1098,18 +1213,20 @@ export default function StudentMovePage() {
                                             </div>
                                         </div>
 
-                                        {/* Pickup Address */}
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                                <GraduationCap className="w-4 h-4" /> Hostel / Room Address (Pickup)
-                                            </Label>
-                                            <Input
-                                                name="hostelAddress"
-                                                value={formData.hostelAddress}
-                                                onChange={handleChange}
-                                                placeholder="e.g. Room 204, Jasper Hostel, IIT ISM Dhanbad"
-                                                className="h-12 border-2 focus:border-orange-500"
-                                            />
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                                    <GraduationCap className="w-4 h-4" /> Hostel / Room Address (Address Line 1)
+                                                </Label>
+                                                <Input
+                                                    name="hostelAddress"
+                                                    value={formData.hostelAddress}
+                                                    onChange={handleChange}
+                                                    placeholder="e.g. Room 204, Jasper Hostel, IIT ISM Dhanbad"
+                                                    className="h-12 border-2 focus:border-orange-500"
+                                                />
+                                            </div>
+                                            
                                         </div>
 
                                         {/* Destination Pincode (Verified in Step 0, Read-only here) */}
@@ -1153,16 +1270,27 @@ export default function StudentMovePage() {
                                             </div>
                                         )}
 
-                                        {/* Destination Full Address */}
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-semibold text-gray-700">Delivery Address</Label>
-                                            <Input
-                                                name="destAddress"
-                                                value={formData.destAddress}
-                                                onChange={handleChange}
-                                                placeholder="Full delivery address (house no, street, landmark)"
-                                                className="h-12 border-2 focus:border-orange-500"
-                                            />
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-semibold text-gray-700">Delivery Address (Address Line 1)</Label>
+                                                <Input
+                                                    name="destAddress"
+                                                    value={formData.destAddress}
+                                                    onChange={handleChange}
+                                                    placeholder="House no, street, locality"
+                                                    className="h-12 border-2 focus:border-orange-500"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-semibold text-gray-700">Landmark (Address Line 2) - Optional</Label>
+                                                <Input
+                                                    name="destLandmark"
+                                                    value={formData.destLandmark}
+                                                    onChange={handleChange}
+                                                    placeholder="Near landmark or school/temple"
+                                                    className="h-12 border-2 focus:border-orange-500"
+                                                />
+                                            </div>
                                         </div>
 
 
@@ -1261,6 +1389,25 @@ export default function StudentMovePage() {
                                                     </div>
                                                 );
                                             })
+                                        )}
+
+                                        {/* Other Items Summary */}
+                                        {edlValue === 0 && OTHER_ITEMS_TYPES.some(item => otherItems[item.id] > 0) && (
+                                            <div className="pt-4 border-t border-gray-50 border-dashed">
+                                                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Extra Items</p>
+                                                {OTHER_ITEMS_TYPES.filter(item => otherItems[item.id] > 0).map((item) => (
+                                                    <div key={item.id} className="flex items-center justify-between py-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-lg">{item.icon}</span>
+                                                            <div>
+                                                                <p className="font-semibold text-gray-900 text-sm italic">{item.name}</p>
+                                                                <p className="text-[10px] text-gray-500 font-bold">₹{item.price.toLocaleString("en-IN")} × {otherItems[item.id]}</p>
+                                                            </div>
+                                                        </div>
+                                                        <p className="font-bold text-gray-900 text-sm">₹{(item.price * otherItems[item.id]).toLocaleString("en-IN")}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         )}
 
                                         {/* Coupon Section (EDL Only) */}
@@ -1384,7 +1531,9 @@ export default function StudentMovePage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Pickup Address</p>
-                                                    <p className="font-bold text-gray-800">{formData.hostelAddress}</p>
+                                                    <p className="font-bold text-gray-800">
+                                                        {formData.hostelAddress}
+                                                    </p>
                                                 </div>
                                                 <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
                                                     <p className="text-[10px] text-orange-400 uppercase tracking-widest font-black mb-1">Packaging & Pickup</p>
@@ -1423,16 +1572,19 @@ export default function StudentMovePage() {
                                                 <div>
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Full Delivery Address</p>
                                                     <p className="font-bold text-gray-800 leading-snug">
-                                                        {formData.destAddress}, {formData.destCity}, {formData.destState} — {formData.destPincode}
+                                                        {formData.destAddress}
+                                                        {formData.destLandmark && `, ${formData.destLandmark}`}, {formData.destCity}, {formData.destState} — {formData.destPincode}
                                                     </p>
                                                 </div>
-                                                <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-                                                    <p className="text-[10px] text-blue-400 uppercase tracking-widest font-black mb-1">Parcel Pickup</p>
-                                                    <p className="font-bold text-blue-900">Scheduled for Doorstep Pickup</p>
-                                                    <p className="text-xs text-blue-700 font-medium mt-1">
-                                                        📅 {formData.pickupDate} • ⏰ {formData.pickupSlot}
-                                                    </p>
-                                                </div>
+                                                {formData.pickupType === 'delivered' && (
+                                                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                                                        <p className="text-[10px] text-blue-400 uppercase tracking-widest font-black mb-1">Parcel Pickup</p>
+                                                        <p className="font-bold text-blue-900">Scheduled for Doorstep Pickup</p>
+                                                        <p className="text-xs text-blue-700 font-medium mt-1">
+                                                            📅 {formData.pickupDate} • ⏰ {formData.pickupSlot}
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>
@@ -1785,6 +1937,95 @@ Please confirm my pickup! 🙏`;
                                     className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
                                 >
                                     Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════ MODAL 3: OTHER ITEMS SELECTION ═══════ */}
+            <AnimatePresence>
+                {showOtherItemsPopup && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setShowOtherItemsPopup(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[90vh]"
+                        >
+                            <div className="bg-gradient-premium p-6 text-center text-white relative">
+                                <button 
+                                    onClick={() => setShowOtherItemsPopup(false)}
+                                    className="absolute right-6 top-6 text-white/60 hover:text-white"
+                                >
+                                    <XCircle className="w-6 h-6" />
+                                </button>
+                                <Sparkles className="w-10 h-10 mx-auto mb-3" />
+                                <h3 className="text-2xl font-black">Special Items </h3>
+                                <p className="text-orange-100 text-xs mt-1">Select any additional electronics or furniture items</p>
+                            </div>
+
+                            <div className="p-6 overflow-y-auto space-y-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {OTHER_ITEMS_TYPES.map((item) => (
+                                        <Card
+                                            key={item.id}
+                                            className={`border-none shadow-md hover:shadow-lg transition-all duration-300 group overflow-hidden ${
+                                                otherItems[item.id] > 0 ? "ring-2 ring-purple-500/50 bg-purple-50/20" : "bg-gray-50/50"
+                                            }`}
+                                        >
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl bg-gradient-to-br ${item.color} text-white shadow-lg text-xl transition-transform group-hover:scale-110`}>
+                                                        {item.icon}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-black text-gray-900 text-sm truncate uppercase tracking-tight">{item.name}</h4>
+                                                        <p className="text-xs font-bold text-purple-600 mt-0.5">₹{item.price.toLocaleString("en-IN")}</p>
+                                                        <hr className="my-1 border-gray-100" />
+                                                        <p className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter">+ GST</p>
+                                                    </div>
+                                                    <div className="flex items-center bg-white rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
+                                                        <button
+                                                            onClick={() => updateOtherItemQuantity(item.id, -1)}
+                                                            disabled={otherItems[item.id] === 0}
+                                                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 hover:text-purple-600 transition-all disabled:opacity-30"
+                                                        >
+                                                            <Minus className="w-3 h-3" />
+                                                        </button>
+                                                        <span className="w-6 text-center font-black text-gray-900 text-xs">{otherItems[item.id]}</span>
+                                                        <button
+                                                            onClick={() => updateOtherItemQuantity(item.id, 1)}
+                                                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 hover:text-purple-600 transition-all font-black"
+                                                        >
+                                                            <Plus className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="p-6 bg-gray-50 border-t items-center flex justify-between">
+                                <div>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Selected Items</p>
+                                    <p className="font-black text-gray-900">{totalOtherItemsCount} Items</p>
+                                </div>
+                                <Button
+                                    onClick={() => setShowOtherItemsPopup(false)}
+                                    className="px-8 bg-gradient-premium h-12 text-lg font-black rounded-xl shadow-lg ring-4 ring-orange-500/10"
+                                >
+                                    Confirm & Save
                                 </Button>
                             </div>
                         </motion.div>
