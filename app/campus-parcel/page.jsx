@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import {
     GraduationCap, Package, Plus, Minus, CreditCard, ArrowRight,
     CheckCircle, XCircle, MapPin, Phone, Mail, User, Calendar,
@@ -545,10 +545,10 @@ export default function StudentMovePage() {
         <>
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
             {/* ────── Graduation Offer Banner ────── */}
-            <div className="bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white py-2.5 text-center text-sm font-bold tracking-wide">
-                <span className="mr-2">🎓</span>
-                Graduation Season Special — Flat rates for IIT ISM students!
-                <span className="ml-2">🎓</span>
+            <div className="bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 text-white py-3 text-center text-sm font-black tracking-widest uppercase shadow-lg relative z-50">
+                <span className="mr-2">✨</span>
+                Offer Effective 27th April — Flat rates & Upto 80% Off on Boxes!
+                <span className="ml-2">✨</span>
             </div>
 
             {/* ────── Hero Section ────── */}
@@ -560,34 +560,74 @@ export default function StudentMovePage() {
                 </div>
 
                 <div className="relative max-w-4xl mx-auto px-4 text-center">
-                    <div className="inline-flex items-center gap-2 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 text-orange-300 text-sm px-4 py-1.5 rounded-full mb-6">
+                    <motion.div 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-flex items-center gap-2 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 text-orange-300 text-sm px-4 py-1.5 rounded-full mb-6"
+                    >
                         <GraduationCap className="w-4 h-4" />
                         Exclusively for IIT ISM Dhanbad Students
-                    </div>
+                    </motion.div>
 
-                    <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight">
+                    <motion.h1 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="text-5xl md:text-8xl font-black mb-6 tracking-tighter leading-[0.9]"
+                    >
                         Moving Out?{" "}
-                        <span className="bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent">
+                        <br className="hidden md:block" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 animate-gradient-x">
                             We've Got You.
                         </span>
-                    </h1>
+                    </motion.h1>
 
-                    <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-                        Pack your hostel life into our boxes. We'll safely deliver your books, electronics,
-                        and belongings to your doorstep — affordable & hassle‑free.
-                    </p>
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.8 }}
+                        className="flex flex-col items-center gap-4 mb-10"
+                    >
+                        <div className="h-px w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
+                        <p className="text-lg md:text-2xl text-gray-400 font-medium max-w-2xl leading-relaxed">
+                            Pack your hostel life into our boxes. We'll safely deliver your belongings 
+                            to your doorstep — <span className="text-white font-bold">affordable & hassle‑free.</span>
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            <div className="px-6 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                                <p className="text-sm font-black tracking-[0.2em] text-orange-400 uppercase italic">
+                                    🚀 Launching 27th April
+                                </p>
+                            </div>
+                            <div className="px-6 py-2 rounded-2xl bg-orange-500/20 border border-orange-500/30 backdrop-blur-md animate-pulse">
+                                <p className="text-sm font-black tracking-[0.1em] text-orange-300 uppercase">
+                                    🔥 Upto 80% Off on Boxes
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
 
-                    <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-400">
-                        <div className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-green-400" /> Safe & Insured
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Truck className="w-4 h-4 text-blue-400" /> Door‑to‑Door
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-yellow-400" /> On‑Time Delivery
-                        </div>
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.15em]"
+                    >
+                        {[
+                            { icon: <Shield className="w-5 h-5 text-green-400" />, label: "Safe & Insured" },
+                            { icon: <Truck className="w-5 h-5 text-blue-400" />, label: "Door‑to‑Door" },
+                            { icon: <Clock className="w-5 h-5 text-yellow-400" />, label: "On‑Time Delivery" }
+                        ].map((item, idx) => (
+                            <motion.div 
+                                key={idx}
+                                whileHover={{ y: -5, color: "#fff" }}
+                                className="flex items-center gap-3 text-gray-400 transition-colors"
+                            >
+                                <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">{item.icon}</div>
+                                {item.label}
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
             </section>
 
@@ -606,18 +646,20 @@ export default function StudentMovePage() {
 
                         return (
                             <div key={s.n} className="relative z-10 flex flex-col items-center gap-3">
-                                <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ${isActive
-                                        ? "step-node-active scale-110"
-                                        : isCompleted
-                                            ? "bg-green-500 text-white shadow-lg"
-                                            : "bg-white border-2 border-gray-200 text-gray-400"
-                                        }`}
+                                <motion.div
+                                    initial={false}
+                                    animate={{
+                                        scale: isActive ? 1.15 : 1,
+                                        backgroundColor: isCompleted ? "#22c55e" : (isActive ? "#ea580c" : "#ffffff"),
+                                        borderColor: isCompleted ? "#22c55e" : (isActive ? "#ea580c" : "#e5e7eb"),
+                                        color: (isActive || isCompleted) ? "#ffffff" : "#9ca3af"
+                                    }}
+                                    className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 shadow-xl shadow-black/5`}
                                 >
-                                    {isCompleted ? <CheckCircle className="w-6 h-6" /> : s.icon}
-                                </div>
-                                <span className={`text-xs font-bold uppercase tracking-wider ${isActive ? "text-orange-600" : "text-gray-400"}`}>
-                                    {s.label}
+                                    {isCompleted ? <CheckCircle className="w-7 h-7" /> : React.cloneElement(s.icon, { className: "w-6 h-6" })}
+                                </motion.div>
+                                <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${isActive ? "text-orange-600" : "text-gray-400"}`}>
+                                    {isActive ? "Viewing" : s.label}
                                 </span>
                             </div>
                         )
@@ -1036,17 +1078,28 @@ export default function StudentMovePage() {
                                     {BOX_TYPES.map((box) => (
                                         <Card
                                             key={box.id}
-                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 ${quantities[box.id] > 0 ? " ring-4 ring-orange-500/20" : ""
+                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ring-1 ring-black/5 ${quantities[box.id] > 0 ? " ring-4 ring-orange-500/30" : ""
                                                 }`}
                                         >
-                                            <div className={`bg-gradient-to-br ${box.color} p-5 text-white text-center`}>
-                                                <span className="text-4xl">{box.icon}</span>
-                                                <h3 className="text-xl font-bold mt-2">{box.name}</h3>
-                                                <p className="text-white/80 text-sm mt-1">{box.dimensions}</p>
+                                            <div className={`bg-gradient-to-br ${box.color} p-6 text-white text-center relative overflow-hidden group`}>
+                                                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
+                                                
+                                                {/* 80% OFF Badge */}
+                                                <div className="absolute top-3 right-3 bg-white text-orange-600 px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter shadow-lg z-10 animate-bounce">
+                                                    80% Off
+                                                </div>
+
+                                                <span className="text-5xl block mb-2">{box.icon}</span>
+                                                <h3 className="text-2xl font-black">{box.name}</h3>
+                                                <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest mt-2">
+                                                    {box.dimensions}
+                                                </div>
                                             </div>
-                                            <CardContent className="p-5 space-y-4">
-                                                <p className="text-sm text-gray-600">{box.description}</p>
-                                                <p className="text-xs text-gray-400 font-medium">{box.capacity}</p>
+                                            <CardContent className="p-6 space-y-5">
+                                                <div className="space-y-1">
+                                                    <p className="text-sm text-gray-700 font-medium leading-relaxed">{box.description}</p>
+                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider">{box.capacity}</p>
+                                                </div>
 
                                                 <div className="text-center">
                                                     <span className="text-3xl font-black text-gray-900">₹{edlValue > 0 ? box.edlPrice : box.price}</span>
@@ -1084,27 +1137,28 @@ export default function StudentMovePage() {
                                     {edlValue === 0 && (
                                         <Card
                                             onClick={() => setShowOtherItemsPopup(true)}
-                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 cursor-pointer group ${totalOtherItemsCount > 0 ? " ring-4 ring-purple-500/20" : ""}`}
+                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-pointer group ring-1 ring-black/5 ${totalOtherItemsCount > 0 ? " ring-4 ring-purple-500/30" : ""}`}
                                         >
-                                            <div className={`bg-gradient-to-br from-gray-800 to-gray-900 p-5 text-white text-center group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-500`}>
+                                            <div className={`bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 text-white text-center group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-700 relative`}>
+                                                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                                                 <div className="relative inline-block">
-                                                    <span className="text-4xl">🔌</span>
+                                                    <span className="text-5xl">⚡</span>
                                                     {totalOtherItemsCount > 0 && (
-                                                        <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                                                        <span className="absolute -top-3 -right-3 bg-orange-500 text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-lg animate-bounce border-2 border-white">
                                                             {totalOtherItemsCount}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <h3 className="text-xl font-bold mt-2">Special Items</h3>
-                                                <p className="text-white/60 text-[10px] uppercase font-black tracking-widest mt-1">Electronics & More</p>
+                                                <h3 className="text-2xl font-black mt-2">Special Items</h3>
+                                                <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mt-1">Electronics & More</p>
                                             </div>
-                                            <CardContent className="p-5 space-y-4 text-center">
-                                                <p className="text-sm text-gray-500 leading-relaxed">
-                                                    For items like <span className="text-gray-900 font-bold">Laptops</span>, <span className="text-gray-900 font-bold">Bicycles</span>, <span className="text-gray-900 font-bold">CPUs</span>, and furniture.
+                                            <CardContent className="p-6 space-y-5 text-center">
+                                                <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                                                    Pack your <span className="text-gray-900 font-black">Laptops</span>, <span className="text-gray-900 font-black">Cycles</span>, and more. 
                                                 </p>
                                                 <div className="pt-2">
-                                                    <Button className="w-full bg-gray-100 hover:bg-purple-600 hover:text-white text-gray-900 rounded-xl font-bold transition-all border-0 shadow-none">
-                                                        {totalOtherItemsCount > 0 ? "Edit Selection" : "Select Items"}
+                                                    <Button className="w-full h-12 bg-gray-50 hover:bg-purple-600 hover:text-white text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all border-2 border-gray-100 group-hover:border-purple-600 shadow-none">
+                                                        {totalOtherItemsCount > 0 ? "Edit Selection" : "View Items"}
                                                     </Button>
                                                 </div>
                                             </CardContent>
