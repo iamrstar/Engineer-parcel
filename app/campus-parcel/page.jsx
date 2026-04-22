@@ -1829,7 +1829,10 @@ Please confirm my pickup! 🙏`;
                                         <p className="font-black text-gray-900 text-sm">
                                             {edlValue === 0 ? "Fetch from Hub" : "Have my own"}
                                         </p>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Free</p>
+                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">
+                                            {edlValue === 0 ? "Collect empty boxes from our campus office." : "Use your own packaging materials."}
+                                        </p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Free</p>
                                     </div>
                                     <div
                                         onClick={() => setFormData(prev => ({ ...prev, packagingType: 'preferred' }))}
@@ -1841,7 +1844,10 @@ Please confirm my pickup! 🙏`;
                                         <p className="font-black text-gray-900 text-sm">
                                             {edlValue === 0 ? "Deliver to Room" : "Preferred Box"}
                                         </p>
-                                        <div className="flex flex-col items-center mt-1">
+                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">
+                                            {edlValue === 0 ? "We'll deliver empty boxes to your room." : "Choose from our high-quality boxes."}
+                                        </p>
+                                        <div className="flex flex-col items-center">
                                             <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹39 / item</p>
                                             <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Free (Limited Time)</p>
                                         </div>
@@ -1931,7 +1937,8 @@ Please confirm my pickup! 🙏`;
                                     >
                                         <div className="text-3xl mb-2">📍</div>
                                         <p className="font-black text-gray-900 text-sm">Drop to Hub</p>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Free</p>
+                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">Drop your package to our warehouse.</p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest"></p>
                                         <a href="https://maps.app.goo.gl/YourHubLocationLink" target="_blank" rel="noopener noreferrer" className="block text-[8px] mt-1 underline text-orange-600" onClick={(e) => e.stopPropagation()}>View Map</a>
                                     </div>
                                     <div
@@ -1940,7 +1947,8 @@ Please confirm my pickup! 🙏`;
                                     >
                                         <div className="text-3xl mb-2">🏠</div>
                                         <p className="font-black text-gray-900 text-sm">Home Pickup</p>
-                                        <div className="flex flex-col items-center mt-1">
+                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">We'll pick up your packed shipment from your room.</p>
+                                        <div className="flex flex-col items-center">
                                             <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹29 fee</p>
                                             <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Free (Limited Time)</p>
                                         </div>
