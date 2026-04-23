@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -118,6 +119,8 @@ export default function StudentMovePage() {
         destState: "",
         destAddress: "",
         destLandmark: "",
+        receiverName: "",
+        receiverPhone: "",
         packagingType: null, // null | 'own' | 'preferred'
         packagingDate: "",
         packagingSlot: "",
@@ -125,6 +128,7 @@ export default function StudentMovePage() {
         pickupDate: "",
         pickupSlot: "Morning (9 AM - 12 PM)",
     })
+    const [sameAsSender, setSameAsSender] = useState(false)
     const [deliveryDays, setDeliveryDays] = useState("")
     const [edlValue, setEdlValue] = useState(0)
     const [showEdlWarning, setShowEdlWarning] = useState(false)
@@ -150,6 +154,8 @@ export default function StudentMovePage() {
                 const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
                 return sum + (chargeableWeight * 80);
             }, 0);
+            // Add EDL Surcharge (Essential for remote areas)
+            base += edlValue; 
         } else {
             base = BOX_TYPES.reduce((sum, box) => {
                 return sum + box.price * quantities[box.id];
@@ -231,6 +237,17 @@ export default function StudentMovePage() {
         }
     }, [formData.packagingDate])
 
+    // Sync receiver details if 'same as sender' is checked
+    useEffect(() => {
+        if (sameAsSender) {
+            setFormData(prev => ({
+                ...prev,
+                receiverName: prev.name,
+                receiverPhone: prev.phone
+            }))
+        }
+    }, [sameAsSender, formData.name, formData.phone])
+
     const handleApplyCoupon = async () => {
         if (!couponCode) return
         setIsValidatingCoupon(true)
@@ -308,23 +325,28 @@ export default function StudentMovePage() {
                 const data = await res.json()
 
                 if (res.ok && data.data?.isServiceable) {
-                    setPincodeStatus("serviceable")
+                    // Set all data fields FIRST before making it "serviceable" to avoid race conditions
+                    const edlResult = data.data.edl || 0
+                    setEdlValue(edlResult)
                     setFormData((prev) => ({
                         ...prev,
                         destCity: data.data.city || "",
                         destState: data.data.state || "",
                     }))
                     setDeliveryDays(data.data.deliveryDays || "")
-                    setEdlValue(data.data.edl || 0)
 
                     // Trigger EDL Animation if applicable
-                    if (data.data.edl > 0) {
+                    if (edlResult > 0) {
                         setEdlStage(1) // Stage 1: "Oh! We don't deliver directly..."
                         setTimeout(() => setEdlStage(2), 2000) // Stage 2: "Finding alternative..."
                         setTimeout(() => setEdlStage(3), 4500) // Stage 3: "Woah! We got something!"
                     } else {
                         setEdlStage(0)
+                        setEdlValue(0)
                     }
+
+                    // Move this to the end so the 'Get Started' button only enables AFTER all values are set
+                    setPincodeStatus("serviceable") 
                 } else {
                     setPincodeStatus("not-serviceable")
                     setPincodeError(data.message || "This pincode is not serviceable yet.")
@@ -355,15 +377,16 @@ export default function StudentMovePage() {
             formData.hostelAddress &&
             formData.destPincode &&
             pincodeStatus === "serviceable" &&
-            formData.destAddress;
+            formData.destAddress &&
+            formData.receiverName &&
+            formData.receiverPhone &&
+            /^\d{10}$/.test(formData.receiverPhone);
 
         const packagingValid = 
-            formData.packagingType === 'own' || 
-            (formData.packagingType === 'preferred' && formData.packagingDate && formData.packagingSlot);
+            formData.packagingType && formData.packagingDate && formData.packagingSlot;
 
         const pickupValid = 
-            formData.pickupType === 'self' || 
-            (formData.pickupType === 'delivered' && formData.pickupDate && formData.pickupSlot);
+            formData.pickupType && formData.pickupDate && formData.pickupSlot;
 
         return basicInfoValid && packagingValid && pickupValid;
     }
@@ -379,7 +402,7 @@ export default function StudentMovePage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: Math.round(totalAmount * 100), // Actual amount in paise
+                    amount: 100, // ⚠️ TEST MODE: ₹1 only for testing the full flow.
                     currency: "INR",
                 }),
             })
@@ -450,8 +473,8 @@ export default function StudentMovePage() {
                                     state: "Jharkhand",
                                 },
                                 receiverDetails: {
-                                    name: formData.name,
-                                    phone: formData.phone,
+                                    name: formData.receiverName,
+                                    phone: formData.receiverPhone,
                                     email: formData.email,
                                     address: formData.destLandmark 
                                         ? `${formData.destAddress}, ${formData.destLandmark}` 
@@ -922,7 +945,7 @@ export default function StudentMovePage() {
                                                                         {/* Dimensions */}
                                                                         <div className="space-y-3">
                                                                             <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                                                                                <Search className="w-3 h-3" /> Dimensions (L × B × H in cm)
+                                                                                <Search className="w-3 h-3" /> Dimensions (L × B × H in cm) <span className="text-red-500 font-bold ml-1">*Required</span>
                                                                             </Label>
                                                                             <div className="flex gap-2">
                                                                                 {['l', 'b', 'h'].map((dim) => (
@@ -944,7 +967,7 @@ export default function StudentMovePage() {
                                                                         {/* Weight */}
                                                                         <div className="space-y-3">
                                                                             <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                                                                                <Package className="w-3 h-3" /> Actual Weight (kg)
+                                                                                <Package className="w-3 h-3" /> Actual Weight (kg) <span className="text-red-500 font-bold ml-1">*Required</span>
                                                                             </Label>
                                                                             <div className="relative">
                                                                                 <Input
@@ -1324,6 +1347,55 @@ export default function StudentMovePage() {
                                             </div>
                                         )}
 
+                                        {/* ─── Receiver Details ─── */}
+                                        <div className="space-y-4 pt-4 border-t border-dashed">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="text-md font-bold text-gray-900 flex items-center gap-2">
+                                                    📦 Receiver Details
+                                                </h4>
+                                                <div className="flex items-center space-x-2">
+                                                    <Checkbox 
+                                                        id="same-as-sender" 
+                                                        checked={sameAsSender}
+                                                        onCheckedChange={(checked) => setSameAsSender(checked)}
+                                                    />
+                                                    <label
+                                                        htmlFor="same-as-sender"
+                                                        className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-600"
+                                                    >
+                                                        Same as Sender
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-semibold text-gray-700">Receiver Name</Label>
+                                                    <Input
+                                                        name="receiverName"
+                                                        value={formData.receiverName}
+                                                        onChange={handleChange}
+                                                        disabled={sameAsSender}
+                                                        placeholder="Name of person receiving"
+                                                        className="h-12 border-2 focus:border-orange-500 disabled:bg-gray-50/80"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-semibold text-gray-700">Receiver Phone</Label>
+                                                    <Input
+                                                        name="receiverPhone"
+                                                        value={formData.receiverPhone}
+                                                        onChange={handleChange}
+                                                        disabled={sameAsSender}
+                                                        placeholder="Receiver's mobile"
+                                                        maxLength={10}
+                                                        className="h-12 border-2 focus:border-orange-500 disabled:bg-gray-50/80"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ─── Delivery Address ─── */}
                                         <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-semibold text-gray-700">Delivery Address (Address Line 1)</Label>
@@ -1355,7 +1427,7 @@ export default function StudentMovePage() {
                                                 <Clock className="w-5 h-5 text-blue-600 mt-0.5" />
                                                 <div>
                                                     <p className="text-sm font-bold text-blue-900">Estimated Delivery Time</p>
-                                                    <p className="text-sm text-blue-700">Expect delivery in {deliveryDays} business days after pickup.</p>
+                                                    <p className="text-sm text-blue-700">Expect delivery in 5-7 business days after pickup.</p>
                                                 </div>
                                             </div>
                                         )}
@@ -1544,9 +1616,15 @@ export default function StudentMovePage() {
 
                                         <div className="border-t pt-4 flex flex-col gap-2 bg-gray-50 -mx-6 px-6 py-4">
                                             <div className="flex justify-between items-center text-sm font-bold text-gray-500">
-                                                <p>Base Amount</p>
-                                                <p>₹{pricingSummary.base.toLocaleString("en-IN")}</p>
+                                                <p>Weight Price (Base)</p>
+                                                <p>₹{(pricingSummary.base - (edlValue > 0 ? edlValue : 0)).toLocaleString("en-IN")}</p>
                                             </div>
+                                            {edlValue > 0 && (
+                                                <div className="flex justify-between items-center text-sm font-bold text-orange-600">
+                                                    <p>Remote Area Surcharge (EDL)</p>
+                                                    <p>+ ₹{edlValue.toLocaleString("en-IN")}</p>
+                                                </div>
+                                            )}
                                             {pricingSummary.discount > 0 && (
                                                 <div className="flex justify-between items-center text-sm font-bold text-green-600">
                                                     <p>Discount</p>
@@ -1580,8 +1658,12 @@ export default function StudentMovePage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                                             <div className="space-y-4">
                                                 <div>
-                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Full Name</p>
+                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Full Name (Sender)</p>
                                                     <p className="font-bold text-gray-800">{formData.name}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Receiver Name</p>
+                                                    <p className="font-bold text-gray-800">{formData.receiverName}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Pickup Address</p>
@@ -1605,14 +1687,14 @@ export default function StudentMovePage() {
                                                             </span>
                                                         )}
                                                     </p>
-                                                    {formData.packagingType === 'preferred' && (
+                                                    {formData.packagingType && (
                                                         <p className="text-xs text-orange-700 font-medium mt-1 italic border-t pt-1 border-orange-200">
-                                                            Empty Box Delivery: {formData.packagingDate} ({formData.packagingSlot})
+                                                            {formData.packagingType === 'own' ? 'Box Collection (Hub): ' : 'Box Delivery (Room): '} {formData.packagingDate} ({formData.packagingSlot})
                                                         </p>
                                                     )}
-                                                    {formData.pickupType === 'delivered' && (
+                                                    {formData.pickupType && (
                                                         <p className="text-xs text-orange-700 font-medium mt-1 italic border-t pt-1 border-orange-200">
-                                                            Parcel Collection: {formData.pickupDate} ({formData.pickupSlot})
+                                                            {formData.pickupType === 'self' ? 'Parcel Drop (Hub): ' : 'Parcel Collection (Room): '} {formData.pickupDate} ({formData.pickupSlot})
                                                         </p>
                                                     )}
                                                 </div>
@@ -1620,8 +1702,12 @@ export default function StudentMovePage() {
 
                                             <div className="space-y-4">
                                                 <div>
-                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Contact Phone</p>
+                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Sender Phone</p>
                                                     <p className="font-bold text-gray-800">{formData.phone}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Receiver Phone</p>
+                                                    <p className="font-bold text-gray-800">{formData.receiverPhone}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Full Delivery Address</p>
@@ -1630,11 +1716,13 @@ export default function StudentMovePage() {
                                                         {formData.destLandmark && `, ${formData.destLandmark}`}, {formData.destCity}, {formData.destState} — {formData.destPincode}
                                                     </p>
                                                 </div>
-                                                {formData.pickupType === 'delivered' && (
-                                                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-                                                        <p className="text-[10px] text-blue-400 uppercase tracking-widest font-black mb-1">Parcel Pickup</p>
-                                                        <p className="font-bold text-blue-900">Scheduled for Doorstep Pickup</p>
-                                                        <p className="text-xs text-blue-700 font-medium mt-1">
+                                                {formData.pickupType && (
+                                                    <div className={`p-3 rounded-xl border ${formData.pickupType === 'self' ? 'bg-orange-50 border-orange-100' : 'bg-blue-50 border-blue-100'}`}>
+                                                        <p className={`text-[10px] uppercase tracking-widest font-black mb-1 ${formData.pickupType === 'self' ? 'text-orange-400' : 'text-blue-400'}`}>Parcel {formData.pickupType === 'self' ? 'Drop-off' : 'Pickup'}</p>
+                                                        <p className={`font-bold ${formData.pickupType === 'self' ? 'text-orange-900' : 'text-blue-900'}`}>
+                                                            {formData.pickupType === 'self' ? 'Scheduled for Hub Drop-off' : 'Scheduled for Doorstep Pickup'}
+                                                        </p>
+                                                        <p className={`text-xs font-medium mt-1 ${formData.pickupType === 'self' ? 'text-orange-700' : 'text-blue-700'}`}>
                                                             📅 {formData.pickupDate} • ⏰ {formData.pickupSlot}
                                                         </p>
                                                     </div>
@@ -1855,7 +1943,7 @@ Please confirm my pickup! 🙏`;
                                 </div>
 
                                 <AnimatePresence>
-                                    {formData.packagingType === 'preferred' && (
+                                    {formData.packagingType && (
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: "auto" }}
@@ -1863,7 +1951,9 @@ Please confirm my pickup! 🙏`;
                                             className="overflow-hidden bg-gray-50 p-4 rounded-xl border border-gray-200"
                                         >
                                             <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">
-                                                {edlValue === 0 ? "When should we deliver your boxes?" : "When should we deliver empty box?"}
+                                                {formData.packagingType === 'own' 
+                                                    ? "When will you collect boxes from our Hub?" 
+                                                    : (edlValue === 0 ? "When should we deliver your boxes?" : "When should we deliver empty box?")}
                                             </p>
                                             <div className="grid grid-cols-1 gap-3">
                                                 <Input
@@ -1895,7 +1985,7 @@ Please confirm my pickup! 🙏`;
                                         setShowPackagingPopup(false)
                                         setShowPickupPopup(true)
                                     }}
-                                    disabled={!formData.packagingType || (formData.packagingType === 'preferred' && (!formData.packagingDate || !formData.packagingSlot))}
+                                    disabled={!formData.packagingType || !formData.packagingDate || !formData.packagingSlot}
                                     className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
                                 >
                                     Confirm Choice
@@ -1956,14 +2046,16 @@ Please confirm my pickup! 🙏`;
                                 </div>
 
                                 <AnimatePresence>
-                                    {formData.pickupType === 'delivered' && (
+                                    {formData.pickupType && (
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: "auto" }}
                                             exit={{ opacity: 0, height: 0 }}
                                             className="overflow-hidden bg-gray-50 p-4 rounded-xl border border-gray-200"
                                         >
-                                            <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">When should we collect your parcel?</p>
+                                            <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">
+                                                {formData.pickupType === 'self' ? "When will you drop your parcel at our Hub?" : "When should we collect your parcel?"}
+                                            </p>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <Input
                                                     name="pickupDate"
@@ -1995,7 +2087,7 @@ Please confirm my pickup! 🙏`;
                                         setShowPickupPopup(false)
                                         setStep(2)
                                     }}
-                                    disabled={formData.pickupType === 'delivered' && (!formData.pickupDate || !formData.pickupSlot)}
+                                    disabled={!formData.pickupType || !formData.pickupDate || !formData.pickupSlot}
                                     className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
                                 >
                                     Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
