@@ -47,7 +47,8 @@ const BOX_TYPES = [
 
 const OTHER_ITEMS_TYPES = [
     { id: "laptop", name: "Laptop", price: 1800, icon: "💻", color: "from-purple-500 to-purple-600" },
-    { id: "bicycle", name: "Bicycle", price: 1200, icon: "🚲", color: "from-green-500 to-green-600" },
+    { id: "bicycleGearless", name: "Bicycle (Gearless)", price: 1200, icon: "🚲", color: "from-green-500 to-green-600" },
+    { id: "bicycleGear", name: "Bicycle (With Gear)", price: 1800, icon: "🚲", color: "from-green-600 to-green-700" },
     { id: "studyTable", name: "Study Table (Regular)", price: 800, icon: "🏷️", color: "from-teal-500 to-teal-600" },
     { id: "studyTableSmall", name: "Study Table (Small/Bed)", price: 275, icon: "🛌", color: "from-emerald-400 to-emerald-500" },
     { id: "mattress", name: "Mattress", price: 1500, icon: "🛏️", color: "from-rose-500 to-rose-600" },
@@ -55,10 +56,10 @@ const OTHER_ITEMS_TYPES = [
     { id: "trolleySmall", name: "Trolley (Small)", price: 1200, icon: "🧳", color: "from-amber-400 to-amber-500" },
     { id: "trolleyMedium", name: "Trolley (Medium)", price: 1500, icon: "🧳", color: "from-amber-500 to-amber-600" },
     { id: "trolleyLarge", name: "Trolley (Large)", price: 1800, icon: "🧳", color: "from-amber-600 to-amber-700" },
-    { id: "pcKit14", name: "PC & Kit (14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500" },
-    { id: "pcKit24", name: "PC & Kit (24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600" },
-    { id: "pcKitAbove", name: "PC & Kit (>24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700" },
-    { id: "cpu", name: "CPU", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600" },
+    { id: "pcKit14", name: "PC Kit (Up to 14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500" },
+    { id: "pcKit24", name: "PC Kit (Up to 24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600" },
+    { id: "pcKitAbove", name: "PC Kit (Above 24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700" },
+    { id: "cpu", name: "CPU / Monitor", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600" },
 ]
 
 export default function StudentMovePage() {
@@ -66,7 +67,8 @@ export default function StudentMovePage() {
     const [quantities, setQuantities] = useState({ alpha: 0, nova: 0 })
     const [otherItems, setOtherItems] = useState({
         laptop: 0,
-        bicycle: 0,
+        bicycleGearless: 0,
+        bicycleGear: 0,
         studyTable: 0,
         studyTableSmall: 0,
         mattress: 0,
@@ -402,7 +404,7 @@ export default function StudentMovePage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: 100, // ⚠️ TEST MODE: ₹1 only for testing the full flow.
+                    amount: Math.round(totalAmount * 100),
                     currency: "INR",
                 }),
             })
@@ -509,7 +511,7 @@ export default function StudentMovePage() {
                                     tax: pricingSummary.tax,
                                     totalAmount: pricingSummary.total,
                                 },
-                                notes: `Campus Parcel — ${fullItemSummary}. Razorpay ID: ${response.razorpay_payment_id}`,
+                                notes: "",
                             }
 
                             const bookingRes = await fetch(`${API_BASE_URL}/api/bookings/confirm-booking`, {
@@ -1803,6 +1805,15 @@ export default function StudentMovePage() {
                                     <CheckCircle className="w-12 h-12 text-green-600" />
                                 </div>
                                 <h2 className="text-3xl font-bold text-gray-900">Booking Confirmed! 🎉</h2>
+                                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 my-4">
+                                    <p className="text-blue-800 font-bold flex items-center justify-center gap-2">
+                                        <Info className="w-5 h-5" /> 
+                                        A confirmation email has been sent to your email ID.
+                                    </p>
+                                    <p className="text-blue-600 text-sm mt-1">
+                                        Please check your **Inbox** as well as the **Spam folder**.
+                                    </p>
+                                </div>
                                 <p className="text-gray-500">
                                     Your campus parcel booking has been confirmed. We'll pick up your boxes on the selected date.
                                     You can track your booking anytime using your Booking ID.
@@ -2142,7 +2153,7 @@ Please confirm my pickup! 🙏`;
                                                         {item.icon}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="font-black text-gray-900 text-sm truncate uppercase tracking-tight">{item.name}</h4>
+                                                        <h4 className="font-black text-gray-900 text-sm uppercase tracking-tight leading-tight">{item.name}</h4>
                                                         <p className="text-xs font-bold text-purple-600 mt-0.5">₹{item.price.toLocaleString("en-IN")}</p>
                                                         <hr className="my-1 border-gray-100" />
                                                         <p className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter">+ GST</p>
