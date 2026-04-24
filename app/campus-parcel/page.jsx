@@ -23,7 +23,7 @@ const BOX_TYPES = [
         price: 499,
         edlPrice: 1800,
         description: "Books, clothes & study materials",
-        dimensions: "42\ × 42\ × 27\ cm",
+        dimensions: "42\ × 42\ × 27\cm",
         capacity: "Up to 30 kg",
         icon: "📦",
         color: "from-blue-500 to-blue-600",
@@ -50,7 +50,7 @@ const OTHER_ITEMS_TYPES = [
     { id: "bicycleGearless", name: "Bicycle (Gearless)", price: 1200, icon: "🚲", color: "from-green-500 to-green-600" },
     { id: "bicycleGear", name: "Bicycle (With Gear)", price: 1800, icon: "🚲", color: "from-green-600 to-green-700" },
     { id: "studyTable", name: "Study Table (Regular)", price: 800, icon: "🏷️", color: "from-teal-500 to-teal-600" },
-    { id: "studyTableSmall", name: "Study Table (Small/Bed)", price: 275, icon: "🛌", color: "from-emerald-400 to-emerald-500" },
+    { id: "studyTableSmall", name: " Bed Study Table ", price: 275, icon: "🛌", color: "from-emerald-400 to-emerald-500" },
     { id: "mattress", name: "Mattress", price: 1500, icon: "🛏️", color: "from-rose-500 to-rose-600" },
     { id: "cooler", name: "Cooler", price: 1500, icon: "🌬️", color: "from-cyan-500 to-cyan-600" },
     { id: "trolleySmall", name: "Trolley (Small)", price: 1200, icon: "🧳", color: "from-amber-400 to-amber-500" },
@@ -156,6 +156,12 @@ export default function StudentMovePage() {
                 const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
                 return sum + (chargeableWeight * 80);
             }, 0);
+            
+            // Add other items cost
+            base += OTHER_ITEMS_TYPES.reduce((sum, item) => {
+                return sum + item.price * otherItems[item.id];
+            }, 0);
+
             // Add EDL Surcharge (Essential for remote areas)
             base += edlValue; 
         } else {
@@ -194,16 +200,16 @@ export default function StudentMovePage() {
 
     const totalAmount = pricingSummary.total;
 
-    const totalBoxes = useMemo(() => {
-        if (edlValue > 0) return edlPackages.length;
-        const standardBoxes = Object.values(quantities).reduce((a, b) => a + b, 0);
-        const extraItems = Object.values(otherItems).reduce((a, b) => a + b, 0);
-        return standardBoxes + extraItems;
-    }, [quantities, otherItems, edlPackages, edlValue])
-
     const totalOtherItemsCount = useMemo(() => {
         return Object.values(otherItems).reduce((a, b) => a + b, 0);
     }, [otherItems])
+
+    const totalBoxes = useMemo(() => {
+        if (edlValue > 0) return edlPackages.length + totalOtherItemsCount;
+        const standardBoxes = Object.values(quantities).reduce((a, b) => a + b, 0);
+        const extraItems = Object.values(otherItems).reduce((a, b) => a + b, 0);
+        return standardBoxes + extraItems;
+    }, [quantities, otherItems, edlPackages, edlValue, totalOtherItemsCount])
 
     // ─── Handlers ───
     const updateQuantity = (id, delta) => {
@@ -924,6 +930,10 @@ export default function StudentMovePage() {
                                                                             <div
                                                                                 key={type}
                                                                                 onClick={() => {
+                                                                                    if (type === "Other") {
+                                                                                        setShowOtherItemsPopup(true);
+                                                                                        return;
+                                                                                    }
                                                                                     const newPkgs = [...edlPackages];
                                                                                     newPkgs[index].type = type;
                                                                                     setEdlPackages(newPkgs);
@@ -1005,24 +1015,77 @@ export default function StudentMovePage() {
                                                     })}
                                                 </div>
 
-                                                <Button 
-                                                    variant="outline" 
-                                                    onClick={() => setEdlPackages(prev => [...prev, { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }])}
-                                                    className="w-full h-14 border-2 border-dashed border-gray-300 hover:border-orange-500 hover:bg-orange-50 text-gray-500 font-bold rounded-2xl flex items-center justify-center gap-2"
-                                                >
-                                                    <Plus className="w-5 h-5" /> Add Another Package
-                                                </Button>
-
-                                                <div className="pt-6">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                     <Button 
-                                                        onClick={() => {
-                                                            setShowPackagingPopup(true)
-                                                        }}
-                                                        disabled={edlPackages.some(p => !p.l || !p.b || !p.h || !p.weight)}
-                                                        className="w-full bg-gradient-premium h-16 text-xl font-black shadow-2xl shadow-orange-500/20 rounded-2xl"
+                                                        variant="outline" 
+                                                        onClick={() => setEdlPackages(prev => [...prev, { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }])}
+                                                        className="w-full h-14 border-2 border-dashed border-gray-300 hover:border-orange-500 hover:bg-orange-50 text-gray-500 font-bold rounded-2xl flex items-center justify-center gap-2"
                                                     >
-                                                        Next: Package Contents <ArrowRight className="ml-2 w-6 h-6" />
+                                                        <Plus className="w-5 h-5" /> Add Another Package
                                                     </Button>
+
+                                                    <Button 
+                                                        onClick={() => setShowOtherItemsPopup(true)}
+                                                        className={`w-full h-14 border-2 border-dashed transition-all font-bold rounded-2xl flex items-center justify-center gap-2 ${
+                                                            totalOtherItemsCount > 0 
+                                                                ? "border-purple-500 bg-purple-50 text-purple-700 shadow-sm" 
+                                                                : "border-gray-300 hover:border-purple-500 hover:bg-purple-50 text-gray-500"
+                                                        }`}
+                                                    >
+                                                        {totalOtherItemsCount > 0 ? (
+                                                            <>
+                                                                <CheckCircle className="w-5 h-5 text-purple-600" />
+                                                                Edit Special Items ({totalOtherItemsCount})
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Sparkles className="w-5 h-5" />
+                                                                Add Special Items (Laptop, Cycle, etc.)
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
+
+                                                <div className="pt-10">
+                                                    {/* Highly Visible Total Summary Card for EDL */}
+                                                    <Card className="border-2 border-orange-500 bg-gray-900 text-white shadow-2xl overflow-hidden rounded-3xl">
+                                                        <CardContent className="p-8">
+                                                            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                                                <div className="text-center md:text-left">
+                                                                    <p className="text-orange-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Final Estimated Budget</p>
+                                                                    <p className="text-4xl font-black flex items-baseline gap-2">
+                                                                        <span className="text-xl text-gray-400">₹</span>
+                                                                        {totalAmount.toLocaleString("en-IN")}
+                                                                    </p>
+                                                                    <p className="text-gray-400 text-xs mt-2 font-medium">
+                                                                        {totalBoxes} total item{totalBoxes !== 1 ? 's' : ''} • Inclusive of GST & EDL
+                                                                    </p>
+                                                                </div>
+                                                                
+                                                                <Button
+                                                                    onClick={() => setShowPackagingPopup(true)}
+                                                                    disabled={edlPackages.some(p => !p.l || !p.b || !p.h || !p.weight)}
+                                                                    className="w-full md:w-auto bg-gradient-premium h-16 px-12 text-xl font-black shadow-xl shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all rounded-2xl group flex items-center gap-3"
+                                                                >
+                                                                    <span>Next: Save & Continue</span>
+                                                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                                                                </Button>
+                                                            </div>
+                                                            
+                                                            {totalOtherItemsCount > 0 && (
+                                                                <div className="mt-6 pt-6 border-t border-white/10 flex flex-wrap gap-3">
+                                                                    <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-500/30">
+                                                                        + {totalOtherItemsCount} Special Item{totalOtherItemsCount !== 1 ? 's' : ''} Added
+                                                                    </span>
+                                                                    {OTHER_ITEMS_TYPES.filter(it => otherItems[it.id] > 0).map(it => (
+                                                                        <span key={it.id} className="text-[10px] text-gray-500 font-bold uppercase italic">
+                                                                            • {it.name}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </CardContent>
+                                                    </Card>
                                                 </div>
                                             </>
                                         ) : (
@@ -1520,7 +1583,7 @@ export default function StudentMovePage() {
                                         )}
 
                                         {/* Other Items Summary */}
-                                        {edlValue === 0 && OTHER_ITEMS_TYPES.some(item => otherItems[item.id] > 0) && (
+                                        {OTHER_ITEMS_TYPES.some(item => otherItems[item.id] > 0) && (
                                             <div className="pt-4 border-t border-gray-50 border-dashed">
                                                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3">Extra Items</p>
                                                 {OTHER_ITEMS_TYPES.filter(item => otherItems[item.id] > 0).map((item) => (
