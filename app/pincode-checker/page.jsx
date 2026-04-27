@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle, Search, XCircle, MapPin, Clock, Package } from "lucide-react"
+import { CheckCircle, Search, XCircle, MapPin, Clock, Package, Phone, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -32,8 +32,9 @@ export default function PincodeCheckerPage() {
       if (!res.ok) {
         setResult({
           isServiceable: false,
+          contactNumber: data.data?.contactNumber || "+919525801506",
+          message: data.message
         })
-        setError(data.message || "Pincode not serviceable")
       } else {
         setResult({
           isServiceable: data.data.isServiceable,
@@ -182,10 +183,25 @@ export default function PincodeCheckerPage() {
                         )}
 
                         {!result.isServiceable && (
-                          <div className="mt-4 space-y-3">
-                            <p className="text-gray-700 bg-white/60 backdrop-blur-sm p-4 rounded-lg">
-                              We're constantly expanding our delivery network. Check back soon or contact our support team for more information.
-                            </p>
+                          <div className="mt-4 space-y-4">
+                            <div className="bg-white/60 backdrop-blur-sm p-5 rounded-2xl border border-red-100">
+                              <div className="flex items-start gap-3 mb-4">
+                                <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                                <p className="text-sm font-bold text-red-800 leading-relaxed">
+                                  {result.message || "Oops! Area not supported. Pincode not found in our database"}
+                                </p>
+                              </div>
+                              <p className="text-xs text-gray-700 font-medium leading-relaxed mb-4">
+                                We might still be able to deliver your items! Please contact us directly to arrange a special delivery.
+                              </p>
+                              <Button 
+                                onClick={() => window.location.href = `tel:${result.contactNumber || "+919525801506"}`}
+                                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                              >
+                                <Phone className="w-4 h-4" /> 
+                                <span>Contact Us to Deliver</span>
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>
