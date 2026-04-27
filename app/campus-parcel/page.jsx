@@ -519,7 +519,7 @@ export default function StudentMovePage() {
                                     tax: pricingSummary.tax,
                                     totalAmount: pricingSummary.total,
                                 },
-                                notes: "",
+                                notes: `Campus Parcel Booking — ${fullItemSummary}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
                             }
 
                             const bookingRes = await fetch(`${API_BASE_URL}/api/bookings/confirm-booking`, {
