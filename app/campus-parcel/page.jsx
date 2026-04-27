@@ -63,7 +63,7 @@ const OTHER_ITEMS_TYPES = [
     { id: "cpu", name: "CPU / Monitor", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600" },
 ]
 
-const MAINTENANCE_MODE = true; // Toggle this to enable/disable service down page
+const MAINTENANCE_MODE = false; // Toggle this to enable/disable service down page
 
 export default function StudentMovePage() {
     // ─── State ───
