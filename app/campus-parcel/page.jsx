@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 
+import Maintenance from "@/components/Maintenance"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 // ─── Box Configurations ───
@@ -61,6 +62,8 @@ const OTHER_ITEMS_TYPES = [
     { id: "pcKitAbove", name: "PC Kit (Above 24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700" },
     { id: "cpu", name: "CPU / Monitor", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600" },
 ]
+
+const MAINTENANCE_MODE = true; // Toggle this to enable/disable service down page
 
 export default function StudentMovePage() {
     // ─── State ───
@@ -573,6 +576,10 @@ export default function StudentMovePage() {
     }, [])
 
     // ─── Component Render ───
+
+    if (MAINTENANCE_MODE) {
+        return <Maintenance />
+    }
 
     return (
         <>
