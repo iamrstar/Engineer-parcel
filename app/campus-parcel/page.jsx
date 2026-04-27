@@ -144,6 +144,7 @@ export default function StudentMovePage() {
     // ─── Pincode Check State ───
     const [pincodeStatus, setPincodeStatus] = useState(null) // null | "checking" | "serviceable" | "not-serviceable"
     const [pincodeError, setPincodeError] = useState("")
+    const [contactNumber, setContactNumber] = useState("")
 
     // ─── Calculations ───
     const pricingSummary = useMemo(() => {
@@ -358,6 +359,7 @@ export default function StudentMovePage() {
                 } else {
                     setPincodeStatus("not-serviceable")
                     setPincodeError(data.message || "This pincode is not serviceable yet.")
+                    setContactNumber(data.data?.contactNumber || "")
                     setFormData((prev) => ({ ...prev, destCity: "", destState: "" }))
                     setEdlValue(0)
                     setEdlStage(0)
@@ -833,14 +835,29 @@ export default function StudentMovePage() {
                                             <motion.div
                                                 initial={{ opacity: 0, scale: 0.95 }}
                                                 animate={{ opacity: 1, scale: 1 }}
-                                                className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-center gap-4"
+                                                className="bg-red-50 border border-red-200 rounded-3xl p-6 flex flex-col gap-5 shadow-xl shadow-red-500/5"
                                             >
-                                                <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white shrink-0">
-                                                    <XCircle className="w-6 h-6" />
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-14 h-14 rounded-2xl bg-red-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-red-500/20">
+                                                        <AlertTriangle className="w-7 h-7" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-black text-red-900 text-lg leading-tight">Oops! Area not supported.</p>
+                                                        <p className="text-sm text-red-700 font-medium mt-1">{pincodeError}</p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="font-black text-red-900">Oops! Area not supported.</p>
-                                                    <p className="text-sm text-red-700">{pincodeError}</p>
+
+                                                <div className="space-y-4 pt-4 border-t border-red-100">
+                                                    <p className="text-xs text-red-800 font-bold leading-relaxed">
+                                                        We might still be able to deliver your items! Please contact us directly to arrange a special delivery.
+                                                    </p>
+                                                    <Button 
+                                                        onClick={() => window.location.href = `tel:${contactNumber || "+919525801506"}`}
+                                                        className="w-full bg-red-600 hover:bg-red-700 text-white font-black h-14 rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-red-600/20 transition-all active:scale-95"
+                                                    >
+                                                        <Phone className="w-5 h-5" /> 
+                                                        <span>Contact Us to Deliver</span>
+                                                    </Button>
                                                 </div>
                                             </motion.div>
                                         )}
