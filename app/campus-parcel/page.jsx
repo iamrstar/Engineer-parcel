@@ -47,23 +47,64 @@ const BOX_TYPES = [
 ]
 
 const OTHER_ITEMS_TYPES = [
-    { id: "laptop", name: "Laptop", price: 1800, icon: "💻", color: "from-purple-500 to-purple-600" },
-    { id: "bicycleGearless", name: "Bicycle (Gearless)", price: 1200, icon: "🚲", color: "from-green-500 to-green-600" },
-    { id: "bicycleGear", name: "Bicycle (With Gear)", price: 1800, icon: "🚲", color: "from-green-600 to-green-700" },
-    { id: "studyTable", name: "Study Table (Regular)", price: 800, icon: "🏷️", color: "from-teal-500 to-teal-600" },
-    { id: "studyTableSmall", name: " Bed Study Table ", price: 275, icon: "🛌", color: "from-emerald-400 to-emerald-500" },
-    { id: "mattress", name: "Mattress", price: 1500, icon: "🛏️", color: "from-rose-500 to-rose-600" },
-    { id: "cooler", name: "Cooler", price: 1500, icon: "🌬️", color: "from-cyan-500 to-cyan-600" },
-    { id: "trolleySmall", name: "Trolley (Small)", price: 1200, icon: "🧳", color: "from-amber-400 to-amber-500" },
-    { id: "trolleyMedium", name: "Trolley (Medium)", price: 1500, icon: "🧳", color: "from-amber-500 to-amber-600" },
-    { id: "trolleyLarge", name: "Trolley (Large)", price: 1800, icon: "🧳", color: "from-amber-600 to-amber-700" },
-    { id: "pcKit14", name: "PC Kit (Up to 14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500" },
-    { id: "pcKit24", name: "PC Kit (Up to 24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600" },
-    { id: "pcKitAbove", name: "PC Kit (Above 24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700" },
-    { id: "cpu", name: "CPU / Monitor", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600" },
+    { id: "laptop", name: "Laptop", price: 1800, icon: "💻", color: "from-purple-500 to-purple-600", weight: 10 },
+    { id: "bicycleGearless", name: "Bicycle (Gearless)", price: 1200, icon: "🚲", color: "from-green-500 to-green-600", weight: 60 },
+    { id: "bicycleGear", name: "Bicycle (With Gear)", price: 1800, icon: "🚲", color: "from-green-600 to-green-700", weight: 70 },
+    { id: "studyTable", name: "Study Table (Regular)", price: 800, icon: "🏷️", color: "from-teal-500 to-teal-600", weight: 50 },
+    { id: "studyTableSmall", name: " Bed Study Table ", price: 275, icon: "🛌", color: "from-emerald-400 to-emerald-500", weight: 15 },
+    { id: "mattress", name: "Mattress", price: 1500, icon: "🛏️", color: "from-rose-500 to-rose-600", weight: 100 },
+    { id: "cooler", name: "Cooler", price: 1500, icon: "🌬️", color: "from-cyan-500 to-cyan-600", weight: 100 },
+    { id: "trolleySmall", name: "Trolley (Small)", price: 1200, icon: "🧳", color: "from-amber-400 to-amber-500", weight: 25 },
+    { id: "trolleyMedium", name: "Trolley (Medium)", price: 1500, icon: "🧳", color: "from-amber-500 to-amber-600", weight: 50 },
+    { id: "trolleyLarge", name: "Trolley (Large)", price: 1800, icon: "🧳", color: "from-amber-600 to-amber-700", weight: 75 },
+    { id: "pcKit14", name: "PC Kit (Up to 14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500", weight: 10 },
+    { id: "pcKit24", name: "PC Kit (Up to 24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600", weight: 30 },
+    { id: "pcKitAbove", name: "PC Kit (Above 24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700", weight: 50 },
+    { id: "cpu", name: "CPU / Monitor", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600", weight: 15 },
 ]
 
 const MAINTENANCE_MODE = false; // Toggle this to enable/disable service down page
+
+// ─── EDL Rate Matrix ───
+const getEdlMatrixSurcharge = (distanceKm, totalWeightKg) => {
+    if (distanceKm <= 0) return 0;
+
+    // Determine Distance Bracket Index
+    let dIndex = -1;
+    if (distanceKm <= 50) dIndex = 0; // Assuming 0-50km uses the lowest bracket (20-50)
+    else if (distanceKm <= 100) dIndex = 1;
+    else if (distanceKm <= 150) dIndex = 2;
+    else if (distanceKm <= 200) dIndex = 3;
+    else if (distanceKm <= 250) dIndex = 4;
+    else if (distanceKm <= 300) dIndex = 5;
+    else if (distanceKm <= 350) dIndex = 6;
+    else if (distanceKm <= 400) dIndex = 7;
+    else if (distanceKm <= 450) dIndex = 8;
+    else dIndex = 9; // > 450 Kms
+
+    // Determine Weight Bracket Index
+    let wIndex = -1;
+    if (totalWeightKg <= 100) wIndex = 0;
+    else if (totalWeightKg <= 250) wIndex = 1;
+    else if (totalWeightKg <= 500) wIndex = 2;
+    else if (totalWeightKg <= 1000) wIndex = 3;
+    else wIndex = 4; // > 1000 Kgs
+
+    const matrix = [
+        [550, 990, 1100, 1375, 1650],    // 20-50
+        [825, 1210, 1375, 1650, 1925],   // 51-100
+        [1100, 1650, 1925, 2200, 2750],  // 101-150
+        [1375, 1925, 2200, 2475, 3300],  // 151-200
+        [1650, 2200, 2750, 3300, 3960],  // 201-250
+        [1925, 2500, 3150, 3800, 4560],  // 250-300
+        [2200, 2800, 3550, 4300, 5160],  // 300-350
+        [2475, 3100, 3950, 4800, 5760],  // 350-400
+        [2750, 3400, 4350, 5300, 6360],  // 400-450
+        [3025, 3700, 4750, 5800, 6960],  // 450-500
+    ];
+
+    return matrix[dIndex][wIndex];
+};
 
 export default function StudentMovePage() {
     // ─── State ───
@@ -139,12 +180,6 @@ export default function StudentMovePage() {
     const [deliveryDays, setDeliveryDays] = useState("")
     const [edlValue, setEdlValue] = useState(0)
     const [showEdlWarning, setShowEdlWarning] = useState(false)
-    const [edlPackages, setEdlPackages] = useState([
-        { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }
-    ])
-    const [edlContents, setEdlContents] = useState([])
-    const [otherItemText, setOtherItemText] = useState("")
-    const [edlStep, setEdlStep] = useState(0) // 0: Packages, 1: Contents
 
     // ─── Pincode Check State ───
     const [pincodeStatus, setPincodeStatus] = useState(null) // null | "checking" | "serviceable" | "not-serviceable"
@@ -154,60 +189,53 @@ export default function StudentMovePage() {
     // ─── Calculations ───
     const pricingSummary = useMemo(() => {
         let base = 0;
+        let edlSurcharge = 0;
         
+        // 1. Calculate standard base price for ALL pincodes
+        base = BOX_TYPES.reduce((sum, box) => {
+            return sum + box.price * quantities[box.id];
+        }, 0);
+        
+        // Add other items cost
+        base += OTHER_ITEMS_TYPES.reduce((sum, item) => {
+            return sum + item.price * otherItems[item.id];
+        }, 0);
+
+        // 2. Calculate Remote Location (EDL) Surcharge if applicable
         if (edlValue > 0) {
-            // EDL Pricing: Sum of (Max(Actual, Volumetric) * 80) + 990 surcharge per package
-            base = edlPackages.reduce((sum, pkg) => {
-                const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
-                const weightVal = Number(pkg.weight) || 0;
-                const chargeableWeight = Math.max(weightVal, volWeight);
-                // Only add 990 if the package has some dimensions or weight (is a real item)
-                const packageBasePrice = (chargeableWeight > 0 || pkg.l) ? (chargeableWeight * 80) + 990 : 0;
-                return sum + packageBasePrice;
+            // Calculate total weight based on standard box sizes (Alpha = 30kg, Nova = 75kg)
+            let totalWeight = (quantities.alpha * 30) + (quantities.nova * 75);
+            
+            // Add weight of other items
+            const otherItemsWeight = OTHER_ITEMS_TYPES.reduce((sum, item) => {
+                return sum + (item.weight * otherItems[item.id] || 0);
             }, 0);
             
-            // Add other items cost (with 990 EDL surcharge per item)
-            base += OTHER_ITEMS_TYPES.reduce((sum, item) => {
-                const effectivePrice = otherItems[item.id] > 0 ? item.price + 990 : item.price;
-                return sum + effectivePrice * otherItems[item.id];
-            }, 0);
-        } else {
-            base = BOX_TYPES.reduce((sum, box) => {
-                return sum + box.price * quantities[box.id];
-            }, 0);
+            totalWeight += otherItemsWeight;
             
-            // Add other items cost
-            base += OTHER_ITEMS_TYPES.reduce((sum, item) => {
-                return sum + item.price * otherItems[item.id];
-            }, 0);
+            if (totalWeight > 0 || base > 0) {
+                // If there's no weight but base > 0 (only other items selected), we still apply minimum bracket (1kg)
+                edlSurcharge = getEdlMatrixSurcharge(edlValue, Math.max(totalWeight, 1)); 
+            }
         }
         
-        // Add packaging fee (Free for now)
-        if (formData.packagingType === 'preferred') {
-            base += 0;
-        }
-
-        // Add pickup fee if applicable (Free for now)
-        if (formData.pickupType === 'delivered') {
-            base += 0;
-        }
-
         const insuranceCharges = formData.optInsurance && formData.itemValue ? Number(formData.itemValue) * 0.03 : 0;
         
         const discountedBase = Math.max(0, base - discount);
-        const subtotal = discountedBase + insuranceCharges;
+        const subtotal = discountedBase + insuranceCharges + edlSurcharge;
         const tax = subtotal * 0.18;
         const total = subtotal + tax;
 
         return {
             base: Number(base.toFixed(2)),
+            edlSurcharge: Number(edlSurcharge.toFixed(2)),
             insurance: Number(insuranceCharges.toFixed(2)),
             discount: Number(discount.toFixed(2)),
             subtotal: Number(subtotal.toFixed(2)),
             tax: Number(tax.toFixed(2)),
             total: Number(total.toFixed(2))
         };
-    }, [quantities, otherItems, edlValue, edlPackages, discount, formData.optInsurance, formData.itemValue, formData.pickupType, formData.packagingType])
+    }, [quantities, otherItems, edlValue, discount, formData.optInsurance, formData.itemValue])
 
     const totalAmount = pricingSummary.total;
 
@@ -216,13 +244,9 @@ export default function StudentMovePage() {
     }, [otherItems])
 
     const totalBoxes = useMemo(() => {
-        if (edlValue > 0) {
-            const validPkgs = edlPackages.filter(p => p.l || p.b || p.h || p.weight);
-            return validPkgs.length + totalOtherItemsCount;
-        }
         const standardBoxes = Object.values(quantities).reduce((a, b) => a + b, 0);
         return standardBoxes + totalOtherItemsCount;
-    }, [quantities, otherItems, edlPackages, edlValue, totalOtherItemsCount])
+    }, [quantities, totalOtherItemsCount])
 
     // ─── Handlers ───
     const updateQuantity = (id, delta) => {
@@ -279,15 +303,7 @@ export default function StudentMovePage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     code: couponCode,
-                    orderTotal: edlValue > 0 
-                        ? edlPackages.reduce((sum, pkg) => {
-                            const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
-                            const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
-                            return sum + (chargeableWeight * 80);
-                          }, 0)
-                        : BOX_TYPES.reduce((sum, box) => {
-                            return sum + box.price * quantities[box.id];
-                          }, 0)
+                    orderTotal: pricingSummary.subtotal // Use calculated subtotal instead of manual computation
                 }),
             })
             const data = await res.json()
@@ -358,14 +374,6 @@ export default function StudentMovePage() {
 
                     // Trigger EDL Animation if applicable
                     if (edlResult > 0) {
-                        // Clear bicycle items as they aren't allowed for EDL
-                        setOtherItems(prev => {
-                            const updated = { ...prev };
-                            Object.keys(updated).forEach(key => {
-                                if (key.toLowerCase().includes("bicycle")) updated[key] = 0;
-                            });
-                            return updated;
-                        });
                         setEdlStage(1) // Stage 1: "Oh! We don't deliver directly..."
                         setTimeout(() => setEdlStage(2), 2000) // Stage 2: "Finding alternative..."
                         setTimeout(() => setEdlStage(3), 4500) // Stage 3: "Woah! We got something!"
@@ -445,7 +453,7 @@ export default function StudentMovePage() {
                 amount: order.amount,
                 currency: order.currency,
                 name: "Engineers Parcel",
-                description: `Campus Parcel — ${totalBoxes} box(es)`,
+                description: `Campus Parcel — ${totalBoxes} item(s) (Incl. GST${pricingSummary.edlSurcharge > 0 ? " & EDL" : ""})`,
                 order_id: order.id,
                 handler: async (response) => {
                     // 3. Verify payment
@@ -463,23 +471,9 @@ export default function StudentMovePage() {
 
                         if (verifyData.success) {
                             // 4. Save booking to database
-                            let boxDescription = "";
-                            let detailedPackageInfo = null;
-
-                            if (edlValue > 0) {
-                                boxDescription = `EDL Multi-package: ${edlPackages.length} items. Contents: ${edlContents.join(", ")}`;
-                                detailedPackageInfo = edlPackages.map((pkg, idx) => ({
-                                    id: idx + 1,
-                                    type: pkg.type,
-                                    dims: `${pkg.l}x${pkg.b}x${pkg.h}`,
-                                    weight: pkg.weight,
-                                    chargeable: Math.max(Number(pkg.weight), (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700).toFixed(2)
-                                }));
-                            } else {
-                                boxDescription = BOX_TYPES
-                                    .filter((b) => quantities[b.id] > 0)
-                                    .map((b) => `${b.name} x${quantities[b.id]}`);
-                            }
+                            const boxDescription = Object.values(BOX_TYPES)
+                                .filter((b) => quantities[b.id] > 0)
+                                .map((b) => `${b.name} x${quantities[b.id]}`);
 
                             // Add other items to summary string
                             const selectedExtraItems = OTHER_ITEMS_TYPES
@@ -487,9 +481,13 @@ export default function StudentMovePage() {
                                 .map(item => `${item.name} x${otherItems[item.id]}`);
                             
                             const fullItemSummary = [
-                                ...(Array.isArray(boxDescription) ? boxDescription : [boxDescription]), 
+                                ...boxDescription, 
                                 ...selectedExtraItems
                             ].filter(Boolean).join(", ");
+
+                            const totalWeight = edlValue > 0 ? 
+                                ((quantities.alpha * 30) + (quantities.nova * 75) + OTHER_ITEMS_TYPES.reduce((sum, item) => sum + (item.weight * otherItems[item.id] || 0), 0)) 
+                                : undefined;
 
                             const bookingData = {
                                 serviceType: "campus-parcel",
@@ -518,13 +516,10 @@ export default function StudentMovePage() {
                                 packageDetails: {
                                     items: fullItemSummary,
                                     totalItems: totalBoxes,
-                                    weight: edlValue > 0 ? edlPackages.reduce((sum, pkg) => sum + Number(pkg.weight), 0) : undefined,
-                                    weightUnit: edlValue > 0 ? "kg" : undefined,
+                                    weight: totalWeight, // Calculated weight for EDL matrices
+                                    weightUnit: "kg",
                                     description: fullItemSummary,
                                     isEdl: edlValue > 0,
-                                    edlItems: detailedPackageInfo,
-                                    edlContents: edlContents,
-                                    otherContentText: otherItemText,
                                     itemValue: formData.itemValue,
                                     optInsurance: formData.optInsurance,
                                     insuranceCharges: pricingSummary.insurance
@@ -940,307 +935,8 @@ export default function StudentMovePage() {
                                     </p>
                                 </div>
 
-                                {edlValue > 0 ? (
-                                    /* ───── EDL MULTI-PACKAGE MANAGER ───── */
-                                    <div className="space-y-6">
-                                        {edlStep === 0 ? (
-                                            <>
-                                                <div className="space-y-4">
-                                                    {edlPackages.map((pkg, index) => {
-                                                        const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
-                                                        const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
-                                                        
-                                                        return (
-                                                            <Card key={pkg.id} className="glass border-0 shadow-lg overflow-hidden transition-all hover:shadow-xl">
-                                                                <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center font-black text-sm">
-                                                                            {index + 1}
-                                                                        </div>
-                                                                        <span className="font-bold uppercase tracking-wider text-xs">Package Details</span>
-                                                                    </div>
-                                                                    {(edlPackages.length > 1 || totalOtherItemsCount > 0) && (
-                                                                        <button 
-                                                                            onClick={() => setEdlPackages(prev => prev.filter(p => p.id !== pkg.id))}
-                                                                            className="text-red-400 hover:text-red-300 transition-colors"
-                                                                        >
-                                                                            <XCircle className="w-5 h-5" />
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                                <CardContent className="p-6 space-y-6">
-                                                                    {/* Packaging Type */}
-                                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                                                        {["Box", "Suitcase", "Backpack", "Other"].map((type) => (
-                                                                            <div
-                                                                                key={type}
-                                                                                onClick={() => {
-                                                                                    if (type === "Other") {
-                                                                                        setShowOtherItemsPopup(true);
-                                                                                        return;
-                                                                                    }
-                                                                                    const newPkgs = [...edlPackages];
-                                                                                    newPkgs[index].type = type;
-                                                                                    setEdlPackages(newPkgs);
-                                                                                    if (type === "Box") {
-                                                                                        setShowPackagingPopup(true);
-                                                                                    }
-                                                                                }}
-                                                                                className={`p-3 rounded-xl border-2 text-center cursor-pointer transition-all ${
-                                                                                    pkg.type === type 
-                                                                                        ? "border-orange-500 bg-orange-50 text-orange-700 shadow-sm" 
-                                                                                        : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
-                                                                                }`}
-                                                                            >
-                                                                                <div className="text-xl mb-1">
-                                                                                    {type === "Box" ? "📦" : type === "Suitcase" ? "💼" : type === "Backpack" ? "🎒" : "➕"}
-                                                                                </div>
-                                                                                <p className="text-[10px] font-black uppercase tracking-tighter">{type}</p>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-
-                                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                                                                        {/* Dimensions */}
-                                                                        <div className="space-y-3">
-                                                                            <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                                                                                <Search className="w-3 h-3" /> Dimensions (L × B × H in cm) <span className="text-red-500 font-bold ml-1">*Required</span>
-                                                                            </Label>
-                                                                            <div className="flex gap-2">
-                                                                                {['l', 'b', 'h'].map((dim) => (
-                                                                                    <Input
-                                                                                        key={dim}
-                                                                                        placeholder={dim.toUpperCase()}
-                                                                                        value={pkg[dim]}
-                                                                                        onChange={(e) => {
-                                                                                            const newPkgs = [...edlPackages];
-                                                                                            newPkgs[index][dim] = e.target.value.replace(/\D/g, "");
-                                                                                            setEdlPackages(newPkgs);
-                                                                                        }}
-                                                                                        className="h-12 text-center font-bold border-2 focus:border-blue-500"
-                                                                                    />
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-
-                                                                        {/* Weight */}
-                                                                        <div className="space-y-3">
-                                                                            <Label className="text-[10px] font-black uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                                                                                <Package className="w-3 h-3" /> Actual Weight (kg) <span className="text-red-500 font-bold ml-1">*Required</span>
-                                                                            </Label>
-                                                                            <div className="relative">
-                                                                                <Input
-                                                                                    placeholder="0.00"
-                                                                                    value={pkg.weight}
-                                                                                    onChange={(e) => {
-                                                                                        const newPkgs = [...edlPackages];
-                                                                                        newPkgs[index].weight = e.target.value.replace(/[^\d.]/g, "");
-                                                                                        setEdlPackages(newPkgs);
-                                                                                    }}
-                                                                                    className="h-12 pl-12 font-bold border-2 focus:border-blue-500"
-                                                                                />
-                                                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">KG</span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div className="bg-blue-50 rounded-2xl p-4 flex justify-between items-center border border-blue-100/50">
-                                                                        <div className="space-y-1">
-                                                                            <div className="flex items-center gap-1.5 group/vol relative">
-                                                                                <p className="text-[10px] text-blue-400 uppercase font-black">Chargeable Weight</p>
-                                                                                <Info className="w-3 h-3 text-blue-300 cursor-help" />
-                                                                                <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-blue-900 text-white text-[11px] rounded-xl opacity-0 group-hover/vol:opacity-100 transition-opacity pointer-events-none z-50 shadow-2xl border border-blue-400/20 leading-relaxed font-medium">
-                                                                                    <p className="font-black text-blue-200 uppercase tracking-widest text-[9px] mb-1">How it's calculated:</p>
-                                                                                    We compare Actual Weight vs Volumetric Weight (L×B×H ÷ 2700) and charge for the higher value.
-                                                                                </div>
-                                                                            </div>
-                                                                            <p className="text-xl font-black text-blue-900">
-                                                                                {chargeableWeight > 0 ? chargeableWeight.toFixed(2) : "0.00"} <span className="text-sm font-bold">Kgs</span>
-                                                                            </p>
-                                                                            {pkg.l && pkg.b && pkg.h && (
-                                                                                <p className="text-[9px] font-bold text-blue-400/80">
-                                                                                    Volumetric: {volWeight.toFixed(2)} kg
-                                                                                </p>
-                                                                            )}
-                                                                        </div>
-                                                                        <div className="text-right">
-                                                                            <p className="text-[10px] text-blue-400 uppercase font-black mb-0.5">Estimated Price</p>
-                                                                            <p className="text-xl font-black text-blue-900">
-                                                                                ₹{(chargeableWeight > 0 || pkg.l) ? (chargeableWeight * 80 + 990).toLocaleString("en-IN") : "0"}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </CardContent>
-                                                            </Card>
-                                                        );
-                                                    })}
-                                                </div>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <Button 
-                                                        variant="outline" 
-                                                        onClick={() => setEdlPackages(prev => [...prev, { id: Date.now(), type: "", l: "", b: "", h: "", weight: "" }])}
-                                                        className="w-full h-14 border-2 border-dashed border-gray-300 hover:border-orange-500 hover:bg-orange-50 text-gray-500 font-bold rounded-2xl flex items-center justify-center gap-2"
-                                                    >
-                                                        <Plus className="w-5 h-5" /> Add Another Package
-                                                    </Button>
-
-                                                    <Button 
-                                                        onClick={() => setShowOtherItemsPopup(true)}
-                                                        className={`w-full h-14 border-2 border-dashed transition-all font-bold rounded-2xl flex items-center justify-center gap-2 ${
-                                                            totalOtherItemsCount > 0 
-                                                                ? "border-purple-500 bg-purple-50 text-purple-700 shadow-sm" 
-                                                                : "border-gray-300 hover:border-purple-500 hover:bg-purple-50 text-gray-500"
-                                                        }`}
-                                                    >
-                                                        {totalOtherItemsCount > 0 ? (
-                                                            <>
-                                                                <CheckCircle className="w-5 h-5 text-purple-600" />
-                                                                Edit Special Items ({totalOtherItemsCount})
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Sparkles className="w-5 h-5" />
-                                                                Add Special Items (Laptop, Cycle, etc.)
-                                                            </>
-                                                        )}
-                                                    </Button>
-                                                </div>
-
-                                                <div className="pt-10">
-                                                    {/* Highly Visible Total Summary Card for EDL */}
-                                                    <Card className="border-2 border-orange-500 bg-gray-900 text-white shadow-2xl overflow-hidden rounded-3xl">
-                                                        <CardContent className="p-8">
-                                                            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                                                                <div className="text-center md:text-left">
-                                                                    <p className="text-orange-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Final Estimated Budget</p>
-                                                                    <p className="text-4xl font-black flex items-baseline gap-2">
-                                                                        <span className="text-xl text-gray-400">₹</span>
-                                                                        {totalAmount.toLocaleString("en-IN")}
-                                                                    </p>
-                                                                    <p className="text-gray-400 text-xs mt-2 font-medium">
-                                                                        {totalBoxes} total item{totalBoxes !== 1 ? 's' : ''} • Inclusive of GST & EDL
-                                                                    </p>
-                                                                </div>
-                                                                
-                                                                <Button
-                                                                    onClick={() => {
-                                                                        const packagingValid = formData.packagingType && (formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot));
-                                                                        const pickupValid = formData.pickupType && formData.pickupDate && formData.pickupSlot;
-                                                                        
-                                                                        const hasPackages = edlPackages.some(p => p.l || p.b || p.h || p.weight);
-                                                                        
-                                                                        if (packagingValid && pickupValid) {
-                                                                            setStep(2);
-                                                                        } else if (packagingValid) {
-                                                                            setShowPickupPopup(true);
-                                                                        } else if (!hasPackages && totalOtherItemsCount > 0) {
-                                                                            // Auto-set to own packaging for special items only
-                                                                            setFormData(prev => ({ ...prev, packagingType: 'own' }));
-                                                                            setShowPickupPopup(true);
-                                                                        } else {
-                                                                            setShowPackagingPopup(true);
-                                                                        }
-                                                                    }}
-                                                                    disabled={totalBoxes === 0 || edlPackages.filter(p => p.l || p.b || p.h || p.weight).some(p => !p.l || !p.b || !p.h || !p.weight)}
-                                                                    className="w-full md:w-auto bg-gradient-premium h-16 px-12 text-xl font-black shadow-xl shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all rounded-2xl group flex items-center gap-3"
-                                                                >
-                                                                    <span>Next: Save & Continue</span>
-                                                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                                                                </Button>
-                                                            </div>
-                                                            
-                                                            {totalOtherItemsCount > 0 && (
-                                                                <div className="mt-6 pt-6 border-t border-white/10 flex flex-wrap gap-3">
-                                                                    <span className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-500/30">
-                                                                        + {totalOtherItemsCount} Special Item{totalOtherItemsCount !== 1 ? 's' : ''} Added
-                                                                    </span>
-                                                                    {OTHER_ITEMS_TYPES.filter(it => otherItems[it.id] > 0).map(it => (
-                                                                        <span key={it.id} className="text-[10px] text-gray-500 font-bold uppercase italic">
-                                                                            • {it.name}
-                                                                        </span>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </CardContent>
-                                                    </Card>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            /* ───── EDL PACKAGE CONTENTS (MULTI-SELECT) ───── */
-                                            <div className="space-y-8">
-                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                                    {[
-                                                        { label: "Books & Docs", icon: "📚" },
-                                                        { label: "Clothes & Items", icon: "👕" },
-                                                        { label: "Consumables", icon: "🍪" },
-                                                        { label: "Electronics", icon: "📱" },
-                                                        { label: "Household Items", icon: "🍳" },
-                                                        { label: "Other", icon: "📦" }
-                                                    ].map((item) => {
-                                                        const isSelected = edlContents.includes(item.label);
-                                                        return (
-                                                            <div
-                                                                key={item.label}
-                                                                onClick={() => {
-                                                                    setEdlContents(prev => 
-                                                                        prev.includes(item.label) 
-                                                                            ? prev.filter(i => i !== item.label)
-                                                                            : [...prev, item.label]
-                                                                    );
-                                                                }}
-                                                                className={`p-6 rounded-3xl border-2 transition-all cursor-pointer text-center relative group ${
-                                                                    isSelected 
-                                                                        ? "border-orange-500 bg-orange-50 ring-4 ring-orange-500/10 shadow-lg" 
-                                                                        : "border-gray-100 bg-white hover:border-gray-200"
-                                                                }`}
-                                                            >
-                                                                {isSelected && (
-                                                                    <div className="absolute top-3 right-3 bg-orange-500 text-white p-1 rounded-full shadow-md scale-110">
-                                                                        <Check className="w-3 h-3" />
-                                                                    </div>
-                                                                )}
-                                                                <div className={`text-4xl mb-4 transition-transform duration-300 group-hover:scale-110`}>{item.icon}</div>
-                                                                <p className="text-sm font-black text-gray-900 group-hover:text-orange-600 transition-colors uppercase tracking-tight">{item.label}</p>
-                                                                
-                                                                {item.label === "Other" && isSelected && (
-                                                                    <motion.div 
-                                                                        initial={{ opacity: 0, y: 10 }}
-                                                                        animate={{ opacity: 1, y: 0 }}
-                                                                        className="mt-4"
-                                                                        onClick={(e) => e.stopPropagation()}
-                                                                    >
-                                                                        <Input 
-                                                                            placeholder="Specify items..."
-                                                                            value={otherItemText}
-                                                                            onChange={(e) => setOtherItemText(e.target.value)}
-                                                                            className="h-10 border-2 border-orange-200 focus:border-orange-500 bg-white text-xs font-bold"
-                                                                        />
-                                                                    </motion.div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-
-                                                <div className="flex gap-4 pt-4">
-                                                    <Button variant="outline" onClick={() => setEdlStep(0)} className="h-14 px-8 border-2 rounded-2xl font-bold">
-                                                        Back to Packages
-                                                    </Button>
-                                                    <Button 
-                                                        onClick={() => setShowPackagingPopup(true)}
-                                                        disabled={edlContents.length === 0}
-                                                        className="flex-1 bg-gradient-premium h-14 text-lg font-black shadow-xl shadow-orange-500/20 rounded-2xl"
-                                                    >
-                                                        Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    /* ───── STANDARD BOX SELECTOR ───── */
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* ───── STANDARD BOX SELECTOR ───── */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {BOX_TYPES.map((box) => (
                                         <Card
                                             key={box.id}
@@ -1249,8 +945,7 @@ export default function StudentMovePage() {
                                                     updateQuantity(box.id, 1);
                                                 }
                                             }}
-                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ring-1 ring-black/5 cursor-pointer ${quantities[box.id] > 0 ? " ring-4 ring-orange-500/30" : ""
-                                                }`}
+                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ring-1 ring-black/5 cursor-pointer ${quantities[box.id] > 0 ? " ring-4 ring-orange-500/30" : ""}`}
                                         >
                                             <div className={`bg-gradient-to-br ${box.color} p-6 text-white text-center relative overflow-hidden group`}>
                                                 <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-700"></div>
@@ -1282,7 +977,7 @@ export default function StudentMovePage() {
                                                 </div>
 
                                                 <div className="text-center">
-                                                    <span className="text-3xl font-black text-gray-900">₹{edlValue > 0 ? box.edlPrice : box.price}</span>
+                                                    <span className="text-3xl font-black text-gray-900">₹{box.price}</span>
                                                     <span className="text-sm text-gray-400 ml-1">+ GST</span>
                                                 </div>
 
@@ -1306,7 +1001,7 @@ export default function StudentMovePage() {
 
                                                 {quantities[box.id] > 0 && (
                                                     <p className="text-center text-sm font-semibold text-gray-700">
-                                                        Subtotal: ₹{(edlValue > 0 ? box.edlPrice : box.price) * quantities[box.id]}
+                                                        Subtotal: ₹{box.price * quantities[box.id]}
                                                     </p>
                                                 )}
                                             </CardContent>
@@ -1314,82 +1009,101 @@ export default function StudentMovePage() {
                                     ))}
 
                                     {/* ───── OTHER ITEMS CARD (POPUP TRIGGER) ───── */}
-                                    {edlValue === 0 && (
-                                        <Card
-                                            onClick={() => setShowOtherItemsPopup(true)}
-                                            className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-pointer group ring-1 ring-black/5 ${totalOtherItemsCount > 0 ? " ring-4 ring-purple-500/30" : ""}`}
-                                        >
-                                            <div className={`bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 text-white text-center group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-700 relative`}>
-                                                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                                                <div className="relative inline-block">
-                                                    <span className="text-5xl">⚡</span>
-                                                    {totalOtherItemsCount > 0 && (
-                                                        <span className="absolute -top-3 -right-3 bg-orange-500 text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-lg animate-bounce border-2 border-white">
-                                                            {totalOtherItemsCount}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <h3 className="text-2xl font-black mt-2">Special Items</h3>
-                                                <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mt-1">Electronics & More</p>
+                                    <Card
+                                        onClick={() => setShowOtherItemsPopup(true)}
+                                        className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-pointer group ring-1 ring-black/5 ${totalOtherItemsCount > 0 ? " ring-4 ring-purple-500/30" : ""}`}
+                                    >
+                                        <div className={`bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 text-white text-center group-hover:from-purple-600 group-hover:to-purple-700 transition-all duration-700 relative`}>
+                                            <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                                            <div className="relative inline-block">
+                                                <span className="text-5xl">⚡</span>
+                                                {totalOtherItemsCount > 0 && (
+                                                    <span className="absolute -top-3 -right-3 bg-orange-500 text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-lg animate-bounce border-2 border-white">
+                                                        {totalOtherItemsCount}
+                                                    </span>
+                                                )}
                                             </div>
-                                            <CardContent className="p-6 space-y-5 text-center">
-                                                <p className="text-sm text-gray-500 font-medium leading-relaxed">
-                                                    Pack your <span className="text-gray-900 font-black">Laptops</span>, <span className="text-gray-900 font-black">Cycles</span>, and more. 
-                                                </p>
-                                                <div className="pt-2">
-                                                    <Button className="w-full h-12 bg-gray-50 hover:bg-purple-600 hover:text-white text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all border-2 border-gray-100 group-hover:border-purple-600 shadow-none">
-                                                        {totalOtherItemsCount > 0 ? "Edit Selection" : "View Items"}
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    )}
+                                            <h3 className="text-2xl font-black mt-2">Special Items</h3>
+                                            <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mt-1">Electronics & More</p>
+                                        </div>
+                                        <CardContent className="p-6 space-y-5 text-center">
+                                            <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                                                Pack your <span className="text-gray-900 font-black">Laptops</span>, <span className="text-gray-900 font-black">Cycles</span>, and more. 
+                                            </p>
+                                            <div className="pt-2">
+                                                <Button className="w-full h-12 bg-gray-50 hover:bg-purple-600 hover:text-white text-gray-900 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all border-2 border-gray-100 group-hover:border-purple-600 shadow-none">
+                                                    {totalOtherItemsCount > 0 ? "Edit Selection" : "View Items"}
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
                                 </div>
-                                )}
 
-
-
-                                {edlValue === 0 && (
-                                    /* Total Bar (Standard) */
-                                    <Card className="border-0 shadow-xl bg-gray-900 text-white mt-8">
-                                        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                                            <div>
-                                                <p className="text-gray-400 text-sm">
-                                                    {totalBoxes} box{totalBoxes !== 1 ? "es" : ""} selected
-                                                </p>
+                                {/* Total Bar (Standard) */}
+                                <Card className="border-0 shadow-xl bg-gray-900 text-white mt-8">
+                                    <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                                        <div>
+                                            <p className="text-gray-400 text-sm">
+                                                {totalBoxes} item{totalBoxes !== 1 ? "s" : ""} selected
+                                            </p>
+                                            <div className="flex items-center gap-2">
                                                 <p className="text-3xl font-black">
                                                     Total: ₹{totalAmount.toLocaleString("en-IN")}
                                                 </p>
+                                                <div className="group relative">
+                                                    <Info className="w-5 h-5 text-gray-400 hover:text-orange-400 cursor-help transition-colors" />
+                                                    <div className="absolute bottom-full left-0 mb-3 w-56 p-4 bg-gray-800 text-white text-xs rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl border border-gray-700">
+                                                        <p className="font-bold text-orange-400 mb-2 uppercase tracking-wider text-[10px]">Price Breakdown</p>
+                                                        <div className="space-y-1.5 font-medium">
+                                                            <div className="flex justify-between text-gray-300">
+                                                                <span>Base Items:</span>
+                                                                <span>₹{pricingSummary.base.toLocaleString("en-IN")}</span>
+                                                            </div>
+                                                            {pricingSummary.edlSurcharge > 0 && (
+                                                                <div className="flex justify-between text-red-400 font-bold">
+                                                                    <span>Remote Delivery (EDL):</span>
+                                                                    <span>₹{pricingSummary.edlSurcharge.toLocaleString("en-IN")}</span>
+                                                                </div>
+                                                            )}
+                                                            <div className="flex justify-between text-gray-300">
+                                                                <span>GST (18%):</span>
+                                                                <span>₹{pricingSummary.tax.toLocaleString("en-IN")}</span>
+                                                            </div>
+                                                        </div>
+                                                        {/* Triangle pointer */}
+                                                        <div className="absolute top-full left-4 -mt-1 w-2 h-2 bg-gray-800 border-b border-r border-gray-700 transform rotate-45"></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                                <Button 
-                                                    id="next-btn"
-                                                    onClick={() => {
-                                                        const packagingValid = formData.packagingType && (formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot));
-                                                        const pickupValid = formData.pickupType && formData.pickupDate && formData.pickupSlot;
-                                                        
-                                                        const hasBoxes = quantities.alpha > 0 || quantities.nova > 0;
-                                                        
-                                                        if (packagingValid && pickupValid) {
-                                                            setStep(2);
-                                                        } else if (packagingValid) {
-                                                            setShowPickupPopup(true);
-                                                        } else if (!hasBoxes && totalOtherItemsCount > 0) {
-                                                            // Auto-set to own packaging for special items only
-                                                            setFormData(prev => ({ ...prev, packagingType: 'own' }));
-                                                            setShowPickupPopup(true);
-                                                        } else {
-                                                            setShowPackagingPopup(true);
-                                                        }
-                                                    }}
-                                                    disabled={totalBoxes === 0}
-                                                    className="w-full md:w-auto bg-gradient-premium h-16 px-12 text-xl font-black shadow-xl shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all rounded-2xl group flex items-center gap-3"
-                                                >
-                                                    <span>Next: Save & Continue</span>
-                                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                                                </Button>
-                                        </CardContent>
-                                    </Card>
-                                )}
+                                        </div>
+                                            <Button 
+                                                id="next-btn"
+                                                onClick={() => {
+                                                    const packagingValid = formData.packagingType && (formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot));
+                                                    const pickupValid = formData.pickupType && formData.pickupDate && formData.pickupSlot;
+                                                    
+                                                    const hasBoxes = quantities.alpha > 0 || quantities.nova > 0;
+                                                    
+                                                    if (packagingValid && pickupValid) {
+                                                        setStep(2);
+                                                    } else if (packagingValid) {
+                                                        setShowPickupPopup(true);
+                                                    } else if (!hasBoxes && totalOtherItemsCount > 0) {
+                                                        // Auto-set to own packaging for special items only
+                                                        setFormData(prev => ({ ...prev, packagingType: 'own' }));
+                                                        setShowPickupPopup(true);
+                                                    } else {
+                                                        setShowPackagingPopup(true);
+                                                    }
+                                                }}
+                                                disabled={totalBoxes === 0}
+                                                className="w-full md:w-auto bg-gradient-premium h-16 px-12 text-xl font-black shadow-xl shadow-orange-500/40 hover:scale-105 active:scale-95 transition-all rounded-2xl group flex items-center gap-3"
+                                            >
+                                                <span>Next: Save & Continue</span>
+                                                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                                            </Button>
+                                    </CardContent>
+                                </Card>
                             </motion.div>
                         )}
 
@@ -1694,57 +1408,19 @@ export default function StudentMovePage() {
                                 <Card className="glass shadow-2xl border-0 overflow-hidden">
                                     <CardContent className="p-6 md:p-8 space-y-6">
                                         <h3 className="font-bold text-lg text-gray-900 border-b pb-3">📦 Items</h3>
-                                        {edlValue > 0 ? (
-                                            /* EDL Items Summary */
-                                            <div className="space-y-4">
-                                                {edlPackages.map((pkg, idx) => {
-                                                    const volWeight = (Number(pkg.l) * Number(pkg.b) * Number(pkg.h)) / 2700;
-                                                    const chargeableWeight = Math.max(Number(pkg.weight), volWeight);
-                                                    return (
-                                                        <div key={pkg.id} className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <div>
-                                                                    <p className="font-black text-gray-900 text-sm uppercase tracking-tight">Package #{idx + 1}: {pkg.type}</p>
-                                                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{pkg.l}x{pkg.b}x{pkg.h} cm • {pkg.weight} kg</p>
-                                                                </div>
-                                                                <p className="font-black text-orange-600 text-sm">
-                                                                    ₹{(chargeableWeight > 0 || pkg.l) ? (chargeableWeight * 80 + 990).toLocaleString("en-IN") : "0"}
-                                                                </p>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[9px] font-black uppercase">
-                                                                    Chargeable: {chargeableWeight.toFixed(2)} kg
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                                <div className="pt-2">
-                                                    <p className="text-[10px] text-gray-400 uppercase font-black mb-2">Package Contents</p>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {edlContents.map(c => (
-                                                            <span key={c} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-[10px] font-bold border border-gray-200">
-                                                                {c}
-                                                            </span>
-                                                        ))}
+                                        {/* Standard Items Summary */}
+                                        {BOX_TYPES.filter((b) => quantities[b.id] > 0).map((box) => {
+                                            const displayPrice = box.price;
+                                            return (
+                                                <div key={box.id} className="flex items-center justify-between py-2">
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{box.name}</p>
+                                                        <p className="text-sm text-gray-500">₹{displayPrice} × {quantities[box.id]}</p>
                                                     </div>
+                                                    <p className="font-bold text-gray-900">₹{(displayPrice * quantities[box.id]).toLocaleString("en-IN")}</p>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            /* Standard Items Summary */
-                                            BOX_TYPES.filter((b) => quantities[b.id] > 0).map((box) => {
-                                                const displayPrice = box.price;
-                                                return (
-                                                    <div key={box.id} className="flex items-center justify-between py-2">
-                                                        <div>
-                                                            <p className="font-semibold text-gray-900">{box.name}</p>
-                                                            <p className="text-sm text-gray-500">₹{displayPrice} × {quantities[box.id]}</p>
-                                                        </div>
-                                                        <p className="font-bold text-gray-900">₹{(displayPrice * quantities[box.id]).toLocaleString("en-IN")}</p>
-                                                    </div>
-                                                );
-                                            })
-                                        )}
+                                            );
+                                        })}
 
                                         {/* Other Items Summary */}
                                         {OTHER_ITEMS_TYPES.some(item => otherItems[item.id] > 0) && (
@@ -1756,10 +1432,10 @@ export default function StudentMovePage() {
                                                             <span className="text-lg">{item.icon}</span>
                                                             <div>
                                                                 <p className="font-semibold text-gray-900 text-sm italic">{item.name}</p>
-                                                                <p className="text-[10px] text-gray-500 font-bold">₹{(edlValue > 0 ? item.price + 990 : item.price).toLocaleString("en-IN")} × {otherItems[item.id]}</p>
+                                                                <p className="text-[10px] text-gray-500 font-bold">₹{item.price.toLocaleString("en-IN")} × {otherItems[item.id]}</p>
                                                             </div>
                                                         </div>
-                                                        <p className="font-bold text-gray-900 text-sm">₹{((edlValue > 0 ? item.price + 990 : item.price) * otherItems[item.id]).toLocaleString("en-IN")}</p>
+                                                        <p className="font-bold text-gray-900 text-sm">₹{(item.price * otherItems[item.id]).toLocaleString("en-IN")}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -1848,6 +1524,12 @@ export default function StudentMovePage() {
                                                 <p>Weight Price (Base)</p>
                                                 <p>₹{pricingSummary.base.toLocaleString("en-IN")}</p>
                                             </div>
+                                            {pricingSummary.edlSurcharge > 0 && (
+                                                <div className="flex justify-between items-center text-sm font-bold text-red-600">
+                                                    <p>Remote Delivery (EDL)</p>
+                                                    <p>+ ₹{pricingSummary.edlSurcharge.toLocaleString("en-IN")}</p>
+                                                </div>
+                                            )}
                                             {pricingSummary.insurance > 0 && (
                                                 <div className="flex justify-between items-center text-sm font-bold text-orange-600">
                                                     <p>Insurance (3%)</p>
@@ -2154,13 +1836,9 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Package className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">
-                                    {edlValue === 0 ? "Box Logistics" : "Need a Box?"}
-                                </h3>
+                                <h3 className="text-xl font-black">Need a Box?</h3>
                                 <p className="text-orange-100 text-xs mt-1">
-                                    {edlValue === 0 
-                                        ? "How would you like to receive your boxes?" 
-                                        : "Would you like us to provide packaging or do you have your own?"}
+                                    How would you like to receive your boxes?
                                 </p>
                             </div>
 
@@ -2170,14 +1848,10 @@ Please confirm my pickup! 🙏`;
                                         onClick={() => setFormData(prev => ({ ...prev, packagingType: 'own' }))}
                                         className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.packagingType === 'own' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
-                                        <div className="text-3xl mb-2">
-                                            {edlValue === 0 ? "📍" : "🛍️"}
-                                        </div>
-                                        <p className="font-black text-gray-900 text-sm">
-                                            {edlValue === 0 ? "Fetch from Hub" : "Have my own"}
-                                        </p>
+                                        <div className="text-3xl mb-2">📍</div>
+                                        <p className="font-black text-gray-900 text-sm">Collect from Hub</p>
                                         <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">
-                                            {edlValue === 0 ? "Collect empty boxes from our campus office." : "Use your own packaging materials."}
+                                            Collect empty boxes from our campus office.
                                         </p>
                                         <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Free</p>
                                     </div>
@@ -2185,14 +1859,10 @@ Please confirm my pickup! 🙏`;
                                         onClick={() => setFormData(prev => ({ ...prev, packagingType: 'preferred' }))}
                                         className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.packagingType === 'preferred' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
-                                        <div className="text-3xl mb-2">
-                                            {edlValue === 0 ? "🏠" : "📦"}
-                                        </div>
-                                        <p className="font-black text-gray-900 text-sm">
-                                            {edlValue === 0 ? "Deliver to Room" : "Preferred Box"}
-                                        </p>
+                                        <div className="text-3xl mb-2">🏠</div>
+                                        <p className="font-black text-gray-900 text-sm">Deliver to Hostel</p>
                                         <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">
-                                            {edlValue === 0 ? "We'll deliver empty boxes to your room." : "Choose from our high-quality boxes."}
+                                            We'll deliver empty boxes to your room.
                                         </p>
                                         <div className="flex flex-col items-center">
                                             <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹39 / item</p>
@@ -2210,7 +1880,7 @@ Please confirm my pickup! 🙏`;
                                             className="overflow-hidden bg-gray-50 p-4 rounded-xl border border-gray-200"
                                         >
                                             <p className="text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest">
-                                                {edlValue === 0 ? "When should we deliver your boxes?" : "When should we deliver empty box?"}
+                                                When should we deliver your boxes?
                                             </p>
                                             <div className="grid grid-cols-1 gap-3">
                                                 <Input
@@ -2272,7 +1942,7 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Truck className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Shipment Pickup</h3>
+                                <h3 className="text-xl font-black">Boxes Pickup</h3>
                                 <p className="text-orange-100 text-xs mt-1">How should we receive your final packed shipment?</p>
                             </div>
 
@@ -2293,7 +1963,7 @@ Please confirm my pickup! 🙏`;
                                         className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.pickupType === 'delivered' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
                                         <div className="text-3xl mb-2">🏠</div>
-                                        <p className="font-black text-gray-900 text-sm">Home Pickup</p>
+                                        <p className="font-black text-gray-900 text-sm">Hostel Pickup</p>
                                         <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">We'll pick up your packed shipment from your room.</p>
                                         <div className="flex flex-col items-center">
                                             <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹29 fee</p>
@@ -2402,7 +2072,7 @@ Please confirm my pickup! 🙏`;
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="font-black text-gray-900 text-sm uppercase tracking-tight leading-tight">{item.name}</h4>
-                                                        <p className="text-xs font-bold text-purple-600 mt-0.5">₹{(edlValue > 0 ? item.price + 990 : item.price).toLocaleString("en-IN")}</p>
+                                                        <p className="text-xs font-bold text-purple-600 mt-0.5">₹{item.price.toLocaleString("en-IN")}</p>
                                                         <hr className="my-1 border-gray-100" />
                                                         <p className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter">+ GST</p>
                                                     </div>
