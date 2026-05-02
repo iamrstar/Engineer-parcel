@@ -2140,7 +2140,7 @@ Please confirm my pickup! 🙏`;
                             <div className="p-8 space-y-6">
                                 <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-2xl">
                                     <p className="text-blue-900 font-bold leading-relaxed">
-                                        "We can't deliver directly to this, but we have an alternative and maybe the offer is not applicable for you."
+                                        Your destination is outside our standard delivery network. We can still deliver your parcel using our extended logistics partners, but please note that an Extra Delivery Location (EDL) surcharge will be added to your final checkout total.
                                     </p>
                                 </div>
                                 <div className="space-y-3">
