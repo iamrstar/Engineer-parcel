@@ -132,6 +132,8 @@ export default function StudentMovePage() {
         pickupType: "self", // 'self' (Hub) or 'delivered' (Doorstep)
         pickupDate: "",
         pickupSlot: "Morning (9 AM - 12 PM)",
+        itemValue: "",
+        optInsurance: false,
     })
     const [sameAsSender, setSameAsSender] = useState(false)
     const [deliveryDays, setDeliveryDays] = useState("")
@@ -190,18 +192,22 @@ export default function StudentMovePage() {
             base += 0;
         }
 
-        const subtotal = Math.max(0, base - discount);
+        const insuranceCharges = formData.optInsurance && formData.itemValue ? Number(formData.itemValue) * 0.03 : 0;
+        
+        const discountedBase = Math.max(0, base - discount);
+        const subtotal = discountedBase + insuranceCharges;
         const tax = subtotal * 0.18;
         const total = subtotal + tax;
 
         return {
             base: Number(base.toFixed(2)),
+            insurance: Number(insuranceCharges.toFixed(2)),
             discount: Number(discount.toFixed(2)),
             subtotal: Number(subtotal.toFixed(2)),
             tax: Number(tax.toFixed(2)),
             total: Number(total.toFixed(2))
         };
-    }, [quantities, otherItems, edlValue, edlPackages, discount, formData.pickupType, formData.packagingType])
+    }, [quantities, otherItems, edlValue, edlPackages, discount, formData.optInsurance, formData.itemValue, formData.pickupType, formData.packagingType])
 
     const totalAmount = pricingSummary.total;
 
@@ -404,7 +410,8 @@ export default function StudentMovePage() {
             formData.destAddress &&
             formData.receiverName &&
             formData.receiverPhone &&
-            /^\d{10}$/.test(formData.receiverPhone);
+            /^\d{10}$/.test(formData.receiverPhone) &&
+            (formData.itemValue && Number(formData.itemValue) > 0 && Number(formData.itemValue) <= 49000);
 
         const packagingValid = 
             formData.packagingType && (formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot));
@@ -517,7 +524,10 @@ export default function StudentMovePage() {
                                     isEdl: edlValue > 0,
                                     edlItems: detailedPackageInfo,
                                     edlContents: edlContents,
-                                    otherContentText: otherItemText
+                                    otherContentText: otherItemText,
+                                    itemValue: formData.itemValue,
+                                    optInsurance: formData.optInsurance,
+                                    insuranceCharges: pricingSummary.insurance
                                 },
                                 boxDeliveryType: formData.packagingType === 'preferred' ? 'delivered' : 'self',
                                 boxDeliveryDate: formData.packagingDate,
@@ -1035,11 +1045,23 @@ export default function StudentMovePage() {
                                                                     </div>
 
                                                                     <div className="bg-blue-50 rounded-2xl p-4 flex justify-between items-center border border-blue-100/50">
-                                                                        <div>
-                                                                            <p className="text-[10px] text-blue-400 uppercase font-black mb-0.5">Chargeable Weight</p>
+                                                                        <div className="space-y-1">
+                                                                            <div className="flex items-center gap-1.5 group/vol relative">
+                                                                                <p className="text-[10px] text-blue-400 uppercase font-black">Chargeable Weight</p>
+                                                                                <Info className="w-3 h-3 text-blue-300 cursor-help" />
+                                                                                <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-blue-900 text-white text-[11px] rounded-xl opacity-0 group-hover/vol:opacity-100 transition-opacity pointer-events-none z-50 shadow-2xl border border-blue-400/20 leading-relaxed font-medium">
+                                                                                    <p className="font-black text-blue-200 uppercase tracking-widest text-[9px] mb-1">How it's calculated:</p>
+                                                                                    We compare Actual Weight vs Volumetric Weight (L×B×H ÷ 2700) and charge for the higher value.
+                                                                                </div>
+                                                                            </div>
                                                                             <p className="text-xl font-black text-blue-900">
                                                                                 {chargeableWeight > 0 ? chargeableWeight.toFixed(2) : "0.00"} <span className="text-sm font-bold">Kgs</span>
                                                                             </p>
+                                                                            {pkg.l && pkg.b && pkg.h && (
+                                                                                <p className="text-[9px] font-bold text-blue-400/80">
+                                                                                    Volumetric: {volWeight.toFixed(2)} kg
+                                                                                </p>
+                                                                            )}
                                                                         </div>
                                                                         <div className="text-right">
                                                                             <p className="text-[10px] text-blue-400 uppercase font-black mb-0.5">Estimated Price</p>
@@ -1226,7 +1248,6 @@ export default function StudentMovePage() {
                                                 if (quantities[box.id] === 0) {
                                                     updateQuantity(box.id, 1);
                                                 }
-                                                setShowPackagingPopup(true);
                                             }}
                                             className={`glass overflow-hidden border-0 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 ring-1 ring-black/5 cursor-pointer ${quantities[box.id] > 0 ? " ring-4 ring-orange-500/30" : ""
                                                 }`}
@@ -1248,7 +1269,16 @@ export default function StudentMovePage() {
                                             <CardContent className="p-6 space-y-5">
                                                 <div className="space-y-1">
                                                     <p className="text-sm text-gray-700 font-medium leading-relaxed">{box.description}</p>
-                                                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider">{box.capacity}</p>
+                                                    <div className="flex items-center gap-1.5 group/info relative">
+                                                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider">{box.capacity} (Volumetric)</p>
+                                                        <Info className="w-3.5 h-3.5 text-gray-300 hover:text-orange-500 cursor-help transition-colors" />
+                                                        <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-gray-900 text-white text-[11px] rounded-xl opacity-0 group-hover/info:opacity-100 transition-opacity pointer-events-none z-50 shadow-2xl border border-white/10 leading-relaxed font-medium">
+                                                            <div className="flex items-center gap-2 mb-1.5 text-orange-400 font-black uppercase tracking-widest text-[9px]">
+                                                                <Info className="w-3 h-3" /> What is Volumetric Weight?
+                                                            </div>
+                                                            It's a way to measure box space. A 30kg dumbbell fits easily because it's small, but bulky items (like pillows) fill the space much faster even if they are light. Pack wisely to fit everything!
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div className="text-center">
@@ -1259,7 +1289,7 @@ export default function StudentMovePage() {
                                                 {/* Quantity Selector */}
                                                 <div className="flex items-center justify-center gap-4">
                                                     <button
-                                                        onClick={() => updateQuantity(box.id, -1)}
+                                                        onClick={(e) => { e.stopPropagation(); updateQuantity(box.id, -1); }}
                                                         className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors disabled:opacity-30"
                                                         disabled={quantities[box.id] === 0}
                                                     >
@@ -1267,7 +1297,7 @@ export default function StudentMovePage() {
                                                     </button>
                                                     <span className="text-2xl font-bold w-8 text-center">{quantities[box.id]}</span>
                                                     <button
-                                                        onClick={() => updateQuantity(box.id, 1)}
+                                                        onClick={(e) => { e.stopPropagation(); updateQuantity(box.id, 1); }}
                                                         className="w-10 h-10 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-700 flex items-center justify-center transition-colors"
                                                     >
                                                         <Plus className="w-4 h-4" />
@@ -1440,9 +1470,69 @@ export default function StudentMovePage() {
                                                     className="h-12 border-2 focus:border-orange-500"
                                                 />
                                             </div>
-                                            
-                                        </div>
 
+                                            <div className="space-y-4 pt-2">
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                                        <CreditCard className="w-4 h-4 text-orange-600" /> Estimated Total Value of Items (₹)
+                                                    </Label>
+                                                    <Input
+                                                        name="itemValue"
+                                                        value={formData.itemValue}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value.replace(/\D/g, "");
+                                                            setFormData(prev => ({ ...prev, itemValue: val }));
+                                                        }}
+                                                        placeholder="e.g. 5000"
+                                                        className={`h-12 border-2 transition-all ${Number(formData.itemValue) > 49000 ? "border-red-500 focus:border-red-600 bg-red-50" : "focus:border-orange-500"}`}
+                                                    />
+                                                    {Number(formData.itemValue) > 49000 ? (
+                                                        <p className="text-[10px] text-red-600 font-black uppercase tracking-tight mt-1 animate-pulse">
+                                                            ⚠️ Value cannot exceed ₹49,000
+                                                        </p>
+                                                    ) : (
+                                                        <div className="flex justify-between items-center mt-1">
+                                                            <p className="text-[10px] text-gray-400 font-medium italic leading-tight">
+                                                                Required for declaration. Max: ₹49,000.
+                                                            </p>
+                                                            {formData.optInsurance && formData.itemValue && (
+                                                                <p className="text-[10px] text-orange-600 font-black">
+                                                                    Insurance Fee: ₹{(Number(formData.itemValue) * 0.03).toFixed(2)}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-2 bg-orange-500 rounded-lg text-white">
+                                                            <Shield className="w-5 h-5" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-gray-900 text-sm">Opt for Insurance?</p>
+                                                            <p className="text-[10px] text-gray-500 font-medium">Protect your items for just 3% of their value</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormData(prev => ({ ...prev, optInsurance: true }))}
+                                                            className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${formData.optInsurance ? "bg-orange-600 text-white shadow-lg" : "bg-white text-gray-400 border border-gray-100"}`}
+                                                        >
+                                                            YES
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormData(prev => ({ ...prev, optInsurance: false }))}
+                                                            className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${!formData.optInsurance ? "bg-gray-600 text-white shadow-lg" : "bg-white text-gray-400 border border-gray-100"}`}
+                                                        >
+                                                            NO
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         {/* Destination Pincode (Verified in Step 0, Read-only here) */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -1758,6 +1848,12 @@ export default function StudentMovePage() {
                                                 <p>Weight Price (Base)</p>
                                                 <p>₹{pricingSummary.base.toLocaleString("en-IN")}</p>
                                             </div>
+                                            {pricingSummary.insurance > 0 && (
+                                                <div className="flex justify-between items-center text-sm font-bold text-orange-600">
+                                                    <p>Insurance (3%)</p>
+                                                    <p>+ ₹{pricingSummary.insurance.toLocaleString("en-IN")}</p>
+                                                </div>
+                                            )}
                                             {pricingSummary.discount > 0 && (
                                                 <div className="flex justify-between items-center text-sm font-bold text-green-600">
                                                     <p>Discount</p>
@@ -1798,6 +1894,22 @@ export default function StudentMovePage() {
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Receiver Name</p>
                                                     <p className="font-bold text-gray-800">{formData.receiverName}</p>
                                                 </div>
+                                                {formData.itemValue && (
+                                                    <div className="flex flex-col gap-1">
+                                                        <div>
+                                                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Declared Item Value</p>
+                                                            <p className="font-bold text-gray-800">₹{Number(formData.itemValue).toLocaleString("en-IN")}</p>
+                                                        </div>
+                                                        {formData.optInsurance && (
+                                                            <div>
+                                                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Transit Insurance</p>
+                                                                <p className="font-bold text-green-600 flex items-center gap-1">
+                                                                    <Shield className="w-3 h-3" /> Opted (3%)
+                                                                </p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                                 <div>
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Pickup Address</p>
                                                     <p className="font-bold text-gray-800">
