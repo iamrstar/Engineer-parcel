@@ -1836,9 +1836,12 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Package className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Need a Box?</h3>
-                                <p className="text-orange-100 text-xs mt-1">
-                                    How would you like to receive your boxes?
+                                <h3 className="text-xl font-black">Step 1: Get Your Boxes  📦</h3>
+                                <div className="mt-2 mb-1 inline-block bg-white text-red-600 text-[11px] font-black px-3 py-1.5 rounded-lg shadow-md uppercase tracking-wider">
+                                     Because you choose the boxes  
+                                </div>
+                                <p className="text-orange-50 text-xs mt-1 font-medium">
+                                    How would you like to receive your empty boxes?
                                 </p>
                             </div>
 
@@ -1942,8 +1945,13 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Truck className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Boxes Pickup</h3>
-                                <p className="text-orange-100 text-xs mt-1">How should we receive your final packed shipment?</p>
+                                <h3 className="text-xl font-black">Step 2: Parcel Pickup 🚚</h3>
+                                <div className="mt-2 mb-1 inline-block bg-white text-blue-600 text-[11px] font-black px-3 py-1.5 rounded-lg shadow-md uppercase tracking-wider">
+                                    ⚠️ Date to handover your packed boxes
+                                </div>
+                                <p className="text-orange-50 text-xs mt-1 font-medium">
+                                    How should we receive your final packed shipment?
+                                </p>
                             </div>
 
                             <div className="p-6 space-y-6">
