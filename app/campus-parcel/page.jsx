@@ -1836,12 +1836,12 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Package className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Step 1: Get Your Boxes  📦</h3>
+                                <h3 className="text-xl font-black">Step 1: Empty Box Delivery 📦</h3>
                                 <div className="mt-2 mb-1 inline-block bg-white text-red-600 text-[11px] font-black px-3 py-1.5 rounded-lg shadow-md uppercase tracking-wider">
-                                     Because you choose the boxes  
+                                    Required for your selected boxes
                                 </div>
                                 <p className="text-orange-50 text-xs mt-1 font-medium">
-                                    How would you like to receive your empty boxes?
+                                    How would you like to collect your empty packaging?
                                 </p>
                             </div>
 
@@ -1910,16 +1910,25 @@ Please confirm my pickup! 🙏`;
                                     )}
                                 </AnimatePresence>
 
-                                <Button
-                                    onClick={() => {
-                                        setShowPackagingPopup(false)
-                                        setShowPickupPopup(true)
-                                    }}
-                                    disabled={!formData.packagingType || (formData.packagingType !== 'own' && (!formData.packagingDate || !formData.packagingSlot))}
-                                    className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
-                                >
-                                    Confirm Choice
-                                </Button>
+                                <div className="flex gap-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowPackagingPopup(false)}
+                                        className="h-14 px-6 border-2 rounded-2xl font-bold"
+                                    >
+                                        Back
+                                    </Button>
+                                    <Button
+                                        onClick={() => {
+                                            setShowPackagingPopup(false)
+                                            setShowPickupPopup(true)
+                                        }}
+                                        disabled={!formData.packagingType || (formData.packagingType !== 'own' && (!formData.packagingDate || !formData.packagingSlot))}
+                                        className="flex-1 bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
+                                    >
+                                        Next Step <ArrowRight className="ml-2 w-5 h-5" />
+                                    </Button>
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>
@@ -1945,12 +1954,12 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Truck className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Step 2: Parcel Pickup 🚚</h3>
+                                <h3 className="text-xl font-black">Step 2: Schedule Final Pickup 🚚</h3>
                                 <div className="mt-2 mb-1 inline-block bg-white text-blue-600 text-[11px] font-black px-3 py-1.5 rounded-lg shadow-md uppercase tracking-wider">
-                                    ⚠️ Date to handover your packed boxes
+                                    Date to hand over your packed boxes
                                 </div>
                                 <p className="text-orange-50 text-xs mt-1 font-medium">
-                                    How should we receive your final packed shipment?
+                                    How would you like to dispatch your final packed shipment?
                                 </p>
                             </div>
 
@@ -2017,16 +2026,30 @@ Please confirm my pickup! 🙏`;
                                     )}
                                 </AnimatePresence>
 
-                                <Button
-                                    onClick={() => {
-                                        setShowPickupPopup(false)
-                                        setStep(2)
-                                    }}
-                                    disabled={!formData.pickupType || !formData.pickupDate || !formData.pickupSlot}
-                                    className="w-full bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
-                                >
-                                    Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
-                                </Button>
+                                <div className="flex gap-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setShowPickupPopup(false)
+                                            if (quantities.alpha > 0 || quantities.nova > 0) {
+                                                setShowPackagingPopup(true)
+                                            }
+                                        }}
+                                        className="h-14 px-6 border-2 rounded-2xl font-bold"
+                                    >
+                                        Back
+                                    </Button>
+                                    <Button
+                                        onClick={() => {
+                                            setShowPickupPopup(false)
+                                            setStep(2)
+                                        }}
+                                        disabled={!formData.pickupType || !formData.pickupDate || !formData.pickupSlot}
+                                        className="flex-1 bg-gradient-premium h-14 text-lg font-black rounded-2xl shadow-lg shadow-orange-500/20"
+                                    >
+                                        Proceed to Details <ArrowRight className="ml-2 w-5 h-5" />
+                                    </Button>
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>
