@@ -4,8 +4,9 @@ import React, { useState, useMemo, useEffect } from "react"
 import {
     GraduationCap, Package, Plus, Minus, CreditCard, ArrowRight,
     CheckCircle, XCircle, MapPin, Phone, Mail, User, Calendar,
-    Truck, Shield, Clock, AlertTriangle, Sparkles, Box, Search, Check, Bot, Info
+    Truck, Shield, Clock, AlertTriangle, Sparkles, Box, Search, Check, Bot, Info, Zap
 } from "lucide-react"
+
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -22,9 +23,11 @@ const BOX_TYPES = [
         id: "alpha",
         name: "Alpha Box",
         price: 499,
+        originalPrice: 1799,
         edlPrice: 1800,
+
         description: "Books, clothes & study materials",
-        dimensions: "42\ × 42\ × 27\cm",
+        dimensions: "42 × 42 × 27 cm",
         capacity: "Up to 30 kg",
         icon: "📦",
         color: "from-blue-500 to-blue-600",
@@ -35,9 +38,11 @@ const BOX_TYPES = [
         id: "nova",
         name: "Nova Box",
         price: 1049,
+        originalPrice: 3999,
         edlPrice: 4500,
+
         description: "large amount of stuff",
-        dimensions: "60\ × 35\ × 40\ cm",
+        dimensions: "60 × 35 × 40 cm",
         capacity: "Up to 75 kg",
         icon: "📦",
         color: "from-orange-500 to-orange-600",
@@ -45,6 +50,8 @@ const BOX_TYPES = [
         textColor: "text-orange-700",
     },
 ]
+
+
 
 const OTHER_ITEMS_TYPES = [
     { id: "laptop", name: "Laptop", price: 1800, icon: "💻", color: "from-purple-500 to-purple-600", weight: 10 },
@@ -235,6 +242,8 @@ export default function StudentMovePage() {
             tax: Number(tax.toFixed(2)),
             total: Number(total.toFixed(2))
         };
+
+
     }, [quantities, otherItems, edlValue, discount, formData.optInsurance, formData.itemValue])
 
     const totalAmount = pricingSummary.total;
@@ -445,6 +454,8 @@ export default function StudentMovePage() {
                     currency: "INR",
                 }),
             })
+
+
             const order = await orderRes.json()
 
             // 2. Open Razorpay checkout
@@ -601,11 +612,12 @@ export default function StudentMovePage() {
         <>
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
             {/* ────── Graduation Offer Banner ────── */}
-            <div className="bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 text-white py-3 text-center text-sm font-black tracking-widest uppercase shadow-lg relative z-50">
-                <span className="mr-2">✨</span>
-                Offer Effective 27th April — Flat rates & Upto 80% Off on Boxes!
-                <span className="ml-2">✨</span>
+            <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50 animate-pulse">
+                <span className="mr-2">🎓</span>
+                Exclusive Final Year Offer: Alpha Box @ ₹499 (<s>₹1799</s>) & Nova Box @ ₹1049 (<s>₹3999</s>) — ⏳ Only 7 Days Left!
+                <span className="ml-2">🎓</span>
             </div>
+
 
             {/* ────── Hero Section ────── */}
             <section className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-20">
@@ -652,9 +664,10 @@ export default function StudentMovePage() {
                         <div className="flex flex-wrap justify-center gap-3">
                             <div className="px-6 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
                                 <p className="text-sm font-black tracking-[0.2em] text-orange-400 uppercase italic">
-                                    🚀 Launching 27th April
+                                    🎓 Offer Ends Soon
                                 </p>
                             </div>
+
                             <div className="px-6 py-2 rounded-2xl bg-orange-500/20 border border-orange-500/30 backdrop-blur-md animate-pulse">
                                 <p className="text-sm font-black tracking-[0.1em] text-orange-300 uppercase">
                                     🔥 Upto 80% Off on Boxes
@@ -779,13 +792,14 @@ export default function StudentMovePage() {
                                                             exit={{ opacity: 0, scale: 0.9 }}
                                                             className="bg-orange-50 border border-orange-100 rounded-2xl p-5 flex items-center gap-4 shadow-sm"
                                                         >
-                                                            <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
-                                                                <AlertTriangle className="w-6 h-6" />
+                                                            <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0 shadow-inner">
+                                                                <Zap className="w-6 h-6 animate-pulse" />
                                                             </div>
                                                             <div>
-                                                                <p className="font-black text-orange-900">Oh! We don't deliver directly,</p>
-                                                                <p className="text-sm text-orange-700">Checking for alternatives in our network...</p>
+                                                                <p className="font-black text-orange-900 leading-tight">Specialized Route Required</p>
+                                                                <p className="text-sm text-orange-700 font-medium">Your location is unique! Activating our premium partner network...</p>
                                                             </div>
+
                                                         </motion.div>
                                                     )}
 
@@ -797,13 +811,14 @@ export default function StudentMovePage() {
                                                             exit={{ opacity: 0, scale: 0.9 }}
                                                             className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-center gap-4 shadow-sm"
                                                         >
-                                                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 animate-pulse">
+                                                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
                                                                 <Sparkles className="w-6 h-6 animate-spin-slow" />
                                                             </div>
                                                             <div>
-                                                                <p className="font-black text-blue-900 leading-tight">Wait! Finding resolution...</p>
-                                                                <p className="text-sm text-blue-700">Proprietary ENZEE AI is looking for a delivery route</p>
+                                                                <p className="font-black text-blue-900 leading-tight">Optimizing for Reliability...</p>
+                                                                <p className="text-sm text-blue-700 font-medium">Enzee AI is securing a verified route for {formData.destCity}</p>
                                                             </div>
+
                                                         </motion.div>
                                                     )}
 
@@ -820,17 +835,19 @@ export default function StudentMovePage() {
                                                                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                                                                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent z-0 pointer-events-none"
                                                             />
-                                                            <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0 shadow-lg z-10">
-                                                                <Bot className="w-6 h-6" />
+                                                            <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0 shadow-lg z-10 shadow-green-500/20">
+                                                                <CheckCircle className="w-6 h-6" />
                                                             </div>
+
                                                             <div className="z-10">
                                                                 <p className="font-black text-green-900 text-lg leading-tight flex items-center gap-2">
-                                                                    Woah! We got something! ⚡
+                                                                    Guaranteed Delivery Found!
                                                                 </p>
                                                                 <p className="text-sm text-green-700 font-medium">
-                                                                    We've found a resolution using Enzee AI for {formData.destCity}.
+                                                                    Priority route secured with full Insured Delivery  for {formData.destCity}.
                                                                 </p>
                                                             </div>
+
                                                         </motion.div>
                                                     )}
 
@@ -977,9 +994,15 @@ export default function StudentMovePage() {
                                                 </div>
 
                                                 <div className="text-center">
-                                                    <span className="text-3xl font-black text-gray-900">₹{box.price}</span>
-                                                    <span className="text-sm text-gray-400 ml-1">+ GST</span>
+                                                    <div className="flex flex-col items-center">
+                                                        <span className="text-xs text-gray-400 line-through">₹{box.originalPrice}</span>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-3xl font-black text-gray-900">₹{box.price}</span>
+                                                            <span className="text-[10px] text-gray-400 font-bold uppercase">+ GST</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
 
                                                 {/* Quantity Selector */}
                                                 <div className="flex items-center justify-center gap-4">
@@ -1554,6 +1577,8 @@ export default function StudentMovePage() {
                                                 <p className="text-xl font-black text-gray-900 uppercase tracking-tighter">Amount to pay</p>
                                                 <p className="text-3xl font-black text-orange-600">₹{pricingSummary.total.toLocaleString("en-IN")}</p>
                                             </div>
+
+
                                         </div>
                                     </CardContent>
                                 </Card>
