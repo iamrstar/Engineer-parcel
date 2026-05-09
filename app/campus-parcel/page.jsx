@@ -67,9 +67,9 @@ const OTHER_ITEMS_TYPES = [
     { id: "pcKit14", name: "PC Kit (Up to 14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500", weight: 10 },
     { id: "pcKit24", name: "PC Kit (Up to 24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600", weight: 30 },
     { id: "pcKitAbove", name: "PC Kit (Above 24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700", weight: 50 },
-    { id: "monitorSmall", name: "Monitor (Up to 14\")", price: 1200, icon: "🖥️", color: "from-indigo-400 to-indigo-500", weight: 5, note: "Packaging Extra" },
-    { id: "monitorMedium", name: "Monitor (Up to 24\")", price: 1800, icon: "🖥️", color: "from-indigo-500 to-indigo-600", weight: 12, note: "Packaging Extra" },
-    { id: "monitorLarge", name: "Monitor (Above 24\")", price: 2800, icon: "🖥️", color: "from-indigo-600 to-indigo-700", weight: 20, note: "Packaging Extra" },
+    { id: "monitorSmall", name: "Monitor (Up to 14\")", price: 1200, icon: "🖥️", color: "from-indigo-400 to-indigo-500", weight: 5, note: "packaging charges may apply so pack properly" },
+    { id: "monitorMedium", name: "Monitor (Up to 24\")", price: 1800, icon: "🖥️", color: "from-indigo-500 to-indigo-600", weight: 12, note: "packaging charges may apply so pack properly" },
+    { id: "monitorLarge", name: "Monitor (Above 24\")", price: 2800, icon: "🖥️", color: "from-indigo-600 to-indigo-700", weight: 20, note: "packaging charges may apply so pack properly" },
     { id: "cpu", name: "CPU (Only)", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600", weight: 15 },
 ]
 
@@ -214,15 +214,6 @@ export default function StudentMovePage() {
             return sum + item.price * otherItems[item.id];
         }, 0);
 
-        // Add monitor packaging charges (₹449 per monitor)
-        const monitorPackagingCharge = OTHER_ITEMS_TYPES.reduce((sum, item) => {
-            if (item.note === "Packaging Extra") {
-                return sum + (449 * otherItems[item.id]);
-            }
-            return sum;
-        }, 0);
-        base += monitorPackagingCharge;
-
         // 2. Calculate Remote Location (EDL) Surcharge if applicable
         if (edlValue > 0) {
             // Calculate total weight based on standard box sizes (Alpha = 30kg, Nova = 75kg)
@@ -250,7 +241,6 @@ export default function StudentMovePage() {
 
         return {
             base: Number(base.toFixed(2)),
-            monitorPackaging: monitorPackagingCharge,
             edlSurcharge: Number(edlSurcharge.toFixed(2)),
             insurance: Number(insuranceCharges.toFixed(2)),
             discount: Number(discount.toFixed(2)),
@@ -1097,14 +1087,8 @@ export default function StudentMovePage() {
                                                         <div className="space-y-1.5 font-medium">
                                                             <div className="flex justify-between text-gray-300">
                                                                 <span>Base Items:</span>
-                                                                <span>₹{(pricingSummary.base - (pricingSummary.monitorPackaging || 0)).toLocaleString("en-IN")}</span>
+                                                                <span>₹{pricingSummary.base.toLocaleString("en-IN")}</span>
                                                             </div>
-                                                            {pricingSummary.monitorPackaging > 0 && (
-                                                                <div className="flex justify-between text-orange-400 font-bold">
-                                                                    <span>Monitor Packaging:</span>
-                                                                    <span>₹{pricingSummary.monitorPackaging.toLocaleString("en-IN")}</span>
-                                                                </div>
-                                                            )}
                                                             {pricingSummary.edlSurcharge > 0 && (
                                                                 <div className="flex justify-between text-red-400 font-bold">
                                                                     <span>Remote Delivery (EDL):</span>
@@ -1568,14 +1552,8 @@ export default function StudentMovePage() {
                                         <div className="border-t pt-4 flex flex-col gap-2 bg-gray-50 -mx-6 px-6 py-4">
                                             <div className="flex justify-between items-center text-sm font-bold text-gray-500">
                                                 <p>Weight Price (Base)</p>
-                                                <p>₹{(pricingSummary.base - (pricingSummary.monitorPackaging || 0)).toLocaleString("en-IN")}</p>
+                                                <p>₹{pricingSummary.base.toLocaleString("en-IN")}</p>
                                             </div>
-                                            {pricingSummary.monitorPackaging > 0 && (
-                                                <div className="flex justify-between items-center text-sm font-bold text-orange-600">
-                                                    <p>Monitor Packaging</p>
-                                                    <p>+ ₹{pricingSummary.monitorPackaging.toLocaleString("en-IN")}</p>
-                                                </div>
-                                            )}
                                             {pricingSummary.edlSurcharge > 0 && (
                                                 <div className="flex justify-between items-center text-sm font-bold text-red-600">
                                                     <p>Remote Delivery (EDL)</p>
