@@ -67,7 +67,10 @@ const OTHER_ITEMS_TYPES = [
     { id: "pcKit14", name: "PC Kit (Up to 14\")", price: 1500, icon: "🖥️", color: "from-blue-400 to-blue-500", weight: 10 },
     { id: "pcKit24", name: "PC Kit (Up to 24\")", price: 2000, icon: "🖥️", color: "from-blue-500 to-blue-600", weight: 30 },
     { id: "pcKitAbove", name: "PC Kit (Above 24\")", price: 4000, icon: "🖥️", color: "from-blue-600 to-blue-700", weight: 50 },
-    { id: "cpu", name: "CPU / Monitor", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600", weight: 15 },
+    { id: "monitorSmall", name: "Monitor (Up to 14\")", price: 1200, icon: "🖥️", color: "from-indigo-400 to-indigo-500", weight: 5, note: "Packaging Extra" },
+    { id: "monitorMedium", name: "Monitor (Up to 24\")", price: 1800, icon: "🖥️", color: "from-indigo-500 to-indigo-600", weight: 12, note: "Packaging Extra" },
+    { id: "monitorLarge", name: "Monitor (Above 24\")", price: 2800, icon: "🖥️", color: "from-indigo-600 to-indigo-700", weight: 20, note: "Packaging Extra" },
+    { id: "cpu", name: "CPU (Only)", price: 1200, icon: "🔌", color: "from-gray-500 to-gray-600", weight: 15 },
 ]
 
 const MAINTENANCE_MODE = false; // Toggle this to enable/disable service down page
@@ -130,6 +133,9 @@ export default function StudentMovePage() {
         pcKit14: 0,
         pcKit24: 0,
         pcKitAbove: 0,
+        monitorSmall: 0,
+        monitorMedium: 0,
+        monitorLarge: 0,
         cpu: 0
     })
     const [step, setStep] = useState(0) // 0=pincode, 1=boxes, 2=details, 3=summary, 4=success
@@ -208,6 +214,15 @@ export default function StudentMovePage() {
             return sum + item.price * otherItems[item.id];
         }, 0);
 
+        // Add monitor packaging charges (₹449 per monitor)
+        const monitorPackagingCharge = OTHER_ITEMS_TYPES.reduce((sum, item) => {
+            if (item.note === "Packaging Extra") {
+                return sum + (449 * otherItems[item.id]);
+            }
+            return sum;
+        }, 0);
+        base += monitorPackagingCharge;
+
         // 2. Calculate Remote Location (EDL) Surcharge if applicable
         if (edlValue > 0) {
             // Calculate total weight based on standard box sizes (Alpha = 30kg, Nova = 75kg)
@@ -235,6 +250,7 @@ export default function StudentMovePage() {
 
         return {
             base: Number(base.toFixed(2)),
+            monitorPackaging: monitorPackagingCharge,
             edlSurcharge: Number(edlSurcharge.toFixed(2)),
             insurance: Number(insuranceCharges.toFixed(2)),
             discount: Number(discount.toFixed(2)),
@@ -467,8 +483,79 @@ export default function StudentMovePage() {
                 description: `Campus Parcel — ${totalBoxes} item(s) (Incl. GST${pricingSummary.edlSurcharge > 0 ? " & EDL" : ""})`,
                 order_id: order.id,
                 handler: async (response) => {
-                    // 3. Verify payment
+                    setIsProcessing(true);
                     try {
+                        // 3. Prepare booking data upfront
+                        const boxDescription = Object.values(BOX_TYPES)
+                            .filter((b) => quantities[b.id] > 0)
+                            .map((b) => `${b.name} x${quantities[b.id]}`);
+
+                        const selectedExtraItems = OTHER_ITEMS_TYPES
+                            .filter(item => otherItems[item.id] > 0)
+                            .map(item => `${item.name}${item.note ? ` (${item.note})` : ""} x${otherItems[item.id]}`);
+                        
+                        const fullItemSummary = [
+                            ...boxDescription, 
+                            ...selectedExtraItems
+                        ].filter(Boolean).join(", ");
+
+                        const totalWeight = edlValue > 0 ? 
+                            ((quantities.alpha * 30) + (quantities.nova * 75) + OTHER_ITEMS_TYPES.reduce((sum, item) => sum + (item.weight * otherItems[item.id] || 0), 0)) 
+                            : undefined;
+
+                        const bookingData = {
+                            serviceType: "campus-parcel",
+                            senderDetails: {
+                                name: formData.name,
+                                phone: formData.phone,
+                                email: formData.email,
+                                address: formData.hostelAddress,
+                                landmark: "", 
+                                pincode: "826004", 
+                                city: "Dhanbad",
+                                state: "Jharkhand",
+                            },
+                            receiverDetails: {
+                                name: formData.receiverName,
+                                phone: formData.receiverPhone,
+                                email: formData.email,
+                                address: formData.destLandmark 
+                                    ? `${formData.destAddress}, ${formData.destLandmark}` 
+                                    : formData.destAddress,
+                                landmark: formData.destLandmark,
+                                pincode: formData.destPincode,
+                                city: formData.destCity,
+                                state: formData.destState,
+                            },
+                            packageDetails: {
+                                items: fullItemSummary,
+                                totalItems: totalBoxes,
+                                weight: totalWeight,
+                                weightUnit: "kg",
+                                description: fullItemSummary,
+                                isEdl: edlValue > 0,
+                                itemValue: formData.itemValue,
+                                optInsurance: formData.optInsurance,
+                                insuranceCharges: pricingSummary.insurance
+                            },
+                            boxDeliveryType: formData.packagingType === 'preferred' ? 'delivered' : 'self',
+                            boxDeliveryDate: formData.packagingDate,
+                            boxDeliverySlot: formData.packagingSlot,
+                            pickupMethod: formData.pickupType === 'delivered' ? 'doorstep' : 'hub',
+                            pickupDate: formData.pickupDate,
+                            pickupSlot: formData.pickupSlot,
+                            pricing: {
+                                basePrice: pricingSummary.base,
+                                additionalCharges: 0,
+                                discount: pricingSummary.discount,
+                                couponCode: appliedCoupon,
+                                tax: pricingSummary.tax,
+                                totalAmount: pricingSummary.total,
+                            },
+                            notes: `Campus Parcel Booking — ${fullItemSummary}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
+                        }
+
+                        // 4. Verify payment AND confirm booking in ONE call
                         const verifyRes = await fetch(`${API_BASE_URL}/api/payments/verify-payment`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -476,102 +563,32 @@ export default function StudentMovePage() {
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature,
+                                bookingData: bookingData // Send data here for one-step confirmation
                             }),
                         })
+                        
                         const verifyData = await verifyRes.json()
 
                         if (verifyData.success) {
-                            // 4. Save booking to database
-                            const boxDescription = Object.values(BOX_TYPES)
-                                .filter((b) => quantities[b.id] > 0)
-                                .map((b) => `${b.name} x${quantities[b.id]}`);
-
-                            // Add other items to summary string
-                            const selectedExtraItems = OTHER_ITEMS_TYPES
-                                .filter(item => otherItems[item.id] > 0)
-                                .map(item => `${item.name} x${otherItems[item.id]}`);
-                            
-                            const fullItemSummary = [
-                                ...boxDescription, 
-                                ...selectedExtraItems
-                            ].filter(Boolean).join(", ");
-
-                            const totalWeight = edlValue > 0 ? 
-                                ((quantities.alpha * 30) + (quantities.nova * 75) + OTHER_ITEMS_TYPES.reduce((sum, item) => sum + (item.weight * otherItems[item.id] || 0), 0)) 
-                                : undefined;
-
-                            const bookingData = {
-                                serviceType: "campus-parcel",
-                                senderDetails: {
-                                    name: formData.name,
-                                    phone: formData.phone,
-                                    email: formData.email,
-                                    address: formData.hostelAddress,
-                                    landmark: "", // Not required for hostel
-                                    pincode: "826004", // IIT ISM Dhanbad pincode
-                                    city: "Dhanbad",
-                                    state: "Jharkhand",
-                                },
-                                receiverDetails: {
-                                    name: formData.receiverName,
-                                    phone: formData.receiverPhone,
-                                    email: formData.email,
-                                    address: formData.destLandmark 
-                                        ? `${formData.destAddress}, ${formData.destLandmark}` 
-                                        : formData.destAddress,
-                                    landmark: formData.destLandmark,
-                                    pincode: formData.destPincode,
-                                    city: formData.destCity,
-                                    state: formData.destState,
-                                },
-                                packageDetails: {
-                                    items: fullItemSummary,
-                                    totalItems: totalBoxes,
-                                    weight: totalWeight, // Calculated weight for EDL matrices
-                                    weightUnit: "kg",
-                                    description: fullItemSummary,
-                                    isEdl: edlValue > 0,
-                                    itemValue: formData.itemValue,
-                                    optInsurance: formData.optInsurance,
-                                    insuranceCharges: pricingSummary.insurance
-                                },
-                                boxDeliveryType: formData.packagingType === 'preferred' ? 'delivered' : 'self',
-                                boxDeliveryDate: formData.packagingDate,
-                                boxDeliverySlot: formData.packagingSlot,
-                                pickupMethod: formData.pickupType === 'delivered' ? 'doorstep' : 'hub',
-                                pickupDate: formData.pickupDate,
-                                pickupSlot: formData.pickupSlot,
-                                pricing: {
-                                    basePrice: pricingSummary.base,
-                                    additionalCharges: 0, // Packaging/Pickup are now free
-                                    discount: pricingSummary.discount,
-                                    couponCode: appliedCoupon,
-                                    tax: pricingSummary.tax,
-                                    totalAmount: pricingSummary.total,
-                                },
-                                notes: `Campus Parcel Booking — ${fullItemSummary}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
-                            }
-
-                            const bookingRes = await fetch(`${API_BASE_URL}/api/bookings/confirm-booking`, {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ bookingData }),
-                            })
-                            const bookingResult = await bookingRes.json()
-
-                            if (bookingResult.success) {
-                                setBookingId(bookingResult.booking.bookingId)
+                            // Successfully verified and created booking
+                            if (verifyData.booking) {
+                                setBookingId(verifyData.booking.bookingId)
                                 setStep(4)
                             } else {
-                                alert("Payment succeeded but booking creation failed. Please contact support with Payment ID: " + response.razorpay_payment_id)
+                                // Fallback if booking was not created but payment was verified
+                                console.error("Payment verified but booking object missing:", verifyData);
+                                alert("Payment successful! Please contact support with Payment ID: " + response.razorpay_payment_id + " to confirm your booking.");
                             }
                         } else {
-                            alert("Payment verification failed. Please contact support.")
+                            console.error("Payment verification failed:", verifyData);
+                            alert("Payment verification failed. Please contact support with Payment ID: " + response.razorpay_payment_id);
                         }
-                    } catch {
-                        alert("Payment verification error. Please contact support.")
+                    } catch (err) {
+                        console.error("Critical error in payment handler:", err);
+                        alert("An error occurred while processing your payment. Please contact support.");
+                    } finally {
+                        setIsProcessing(false)
                     }
-                    setIsProcessing(false)
                 },
                 prefill: {
                     name: formData.name,
@@ -1080,8 +1097,14 @@ export default function StudentMovePage() {
                                                         <div className="space-y-1.5 font-medium">
                                                             <div className="flex justify-between text-gray-300">
                                                                 <span>Base Items:</span>
-                                                                <span>₹{pricingSummary.base.toLocaleString("en-IN")}</span>
+                                                                <span>₹{(pricingSummary.base - (pricingSummary.monitorPackaging || 0)).toLocaleString("en-IN")}</span>
                                                             </div>
+                                                            {pricingSummary.monitorPackaging > 0 && (
+                                                                <div className="flex justify-between text-orange-400 font-bold">
+                                                                    <span>Monitor Packaging:</span>
+                                                                    <span>₹{pricingSummary.monitorPackaging.toLocaleString("en-IN")}</span>
+                                                                </div>
+                                                            )}
                                                             {pricingSummary.edlSurcharge > 0 && (
                                                                 <div className="flex justify-between text-red-400 font-bold">
                                                                     <span>Remote Delivery (EDL):</span>
@@ -1454,7 +1477,7 @@ export default function StudentMovePage() {
                                                         <div className="flex items-center gap-3">
                                                             <span className="text-lg">{item.icon}</span>
                                                             <div>
-                                                                <p className="font-semibold text-gray-900 text-sm italic">{item.name}</p>
+                                                                <p className="font-semibold text-gray-900 text-sm italic">{item.name} {item.note && <span className="text-red-500 text-[10px] ml-1">({item.note})</span>}</p>
                                                                 <p className="text-[10px] text-gray-500 font-bold">₹{item.price.toLocaleString("en-IN")} × {otherItems[item.id]}</p>
                                                             </div>
                                                         </div>
@@ -1545,8 +1568,14 @@ export default function StudentMovePage() {
                                         <div className="border-t pt-4 flex flex-col gap-2 bg-gray-50 -mx-6 px-6 py-4">
                                             <div className="flex justify-between items-center text-sm font-bold text-gray-500">
                                                 <p>Weight Price (Base)</p>
-                                                <p>₹{pricingSummary.base.toLocaleString("en-IN")}</p>
+                                                <p>₹{(pricingSummary.base - (pricingSummary.monitorPackaging || 0)).toLocaleString("en-IN")}</p>
                                             </div>
+                                            {pricingSummary.monitorPackaging > 0 && (
+                                                <div className="flex justify-between items-center text-sm font-bold text-orange-600">
+                                                    <p>Monitor Packaging</p>
+                                                    <p>+ ₹{pricingSummary.monitorPackaging.toLocaleString("en-IN")}</p>
+                                                </div>
+                                            )}
                                             {pricingSummary.edlSurcharge > 0 && (
                                                 <div className="flex justify-between items-center text-sm font-bold text-red-600">
                                                     <p>Remote Delivery (EDL)</p>
@@ -2130,7 +2159,9 @@ Please confirm my pickup! 🙏`;
                                                         <h4 className="font-black text-gray-900 text-sm uppercase tracking-tight leading-tight">{item.name}</h4>
                                                         <p className="text-xs font-bold text-purple-600 mt-0.5">₹{item.price.toLocaleString("en-IN")}</p>
                                                         <hr className="my-1 border-gray-100" />
-                                                        <p className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter">+ GST</p>
+                                                        <p className="text-[8px] text-gray-400 font-bold uppercase tracking-tighter">
+                                                            + GST {item.note && <span className="text-red-500 ml-1">• {item.note}</span>}
+                                                        </p>
                                                     </div>
                                                     <div className="flex items-center bg-white rounded-xl p-1 gap-1 border border-gray-100 shadow-sm">
                                                         <button
