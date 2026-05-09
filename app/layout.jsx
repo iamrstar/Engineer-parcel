@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google"
+import Script from "next/script"
 import "./globals.css"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
@@ -66,6 +67,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Script 
+          src="https://admin-api.engineersparcel.in/tracking.js" 
+          strategy="afterInteractive" 
+        />
         <Toaster richColors position="top-center" />
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
