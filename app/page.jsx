@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <div className="relative overflow-hidden bg-white">
-      <CelebrationPopup />
+      {/* <CelebrationPopup /> */}
 
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 pointer-events-none">
@@ -66,7 +66,7 @@ export default function Home() {
 
               <div className="flex flex-wrap gap-6 items-center">
                 <Button asChild className="bg-gray-900 hover:bg-black text-white px-8 h-16 rounded-xl text-lg font-bold transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-200">
-                  <Link href="/booking">Start Shipping <ArrowRight className="ml-2 w-5 h-5" /></Link>
+                  <Link href="/booking">Book Now <ArrowRight className="ml-2 w-5 h-5" /></Link>
                 </Button>
                 <div className="flex -space-x-3 items-center">
                   {['/avatars/hero_avatar_1.png', '/avatars/hero_avatar_2.png', '/avatars/hero_avatar_3.png', '/avatars/hero_avatar_4.png'].map((src, i) => (
@@ -208,16 +208,16 @@ export default function Home() {
                 <p className="text-xl text-gray-400 mb-8 leading-relaxed">
                   Fixed-price box packing and reliable delivery for hostel students. Books, clothes, or electronics — we ship it safe.
                 </p>
-                <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                  <Button asChild className="bg-orange-600 hover:bg-orange-700 text-white h-16 px-10 text-xl font-black rounded-2xl shadow-2xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95 group">
-                    <Link href="/campus-parcel" className="flex items-center">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center lg:justify-start w-full">
+                  <Button asChild className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto h-14 sm:h-16 px-4 sm:px-10 text-lg sm:text-xl font-black rounded-2xl shadow-2xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95 group">
+                    <Link href="/campus-parcel" className="flex items-center justify-center whitespace-nowrap">
                       Book Campus Parcel
-                      <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="ml-2 w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
-                  <div className="flex items-center gap-3 px-6 py-4 rounded-2xl border border-white/10 bg-white/5">
+                  <div className="flex items-center justify-center gap-3 w-full sm:w-auto px-6 py-3 sm:py-4 rounded-2xl border border-white/10 bg-white/5">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-white font-bold">1,200+ Students Served</span>
+                    <span className="text-white font-bold text-sm sm:text-base">1,200+ Students Served</span>
                   </div>
                 </div>
               </div>
