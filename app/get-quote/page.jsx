@@ -127,6 +127,8 @@ export default function QuotationPage() {
   
   // AI Flow States
   const [isCalculatingQuote, setIsCalculatingQuote] = useState(false)
+  const [showLeadGate, setShowLeadGate] = useState(false)
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false)
   const [showQuotePopup, setShowQuotePopup] = useState(false)
   const [loadingText, setLoadingText] = useState("Analyzing your inventory...")
 
@@ -217,8 +219,32 @@ export default function QuotationPage() {
     setTimeout(() => {
       clearInterval(interval)
       setIsCalculatingQuote(false)
-      setShowQuotePopup(true)
+      setShowLeadGate(true)
     }, 5000)
+  }
+
+  const handleLeadGateSubmit = async (e) => {
+    e.preventDefault()
+    if (!formData.fullName || !formData.phone || formData.phone.length < 10) return
+
+    setIsSubmittingLead(true)
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+      await axios.post(`${API_URL}/api/leads`, {
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        source: "Rate Calculator",
+        details: { moveSize, distance, items }
+      })
+      setShowLeadGate(false)
+      setShowQuotePopup(true)
+    } catch (error) {
+      console.error("Error capturing lead:", error)
+      alert("Something went wrong. Please try again.")
+    } finally {
+      setIsSubmittingLead(false)
+    }
   }
 
   const handleFinalSubmit = async () => {
@@ -269,7 +295,7 @@ export default function QuotationPage() {
 
   const validateStep = () => {
     if (currentStep === 1) {
-      return formData.fullName && formData.email && formData.phone
+      return formData.email
     }
     if (currentStep === 2) {
       return formData.fromAddress && formData.fromCity && formData.fromPincode &&
@@ -356,6 +382,59 @@ export default function QuotationPage() {
           </div>
           <h2 className="text-3xl font-black text-gray-900 mt-8 mb-2">Calculating Quote</h2>
           <p className="text-xl text-orange-600 font-medium animate-pulse">{loadingText}</p>
+        </div>
+      )}
+
+      {/* Lead Capture Gatekeeper */}
+      {showLeadGate && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[32px] shadow-2xl max-w-md w-full p-8 md:p-10 animate-in zoom-in duration-300 relative border border-orange-100">
+            <button 
+              onClick={() => setShowLeadGate(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 text-orange-600 rounded-full mb-4">
+                <CheckCircle className="w-8 h-8" />
+              </div>
+              <h2 className="text-3xl font-black text-gray-900">Your Quote is Ready!</h2>
+              <p className="text-gray-500 mt-2">Enter your details to view your estimated rate.</p>
+            </div>
+
+            <form onSubmit={handleLeadGateSubmit} className="space-y-4">
+              <div>
+                <Label>Full Name *</Label>
+                <Input
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  className="h-12 bg-gray-50 mt-1"
+                  placeholder="Your Name"
+                  required
+                />
+              </div>
+              <div>
+                <Label>Phone Number *</Label>
+                <Input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  className="h-12 bg-gray-50 mt-1"
+                  placeholder="+91-XXXXXXXXXX"
+                  required
+                />
+              </div>
+              <Button 
+                type="submit"
+                disabled={isSubmittingLead || !formData.phone || !formData.fullName}
+                className="w-full h-14 mt-4 text-lg bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-200 transition-all hover:scale-[1.02]"
+              >
+                {isSubmittingLead ? <Loader2 className="w-6 h-6 animate-spin" /> : "View My Quote"}
+              </Button>
+            </form>
+          </div>
         </div>
       )}
 
@@ -513,19 +592,8 @@ export default function QuotationPage() {
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Personal Information</h2>
               
-              <div>
-                <Label htmlFor="fullName">Full Name *</Label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                />
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div className="md:col-span-2">
                   <Label htmlFor="email">Email Address *</Label>
                   <Input
                     id="email"
@@ -534,17 +602,6 @@ export default function QuotationPage() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="your@email.com"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number *</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="+91-XXXXXXXXXX"
                   />
                 </div>
               </div>
