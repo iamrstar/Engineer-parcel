@@ -5,15 +5,48 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star } from "lucide-react";
+import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 
 // Dynamically import CelebrationPopup (client-only)
 const CelebrationPopup = dynamic(() => import("./CelebrationAnimation"), { ssr: false });
 
 export default function Home() {
   const [trackingId, setTrackingId] = useState("");
+  const [quoteData, setQuoteData] = useState({ fromCity: "", toCity: "", weight: "", phone: "" });
+  const [isQuoting, setIsQuoting] = useState(false);
+  const [quoteSuccess, setQuoteSuccess] = useState(false);
+
+  const handleInstantQuote = async (e) => {
+    e.preventDefault();
+    if (!quoteData.phone || quoteData.phone.length < 10) return;
+    
+    setIsQuoting(true);
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      await axios.post(`${API_URL}/api/leads`, {
+        phone: quoteData.phone,
+        source: "Instant Quote Home",
+        details: { 
+          fromCity: quoteData.fromCity,
+          toCity: quoteData.toCity,
+          weight: quoteData.weight
+        }
+      });
+      setQuoteSuccess(true);
+      setTimeout(() => {
+        setQuoteSuccess(false);
+        setQuoteData({ fromCity: "", toCity: "", weight: "", phone: "" });
+      }, 5000);
+    } catch (error) {
+      console.error("Error submitting quote request:", error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsQuoting(false);
+    }
+  };
 
   return (
     <div className="relative overflow-hidden bg-white">
@@ -34,9 +67,14 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-orange-600 text-xs font-bold px-4 py-2 rounded-full mb-6">
-                <Zap className="w-3 h-3 fill-current" />
-                FASTEST DELIVERY IN INDIA
+              <div className="flex flex-wrap gap-3 mb-6">
+                <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-orange-600 text-xs font-bold px-4 py-2 rounded-full">
+                  <Zap className="w-3 h-3 fill-current" />
+                  FASTEST DELIVERY IN INDIA
+                </div>
+                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold px-4 py-2 rounded-full shadow-sm">
+                  🎓 IIT ISM INCUBATED
+                </div>
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6">
                 Logistics <span className="text-orange-600">Simplified.</span> <br />
@@ -46,21 +84,61 @@ export default function Home() {
                 Experience the next generation of logistics. From local parcels to international freight, we move your world with precision and care.
               </p>
 
-              {/* Tracking Search Bar */}
-              <div className="relative max-w-md group mb-10">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl blur opacity-25 group-focus-within:opacity-50 transition duration-1000 group-focus-within:duration-200"></div>
-                <div className="relative flex items-center bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden group-focus-within:border-orange-500 transition-colors">
-                  <Search className="ml-4 w-5 h-5 text-gray-400 group-focus-within:text-orange-500 transition-colors" />
-                  <input
-                    type="text"
-                    placeholder="ENTER TRACKING ID..."
-                    value={trackingId}
-                    onChange={(e) => setTrackingId(e.target.value.toUpperCase())}
-                    className="flex-1 h-16 px-4 bg-transparent outline-none text-gray-900 font-black uppercase tracking-widest placeholder:text-gray-300 placeholder:font-bold"
-                  />
-                  <Button asChild className="mr-2 bg-orange-600 hover:bg-orange-700 h-12 px-6 rounded-lg text-xs font-black uppercase tracking-widest">
-                    <Link href={`/track-order?id=${trackingId}`}>Track</Link>
-                  </Button>
+              {/* Instant Quote Form */}
+              <div className="relative w-full max-w-xl group mb-10 bg-white p-6 rounded-2xl shadow-2xl border border-gray-100">
+                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-[24px] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <div className="relative bg-white rounded-xl">
+                  <h3 className="text-xl font-black text-gray-900 mb-4 flex items-center">
+                    <Zap className="w-5 h-5 text-orange-500 mr-2" />
+                    Get an Instant Quote
+                  </h3>
+                  
+                  {!quoteSuccess ? (
+                    <form onSubmit={handleInstantQuote} className="grid grid-cols-2 gap-4">
+                      <Input
+                        placeholder="From City"
+                        value={quoteData.fromCity}
+                        onChange={(e) => setQuoteData({...quoteData, fromCity: e.target.value})}
+                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
+                        required
+                      />
+                      <Input
+                        placeholder="To City"
+                        value={quoteData.toCity}
+                        onChange={(e) => setQuoteData({...quoteData, toCity: e.target.value})}
+                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
+                        required
+                      />
+                      <Input
+                        placeholder="Weight (e.g. 50kg, 1BHK)"
+                        value={quoteData.weight}
+                        onChange={(e) => setQuoteData({...quoteData, weight: e.target.value})}
+                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
+                        required
+                      />
+                      <Input
+                        type="tel"
+                        placeholder="Phone Number"
+                        value={quoteData.phone}
+                        onChange={(e) => setQuoteData({...quoteData, phone: e.target.value})}
+                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
+                        required
+                      />
+                      <Button 
+                        type="submit" 
+                        disabled={isQuoting}
+                        className="col-span-2 h-14 mt-2 bg-orange-600 hover:bg-orange-700 text-lg font-black shadow-lg shadow-orange-200"
+                      >
+                        {isQuoting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Get Estimate & Callback"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <div className="py-6 text-center animate-in fade-in zoom-in">
+                      <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                      <h4 className="text-lg font-black text-gray-900">Request Sent Successfully!</h4>
+                      <p className="text-gray-500 font-medium mt-1">Sushank will call you within 30 minutes.</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -74,11 +152,17 @@ export default function Home() {
                       <Image src={src} alt="user" width={40} height={40} className="object-cover" />
                     </div>
                   ))}
-                  <div className="pl-6 text-sm">
-                    <div className="flex items-center gap-1 text-orange-500 mb-0.5">
-                      {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3 h-3 fill-current" />)}
+                  <div className="pl-6 text-sm border-l-2 border-gray-100 ml-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-1 text-orange-500 bg-orange-50 px-2 py-0.5 rounded text-xs font-bold">
+                        <Star className="w-3 h-3 fill-current" /> 4.7
+                      </div>
+                      <span className="text-gray-500 font-medium text-xs">Rating on Google</span>
                     </div>
-                    <p className="text-gray-500 font-medium"><span className="text-gray-900 font-bold">10k+</span> Happy Shippers</p>
+                    <div className="flex items-center gap-4">
+                      <p className="text-gray-500 font-medium"><span className="text-gray-900 font-black text-lg">10k+</span> Shippers</p>
+                      <p className="text-gray-500 font-medium"><span className="text-gray-900 font-black text-lg">50k+</span> Shipments</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -126,6 +210,21 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-orange-900/40 to-transparent"></div>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ TRUST LOGOS SECTION ══════════ */}
+      <section className="py-10 border-y border-gray-100 bg-white overflow-hidden relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Trusted by industry leaders & institutions</p>
+          
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+            {['/partner1.png', '/partner2.png', '/partner3.png', '/partner4.png', '/partner5.png', '/partner6.png', '/partner7.png', '/partner8.png'].map((src, idx) => (
+              <div key={idx} className="relative w-24 h-24 sm:w-32 sm:h-32">
+                <Image src={src} alt={`Partner ${idx + 1}`} fill className="object-contain" />
+              </div>
+            ))}
           </div>
         </div>
       </section>
