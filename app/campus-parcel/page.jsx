@@ -138,7 +138,8 @@ export default function StudentMovePage() {
         monitorLarge: 0,
         cpu: 0
     })
-    const [step, setStep] = useState(0) // 0=pincode, 1=boxes, 2=details, 3=summary, 4=success
+    const [step, setStep] = useState(-1) // -1=college, 0=pincode, 1=boxes, 2=details, 3=summary, 4=success
+    const [selectedCollege, setSelectedCollege] = useState("")
     const [edlStage, setEdlStage] = useState(0) // 0=none, 1=initial-fail, 2=searching, 3=resolved
     const [couponCode, setCouponCode] = useState("")
     const [appliedCoupon, setAppliedCoupon] = useState(null)
@@ -499,8 +500,8 @@ export default function StudentMovePage() {
                                 name: formData.name,
                                 phone: formData.phone,
                                 email: formData.email,
-                                address: formData.hostelAddress,
-                                landmark: "", 
+                                address: `${selectedCollege}, ${formData.hostelAddress}`,
+                                landmark: selectedCollege, 
                                 pincode: "826004", 
                                 city: "Dhanbad",
                                 state: "Jharkhand",
@@ -712,6 +713,7 @@ export default function StudentMovePage() {
                 <div className="flex items-center justify-between relative">
                     <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
                     {[
+                        { n: -1, label: "Campus", icon: <GraduationCap className="w-5 h-5" /> },
                         { n: 0, label: "Pincode", icon: <MapPin className="w-5 h-5" /> },
                         { n: 1, label: "Boxes", icon: <Package className="w-5 h-5" /> },
                         { n: 2, label: "Details", icon: <User className="w-5 h-5" /> },
@@ -747,6 +749,63 @@ export default function StudentMovePage() {
             <section className="pb-20 px-4">
                 <div className="max-w-5xl mx-auto">
                     <AnimatePresence mode="wait">
+                        {/* ═══════ STEP -1 — College Selection ═══════ */}
+                        {step === -1 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="max-w-4xl mx-auto space-y-8"
+                            >
+                                <div className="text-center space-y-2">
+                                    <h2 className="text-3xl font-black text-gray-900">Select Your Campus</h2>
+                                    <p className="text-gray-500">Choose your college to see available services and pricing.</p>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {[
+                                        "BIT Mesra",
+                                        "NIT Durgapur",
+                                        "NIT Jamshedpur",
+                                        "IIT ISM Dhanbad",
+                                        "IIT Patna",
+                                        "IIT Kharagpur",
+                                        "NIT Patna",
+                                        "XLRI Ranchi"
+                                    ].map((college) => (
+                                        <Card 
+                                            key={college}
+                                            onClick={() => setSelectedCollege(college)}
+                                            className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${selectedCollege === college ? 'ring-4 ring-orange-500 border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-orange-300'}`}
+                                        >
+                                            <CardContent className="p-6 flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${selectedCollege === college ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                                    <GraduationCap className="w-6 h-6" />
+                                                </div>
+                                                <h3 className="font-bold text-gray-900 text-sm md:text-base">{college}</h3>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                    <Card className="border-gray-300 border-dashed bg-gray-50 flex items-center justify-center opacity-60">
+                                        <CardContent className="p-6 text-center w-full flex flex-col items-center gap-2">
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <MapPin className="w-5 h-5 text-gray-400" />
+                                            </div>
+                                            <p className="font-black text-gray-500 text-xs uppercase tracking-widest mt-1">More Colleges<br/>Coming Soon</p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                                <div className="flex justify-center pt-8">
+                                    <Button
+                                        onClick={() => setStep(0)}
+                                        disabled={!selectedCollege}
+                                        className="bg-gradient-premium h-14 px-12 text-lg font-black rounded-2xl shadow-xl shadow-orange-500/30 flex items-center gap-2"
+                                    >
+                                        Continue <ArrowRight className="w-5 h-5" />
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* ═══════ STEP 0 — Pincode Verification ═══════ */}
                         {step === 0 && (
                             <motion.div
@@ -1204,13 +1263,21 @@ export default function StudentMovePage() {
                                         <div className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                                    <GraduationCap className="w-4 h-4" /> Hostel / Room Address (Address Line 1)
+                                                    <GraduationCap className="w-4 h-4" /> Campus / College
+                                                </Label>
+                                                <div className="h-12 border-2 border-gray-100 bg-gray-50 flex items-center px-3 rounded-lg text-gray-600 font-bold">
+                                                    {selectedCollege}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2 pt-2">
+                                                <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                                    <MapPin className="w-4 h-4" /> Hostel & Room Details
                                                 </Label>
                                                 <Input
                                                     name="hostelAddress"
                                                     value={formData.hostelAddress}
                                                     onChange={handleChange}
-                                                    placeholder="e.g. Room 204, Jasper Hostel, IIT ISM Dhanbad"
+                                                    placeholder="e.g. Room 204, Jasper Hostel"
                                                     className="h-12 border-2 focus:border-orange-500"
                                                 />
                                             </div>
@@ -1627,7 +1694,7 @@ export default function StudentMovePage() {
                                                 <div>
                                                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">Pickup Address</p>
                                                     <p className="font-bold text-gray-800">
-                                                        {formData.hostelAddress}
+                                                        {selectedCollege}, {formData.hostelAddress}
                                                     </p>
                                                 </div>
                                                 <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
