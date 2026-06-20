@@ -12,6 +12,7 @@ import axios from "axios";
 
 // Dynamically import CelebrationPopup (client-only)
 const CelebrationPopup = dynamic(() => import("./CelebrationAnimation"), { ssr: false });
+const PromoPopup = dynamic(() => import("@/components/PromoPopup"), { ssr: false });
 
 export default function Home() {
   const [trackingId, setTrackingId] = useState("");
@@ -51,6 +52,7 @@ export default function Home() {
   return (
     <div className="relative overflow-hidden bg-white">
       {/* <CelebrationPopup /> */}
+      <PromoPopup />
 
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 pointer-events-none">
