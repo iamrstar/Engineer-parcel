@@ -113,6 +113,18 @@ export default function Navbar() {
                 </Link>
               )}
 
+              <Link href="/city-parcel">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black rounded-xl px-6 shadow-xl shadow-orange-500/20 gap-2 border border-orange-400/20 group">
+                    <span className="text-lg">📦</span>
+                    OneBox
+                  </Button>
+                </motion.div>
+              </Link>
+
               <Link href="/campus-parcel">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -120,26 +132,25 @@ export default function Navbar() {
                 >
                   <Button className="bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 text-white font-black rounded-xl px-6 shadow-xl shadow-gray-900/10 gap-2 border border-white/10 group">
                     <span className="text-lg">🎓</span>
-                    Campus Parcel
-                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    Campus
                   </Button>
                 </motion.div>
               </Link>
             </div>
           </div>
 
-          {/* Mobile: Campus Parcel & Menu Button */}
+          {/* Mobile: OneBox & Menu Button */}
           <div className="flex md:hidden items-center gap-3">
-            <Link href="/campus-parcel">
+            <Link href="/city-parcel">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <Button className="bg-gray-900 border border-white/20 text-white font-black rounded-xl px-3 sm:px-4 py-2 h-9 sm:h-10 text-[10px] sm:text-xs gap-1.5 sm:gap-2 shadow-lg shadow-gray-900/20 active:scale-95 transition-all whitespace-nowrap">
-                  <span className="text-xs sm:text-sm">🎓</span>
-                  Campus Parcel
+                <Button className="bg-gradient-to-r from-orange-500 to-orange-600 border border-orange-400/20 text-white font-black rounded-xl px-3 sm:px-4 py-2 h-9 sm:h-10 text-[10px] sm:text-xs gap-1.5 sm:gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition-all whitespace-nowrap">
+                  <span className="text-xs sm:text-sm">📦</span>
+                  OneBox
                 </Button>
               </motion.div>
             </Link>
@@ -241,24 +252,44 @@ export default function Navbar() {
                 </button>
               )}
 
-              {/* Prominent Mobile Campus Parcel CTA */}
-              <Link
-                href="/campus-parcel"
-                className="flex items-center justify-between p-6 rounded-[2rem] bg-gradient-to-r from-gray-900 to-black text-white shadow-2xl mt-4 group relative overflow-hidden active:scale-95 transition-transform"
-                onClick={toggleMenu}
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,165,0,0.15),transparent)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10 flex items-center gap-4">
-                  <div className="text-4xl group-hover:scale-125 transition-transform duration-500">🎓</div>
-                  <div>
-                    <h3 className="text-xl font-black tracking-tight leading-none uppercase">Campus Parcel</h3>
-                    <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Special Student Service</p>
-                  </div>
-                </div>
-                <div className="relative z-10 p-3 bg-white/10 rounded-full group-hover:bg-orange-500 transition-colors">
-                  <ChevronRight className="h-6 w-6" />
-                </div>
-              </Link>
+              {/* Prominent Mobile CTAs */}
+              <div className="flex flex-col gap-3 mt-4 pb-4">
+                  <Link
+                    href="/city-parcel"
+                    className="flex items-center justify-between p-6 rounded-[2rem] bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-2xl group relative overflow-hidden active:scale-95 transition-transform"
+                    onClick={toggleMenu}
+                  >
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.15),transparent)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10 flex items-center gap-4">
+                      <div className="text-4xl group-hover:scale-125 transition-transform duration-500">📦</div>
+                      <div>
+                        <h3 className="text-xl font-black tracking-tight leading-none uppercase">OneBox</h3>
+                        <p className="text-[10px] font-bold text-orange-100 mt-1 uppercase tracking-widest">Ship Anything</p>
+                      </div>
+                    </div>
+                    <div className="relative z-10 p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                      <ChevronRight className="h-6 w-6" />
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/campus-parcel"
+                    className="flex items-center justify-between p-6 rounded-[2rem] bg-gradient-to-r from-gray-900 to-black text-white shadow-2xl group relative overflow-hidden active:scale-95 transition-transform"
+                    onClick={toggleMenu}
+                  >
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,165,0,0.15),transparent)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10 flex items-center gap-4">
+                      <div className="text-4xl group-hover:scale-125 transition-transform duration-500">🎓</div>
+                      <div>
+                        <h3 className="text-xl font-black tracking-tight leading-none uppercase">Campus Parcel</h3>
+                        <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Special Student Service</p>
+                      </div>
+                    </div>
+                    <div className="relative z-10 p-3 bg-white/10 rounded-full group-hover:bg-orange-500 transition-colors">
+                      <ChevronRight className="h-6 w-6" />
+                    </div>
+                  </Link>
+              </div>
             </div>
           </motion.div>
         )}
