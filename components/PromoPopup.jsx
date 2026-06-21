@@ -13,11 +13,26 @@ export default function PromoPopup() {
     const router = useRouter();
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsOpen(true);
-            setStage("countdown");
-        }, 1000);
-        return () => clearTimeout(timer);
+        if (typeof window === "undefined") return;
+        
+        const hasSeenPopup = sessionStorage.getItem("promoPopupShown");
+        
+        if (hasSeenPopup === "true") {
+            // If already seen the countdown, just show the main popup directly
+            const timer = setTimeout(() => {
+                setIsOpen(true);
+                setStage("main");
+            }, 500);
+            return () => clearTimeout(timer);
+        } else {
+            // First time this session, show the countdown
+            const timer = setTimeout(() => {
+                sessionStorage.setItem("promoPopupShown", "true");
+                setIsOpen(true);
+                setStage("countdown");
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
     }, []);
 
     useEffect(() => {
