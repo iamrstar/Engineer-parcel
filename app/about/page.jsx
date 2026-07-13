@@ -81,59 +81,81 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ══════════ OUR STORY ══════════ */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      {/* ══════════ OUR STORY TIMELINE ══════════ */}
+      <section className="py-32 relative overflow-hidden bg-gray-50/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
             >
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
-                A Tech-First <br />
-                <span className="text-orange-600">Origin Story.</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                Our <span className="text-orange-600">Evolution.</span>
               </h2>
-              <div className="space-y-6">
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Engineers Parcel was born in the middle of the pandemic at <span className="font-bold text-gray-900">IIT(ISM) Dhanbad</span>. We saw the critical need for secure, hygienic, and highly-trackable logistics during a global crisis.
-                </p>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  What started as a campus solution has rapidly scaled into a national mission. We identified massive gaps in Tier-2 and Tier-3 cities and filled them with technical excellence and customer-centric design.
-                </p>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  Today, we're not just moving boxes; we're moving the needle on how India perceives delivery quality.
-                </p>
-              </div>
+              <p className="text-lg text-gray-500 leading-relaxed">
+                From a campus solution to a national logistics powerhouse.
+              </p>
+            </motion.div>
+          </div>
 
-              <div className="mt-12 flex items-center gap-6">
-                <div className="h-1 bg-gray-100 flex-1 rounded-full overflow-hidden">
-                  <div className="h-full bg-orange-600 w-3/4"></div>
+          <div className="relative border-l-4 border-orange-200 ml-4 md:ml-0 md:border-none space-y-16">
+            {/* Desktop Center Line */}
+            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-200 via-orange-500 to-orange-200 -translate-x-1/2 rounded-full"></div>
+
+            {[
+              {
+                year: "2022",
+                title: "The Foundation",
+                desc: "Started during the pandemic at IIT(ISM) Dhanbad to provide secure, hygienic campus logistics.",
+                icon: <Shield className="w-6 h-6 text-white" />
+              },
+              {
+                year: "2023",
+                title: "Tech-First Scaling",
+                desc: "Integrated core AI routing and launched app-based tracking. Expanded beyond the campus to service local city parcels.",
+                icon: <Cpu className="w-6 h-6 text-white" />
+              },
+              {
+                year: "2024",
+                title: "National Reach",
+                desc: "Scaled to cover 19,000+ pincodes across Tier-2 and Tier-3 cities, handling over 7,000kg+ volume monthly.",
+                icon: <Globe className="w-6 h-6 text-white" />
+              },
+              {
+                year: "2025",
+                title: "Intelligent Automation",
+                desc: "Deployed advanced IoT solutions for real-time fleet tracking and automated warehousing systems.",
+                icon: <Zap className="w-6 h-6 text-white" />
+              },
+              {
+                year: "2026 & Beyond",
+                title: "The Future of Logistics",
+                desc: "We aren't just moving boxes anymore; we are the technological backbone defining India's delivery quality.",
+                icon: <ChartCandlestick className="w-6 h-6 text-white" />
+              }
+            ].map((item, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+                className={`relative flex flex-col md:flex-row items-center justify-between group ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+              >
+                {/* Timeline Dot */}
+                <div className="absolute left-[-22px] top-4 md:static md:left-auto md:top-auto w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center border-4 border-white shadow-xl z-10 md:mx-auto group-hover:scale-125 transition-transform duration-500">
+                  {item.icon}
                 </div>
-                <p className="text-gray-900 font-black text-lg italic">"Innovation at speed."</p>
-              </div>
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative group"
-            >
-              <div className="absolute -inset-4 bg-orange-600/20 rounded-[4rem] blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
-              <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
-                <Image
-                  src="/our-story.jpg"
-                  alt="EngineersParcel Team"
-                  width={800}
-                  height={600}
-                  className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 to-transparent"></div>
-              </div>
-            </motion.div>
+                {/* Content Box */}
+                <div className={`ml-8 md:ml-0 md:w-5/12 bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 hover:shadow-2xl transition-all duration-500 relative ${index % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}>
+                  <span className="text-orange-600 font-black text-xl mb-2 block">{item.year}</span>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-500 leading-relaxed">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
