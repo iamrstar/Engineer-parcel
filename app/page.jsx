@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,14 @@ import axios from "axios";
 // Dynamically import CelebrationPopup (client-only)
 const CelebrationPopup = dynamic(() => import("./CelebrationAnimation"), { ssr: false });
 const PromoPopup = dynamic(() => import("@/components/PromoPopup"), { ssr: false });
+const BookNowModal = dynamic(() => import("@/components/BookNowModal"), { ssr: false });
 
 export default function Home() {
   const [trackingId, setTrackingId] = useState("");
   const [quoteData, setQuoteData] = useState({ fromCity: "", toCity: "", weight: "", phone: "" });
   const [isQuoting, setIsQuoting] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
+  const [isBookNowOpen, setIsBookNowOpen] = useState(false);
 
   const handleInstantQuote = async (e) => {
     e.preventDefault();
@@ -53,11 +55,15 @@ export default function Home() {
     <div className="relative overflow-hidden bg-white">
       {/* <CelebrationPopup /> */}
       <PromoPopup />
+      <BookNowModal isOpen={isBookNowOpen} onClose={() => setIsBookNowOpen(false)} />
 
       {/* Background Decorative Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-orange-100/50 rounded-full blur-[120px] -translate-y-1/2"></div>
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-[120px] translate-y-1/2"></div>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }} 
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute w-[800px] h-[800px] bg-gradient-to-tr from-orange-100/60 to-blue-50/60 rounded-full blur-[120px] -z-10" 
+        />
       </div>
 
       {/* ══════════ HERO SECTION ══════════ */}
@@ -70,101 +76,54 @@ export default function Home() {
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <div className="flex flex-wrap gap-3 mb-6">
-                <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 text-orange-600 text-xs font-bold px-4 py-2 rounded-full">
-                  <Zap className="w-3 h-3 fill-current" />
+                <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 text-white shadow-[0_0_15px_rgba(234,88,12,0.3)] text-xs font-bold px-4 py-2 rounded-full relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Zap className="w-3 h-3 text-orange-500 fill-current" />
                   FASTEST DELIVERY IN INDIA
                 </div>
-                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold px-4 py-2 rounded-full shadow-sm">
+                <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-gray-200 text-gray-900 text-xs font-bold px-4 py-2 rounded-full shadow-sm">
                   🎓 IIT ISM INCUBATED
                 </div>
               </div>
-              <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6">
-                Logistics <span className="text-orange-600">Simplified.</span> <br />
-                Excellence Delivered.
+              <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight">
+                Shipping <br />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-400">made simple.</span>
               </h1>
               <p className="text-xl text-gray-500 mb-10 max-w-xl leading-relaxed">
-                Experience the next generation of logistics. From local parcels to international freight, we move your world with precision and care.
+                Ship anything, anywhere.
               </p>
 
-              {/* Instant Quote Form */}
-              <div className="relative w-full max-w-xl group mb-10 bg-white p-6 rounded-2xl shadow-2xl border border-gray-100">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-[24px] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                <div className="relative bg-white rounded-xl">
-                  <h3 className="text-xl font-black text-gray-900 mb-4 flex items-center">
-                    <Zap className="w-5 h-5 text-orange-500 mr-2" />
-                    Get an Instant Quote
-                  </h3>
-                  
-                  {!quoteSuccess ? (
-                    <form onSubmit={handleInstantQuote} className="grid grid-cols-2 gap-4">
-                      <Input
-                        placeholder="From City"
-                        value={quoteData.fromCity}
-                        onChange={(e) => setQuoteData({...quoteData, fromCity: e.target.value})}
-                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
-                        required
-                      />
-                      <Input
-                        placeholder="To City"
-                        value={quoteData.toCity}
-                        onChange={(e) => setQuoteData({...quoteData, toCity: e.target.value})}
-                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
-                        required
-                      />
-                      <Input
-                        placeholder="Weight (e.g. 50kg, 1BHK)"
-                        value={quoteData.weight}
-                        onChange={(e) => setQuoteData({...quoteData, weight: e.target.value})}
-                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
-                        required
-                      />
-                      <Input
-                        type="tel"
-                        placeholder="Phone Number"
-                        value={quoteData.phone}
-                        onChange={(e) => setQuoteData({...quoteData, phone: e.target.value})}
-                        className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium"
-                        required
-                      />
-                      <Button 
-                        type="submit" 
-                        disabled={isQuoting}
-                        className="col-span-2 h-14 mt-2 bg-orange-600 hover:bg-orange-700 text-lg font-black shadow-lg shadow-orange-200"
-                      >
-                        {isQuoting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Get Estimate & Callback"}
-                      </Button>
-                    </form>
-                  ) : (
-                    <div className="py-6 text-center animate-in fade-in zoom-in">
-                      <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                      <h4 className="text-lg font-black text-gray-900">Request Sent Successfully!</h4>
-                      <p className="text-gray-500 font-medium mt-1">Sushank will call you within 30 minutes.</p>
-                    </div>
-                  )}
-                </div>
+              <div className="flex flex-wrap gap-6 items-center mb-10">
+                <Button 
+                  onClick={() => setIsBookNowOpen(true)}
+                  className="bg-gray-900 hover:bg-black text-white px-10 h-16 rounded-2xl text-xl font-black transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-900/20 group relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
+                  Book Now <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button asChild variant="outline" className="bg-white/30 backdrop-blur-md border border-white/50 hover:bg-white/50 text-gray-900 px-8 h-16 rounded-2xl text-lg font-bold transition-all hover:scale-105 active:scale-95 shadow-xl">
+                  <Link href="/city-parcel">Book OneBox</Link>
+                </Button>
               </div>
 
-              <div className="flex flex-wrap gap-6 items-center">
-                <Button asChild className="bg-gray-900 hover:bg-black text-white px-8 h-16 rounded-xl text-lg font-bold transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-200">
-                  <Link href="/booking">Book Now <ArrowRight className="ml-2 w-5 h-5" /></Link>
-                </Button>
+              <div className="flex items-center gap-6">
                 <div className="flex -space-x-3 items-center">
                   {['/avatars/hero_avatar_1.png', '/avatars/hero_avatar_2.png', '/avatars/hero_avatar_3.png', '/avatars/hero_avatar_4.png'].map((src, i) => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 overflow-hidden ring-2 ring-orange-50">
-                      <Image src={src} alt="user" width={40} height={40} className="object-cover" />
+                    <div key={i} className="w-12 h-12 rounded-full border-2 border-white bg-gray-200 overflow-hidden ring-2 ring-orange-50 relative">
+                      <Image src={src} alt="user" fill className="object-cover" />
                     </div>
                   ))}
-                  <div className="pl-6 text-sm border-l-2 border-gray-100 ml-2">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="flex items-center gap-1 text-orange-500 bg-orange-50 px-2 py-0.5 rounded text-xs font-bold">
-                        <Star className="w-3 h-3 fill-current" /> 4.7
-                      </div>
-                      <span className="text-gray-500 font-medium text-xs">Rating on Google</span>
+                </div>
+                <div className="text-sm border-l-2 border-gray-100 pl-6">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-1 text-orange-500 bg-orange-50 px-2 py-1 rounded text-xs font-bold">
+                      <Star className="w-4 h-4 fill-current" /> 4.7
                     </div>
-                    <div className="flex items-center gap-4">
-                      <p className="text-gray-500 font-medium"><span className="text-gray-900 font-black text-lg">10k+</span> Shippers</p>
-                      <p className="text-gray-500 font-medium"><span className="text-gray-900 font-black text-lg">50k+</span> Shipments</p>
-                    </div>
+                    <span className="text-gray-500 font-medium text-sm">Rating on Google</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <p className="text-gray-500 font-medium flex items-center gap-1"><span className="text-gray-900 font-black text-lg"><AnimatedCounter end={10} suffix="k+" /></span> Shippers</p>
+                    <p className="text-gray-500 font-medium flex items-center gap-1"><span className="text-gray-900 font-black text-lg"><AnimatedCounter end={50} suffix="k+" /></span> Shipments</p>
                   </div>
                 </div>
               </div>
@@ -201,20 +160,26 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative rounded-[40px] overflow-hidden shadow-2xl bg-gradient-to-br from-orange-400 to-orange-600 p-2 group">
+              <motion.div 
+                animate={{ y: [-10, 10, -10] }} 
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="relative z-10 w-full aspect-[4/3] md:aspect-auto flex items-center justify-center group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/30 to-transparent blur-3xl -z-10 rounded-full scale-125 group-hover:scale-150 transition-transform duration-1000"></div>
                 <Image
                   src="/Delivery-boy.png"
                   alt="Engineers Parcel Delivery"
                   width={600}
                   height={500}
-                  className="rounded-[36px] grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
+                  className="object-contain drop-shadow-2xl grayscale-[10%] group-hover:grayscale-0 transition-all duration-700 hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-orange-900/40 to-transparent"></div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </div>
       </section>
+
+
 
       {/* ══════════ TRUST LOGOS SECTION ══════════ */}
       <section className="py-10 border-y border-gray-100 bg-white overflow-hidden relative">
@@ -263,18 +228,18 @@ export default function Home() {
               delay={0.2}
             />
             <ServiceCard
-              icon={<Box className="w-8 h-8" />}
-              title="Local Parcel"
-              desc="Lightning-fast same-day delivery for local parcels within major cities."
-              link="/services#local"
-              delay={0.3}
-            />
-            <ServiceCard
               icon={<Globe className="w-8 h-8" />}
               title="International"
               desc="Global logistics network spanning 200+ countries with full tracking."
               link="/services#international"
               delay={0.4}
+            />
+            <ServiceCard
+              icon={<Zap className="w-8 h-8" />}
+              title="Campus Logistics"
+              desc="Specialized moving and parcel services tailored for university students."
+              link="/campus-parcel"
+              delay={0.5}
             />
           </div>
         </div>
@@ -363,8 +328,75 @@ export default function Home() {
       {/* ══════════ TESTIMONIALS SECTION ══════════ */}
       <TestimonialsSection />
 
+      {/* ══════════ INSTANT QUOTE SECTION ══════════ */}
+      <section className="py-20 relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative w-full group bg-white p-10 md:p-16 rounded-[40px] shadow-2xl border border-gray-100 overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-100/50 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-50/50 rounded-full blur-3xl -z-10 -translate-x-1/3 translate-y-1/3"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row gap-12 items-center">
+            <div className="md:w-1/3">
+              <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 flex items-center">
+                <Zap className="w-8 h-8 text-orange-500 mr-3" />
+                Quick Quote
+              </h3>
+              <p className="text-gray-500 text-lg leading-relaxed">Get an instant estimate for your shipment and a callback from our team within minutes.</p>
+            </div>
+            
+            <div className="md:w-2/3 w-full">
+            {!quoteSuccess ? (
+              <form onSubmit={handleInstantQuote} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  placeholder="From City"
+                  value={quoteData.fromCity}
+                  onChange={(e) => setQuoteData({...quoteData, fromCity: e.target.value})}
+                  className="h-14 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium text-base rounded-xl"
+                  required
+                />
+                <Input
+                  placeholder="To City"
+                  value={quoteData.toCity}
+                  onChange={(e) => setQuoteData({...quoteData, toCity: e.target.value})}
+                  className="h-14 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium text-base rounded-xl"
+                  required
+                />
+                <Input
+                  placeholder="Weight (e.g. 50kg, 1BHK)"
+                  value={quoteData.weight}
+                  onChange={(e) => setQuoteData({...quoteData, weight: e.target.value})}
+                  className="h-14 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium text-base rounded-xl"
+                  required
+                />
+                <Input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={quoteData.phone}
+                  onChange={(e) => setQuoteData({...quoteData, phone: e.target.value})}
+                  className="h-14 bg-gray-50 border-gray-200 focus-visible:ring-orange-500 font-medium text-base rounded-xl"
+                  required
+                />
+                <Button 
+                  type="submit" 
+                  disabled={isQuoting}
+                  className="col-span-1 sm:col-span-2 h-14 mt-4 bg-orange-600 hover:bg-orange-700 text-xl font-black rounded-xl shadow-lg shadow-orange-600/20"
+                >
+                  {isQuoting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Get Estimate & Callback"}
+                </Button>
+              </form>
+            ) : (
+              <div className="py-10 text-center animate-in fade-in zoom-in bg-gray-50 rounded-2xl">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h4 className="text-2xl font-black text-gray-900">Request Sent Successfully!</h4>
+                <p className="text-gray-500 font-medium mt-2 text-lg">Sushank will call you within 30 minutes.</p>
+              </div>
+            )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════ CTA SECTION ══════════ */}
-      <section className="py-32 relative overflow-hidden text-center bg-gray-900 border-t border-white/5">
+      <section className="py-32 relative overflow-hidden text-center bg-gray-950 border-t border-white/5">
         <div className="absolute inset-0 pointer-events-none opacity-50">
           <div className="absolute top-0 right-0 w-96 h-96 bg-orange-600/20 rounded-full blur-[120px]"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]"></div>
@@ -486,4 +518,27 @@ function TestimonialsSection() {
       </div>
     </section>
   );
+}
+
+function AnimatedCounter({ end, suffix = "", prefix = "" }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 2000;
+    const increment = end / (duration / 16);
+    
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [end]);
+
+  return <span>{prefix}{count}{suffix}</span>;
 }
