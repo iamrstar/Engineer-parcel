@@ -14,9 +14,12 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-[#001529] text-white overflow-hidden font-sans">
+    <footer className="relative bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white overflow-hidden font-sans">
+      {/* Decorative Glowing Elements */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl pointer-events-none translate-y-1/3 -translate-x-1/3" />
       {/* ══════════ TOP UTILITY BAR ══════════ */}
-      <div className="bg-[#003a8c] border-b border-white/10 py-3 text-sm">
+      <div className="bg-transparent border-b border-white/10 py-3 text-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-6">
             <a href="tel:+919525801506" className="flex items-center gap-2 hover:text-orange-400 transition-colors">
@@ -47,7 +50,7 @@ export default function Footer() {
           <div className="lg:col-span-3 space-y-6">
             <Link href="/" className="inline-block transition-transform hover:scale-105">
               <Image
-                src="/logo.png"
+                src="/logo.jpeg"
                 alt="EngineersParcel Logo"
                 width={180}
                 height={60}
