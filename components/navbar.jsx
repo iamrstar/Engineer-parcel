@@ -47,7 +47,7 @@ export default function Navbar() {
             <Link href="/" className="relative group">
               <div className="absolute -inset-2 bg-orange-500/10 rounded-xl blur-lg transition-all duration-500 group-hover:bg-orange-500/20 opacity-0 group-hover:opacity-100" />
               <Image
-                src="/logo.png"
+                src="/logo.jpeg"
                 alt="EngineersParcel Logo"
                 width={130}
                 height={45}
@@ -58,15 +58,15 @@ export default function Navbar() {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            <div className="flex items-center bg-gray-100/50 p-1 rounded-2xl mr-4">
+          <div className="hidden md:flex items-center gap-8">
+            <div className="flex items-center gap-8">
               {navLinks.map((link, idx) => (
-                <Link key={link.name} href={link.href} className="relative group px-4 py-2">
-                  <span className="relative z-10 text-sm font-bold text-gray-600 group-hover:text-orange-600 transition-colors duration-300">
+                <Link key={link.name} href={link.href} className="relative group">
+                  <span className="text-sm font-bold text-gray-600 hover:text-orange-600 transition-colors duration-300">
                     {link.name}
                   </span>
                   <motion.div
-                    className="absolute inset-0 bg-white rounded-xl shadow-sm opacity-0 group-hover:opacity-100"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100"
                     layoutId="navHover"
                     initial={false}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -75,64 +75,35 @@ export default function Navbar() {
               ))}
             </div>
 
-            <div className="h-6 w-px bg-gray-200 mx-2" />
+            <div className="h-6 w-px bg-gray-200" />
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6">
               {user ? (
-                <div className="flex items-center gap-2">
-                  <Link href="/dashboard">
-                    <Button
-                      variant="ghost"
-                      className="gap-2 font-bold text-gray-700 hover:text-orange-600 hover:bg-orange-50 rounded-xl px-4"
-                    >
-                      <LayoutDashboard className="h-4 w-4" />
-                      Dashboard
-                    </Button>
+                <div className="flex items-center gap-4">
+                  <Link href="/dashboard" className="text-sm font-bold text-gray-600 hover:text-orange-600 transition-colors flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
                   </Link>
-                  <Button
-                    onClick={logout}
-                    variant="ghost"
-                    className="gap-2 font-bold text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl px-4"
-                  >
+                  <button onClick={logout} className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors flex items-center gap-2">
                     <LogOut className="h-4 w-4" />
                     Logout
-                  </Button>
+                  </button>
                 </div>
               ) : (
-                <Link href="/login">
-                  <Button className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-6 shadow-lg shadow-orange-600/20 group overflow-hidden relative">
-                    <span className="relative z-10 flex items-center gap-2">
-                      <LogIn className="h-4 w-4" />
-                      Login
-                    </span>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                      initial={false}
-                    />
-                  </Button>
+                <Link href="/login" className="text-sm font-bold text-gray-600 hover:text-orange-600 transition-colors flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Login
                 </Link>
               )}
-
-              <Link href="/city-parcel">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black rounded-xl px-6 shadow-xl shadow-orange-500/20 gap-2 border border-orange-400/20 group">
-                    <span className="text-lg">📦</span>
-                    OneBox
-                  </Button>
-                </motion.div>
-              </Link>
 
               <Link href="/campus-parcel">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button className="bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 text-white font-black rounded-xl px-6 shadow-xl shadow-gray-900/10 gap-2 border border-white/10 group">
-                    <span className="text-lg">🎓</span>
-                    Campus
+                  <Button className="bg-gray-900 hover:bg-black text-white font-black rounded-xl px-6 shadow-lg shadow-gray-900/20 gap-2 border border-gray-800">
+                    <span className="text-base">🎓</span>
+                    Campus Parcel
                   </Button>
                 </motion.div>
               </Link>
@@ -141,20 +112,6 @@ export default function Navbar() {
 
           {/* Mobile: OneBox & Menu Button */}
           <div className="flex md:hidden items-center gap-3">
-            <Link href="/city-parcel">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <Button className="bg-gradient-to-r from-orange-500 to-orange-600 border border-orange-400/20 text-white font-black rounded-xl px-3 sm:px-4 py-2 h-9 sm:h-10 text-[10px] sm:text-xs gap-1.5 sm:gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition-all whitespace-nowrap">
-                  <span className="text-xs sm:text-sm">📦</span>
-                  OneBox
-                </Button>
-              </motion.div>
-            </Link>
-
             <button
               onClick={toggleMenu}
               className={`p-2.5 rounded-xl transition-all duration-300 shadow-sm ${isMenuOpen
@@ -254,24 +211,6 @@ export default function Navbar() {
 
               {/* Prominent Mobile CTAs */}
               <div className="flex flex-col gap-3 mt-4 pb-4">
-                  <Link
-                    href="/city-parcel"
-                    className="flex items-center justify-between p-6 rounded-[2rem] bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-2xl group relative overflow-hidden active:scale-95 transition-transform"
-                    onClick={toggleMenu}
-                  >
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.15),transparent)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10 flex items-center gap-4">
-                      <div className="text-4xl group-hover:scale-125 transition-transform duration-500">📦</div>
-                      <div>
-                        <h3 className="text-xl font-black tracking-tight leading-none uppercase">OneBox</h3>
-                        <p className="text-[10px] font-bold text-orange-100 mt-1 uppercase tracking-widest">Ship Anything</p>
-                      </div>
-                    </div>
-                    <div className="relative z-10 p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-                      <ChevronRight className="h-6 w-6" />
-                    </div>
-                  </Link>
-
                   <Link
                     href="/campus-parcel"
                     className="flex items-center justify-between p-6 rounded-[2rem] bg-gradient-to-r from-gray-900 to-black text-white shadow-2xl group relative overflow-hidden active:scale-95 transition-transform"
