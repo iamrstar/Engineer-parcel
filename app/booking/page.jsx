@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   CalendarIcon,
   CheckCircle,
@@ -17,7 +18,8 @@ import {
   Box,
   BadgePercent,
   AlertCircle,
-  Loader2
+  Loader2,
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -45,6 +47,17 @@ const steps = [
 ];
 
 export default function BookingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-orange-600" /></div>}>
+      <BookingContent />
+    </Suspense>
+  );
+}
+
+function BookingContent() {
+  const searchParams = useSearchParams();
+  const initialService = searchParams.get("service");
+  
   const [step, setStep] = useState(1);
   const [date, setDate] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,7 +71,8 @@ export default function BookingPage() {
   const [loadingCoupons, setLoadingCoupons] = useState(false);
 
   const [formData, setFormData] = useState({
-    serviceType: "courier",
+    serviceType: ["courier", "local", "international", "shifting"].includes(initialService) ? initialService : "courier",
+    shippingSpeed: "surface",
     pickupPincode: "",
     pickupAddress: "",
     pickupLandmark: "",
@@ -109,6 +123,7 @@ export default function BookingPage() {
         try {
           const res = await axios.post(`${API_BASE_URL}/api/calculate-price`, {
             serviceType: formData.serviceType,
+            shippingSpeed: formData.shippingSpeed,
             weight: parseFloat(formData.weight),
             weightUnit: formData.weightUnit,
             length: parseFloat(formData.length) || 0,
@@ -177,6 +192,7 @@ export default function BookingPage() {
         landmark: formData.deliveryLandmark
       },
       serviceType: formData.serviceType,
+      shippingSpeed: formData.shippingSpeed,
       pickupDate: date ? date.toISOString() : new Date().toISOString(),
       pickupSlot: formData.pickupTime,
       paymentMethod,
@@ -331,23 +347,23 @@ export default function BookingPage() {
               exit={{ opacity: 0, x: -20 }}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                 <Card className="glass border-none overflow-hidden">
-                  <div className="bg-orange-600/5 p-4 border-b border-orange-100">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                      <Truck className="h-5 w-5 text-orange-600" /> Choose Service
+                      <Truck className="h-5 w-5 text-orange-600" /> Choose Speed
                     </h2>
                   </div>
                   <CardContent className="p-6">
                     <RadioGroup
-                      value={formData.serviceType}
-                      onValueChange={(v) => handleSelectChange("serviceType", v)}
+                      value={formData.shippingSpeed}
+                      onValueChange={(v) => handleSelectChange("shippingSpeed", v)}
                       className="grid grid-cols-1 gap-3"
                     >
                       {[
-                        { id: "courier", label: "Courier Service", desc: "Best for documents & small parcels", icon: Box },
-                        { id: "local", label: "Local Parcel", desc: "Same-day delivery within city", icon: Smartphone },
-                        { id: "international", label: "International", desc: "Global shipping & logistics", icon: CreditCard },
-                        { id: "shifting", label: "Shifting", desc: "Home & office relocation", icon: Package },
+                        { id: "surface", label: "Surface (Economy)", desc: "Cost-effective ground shipping", icon: Truck, eta: "5-7 Days" },
+                        { id: "air", label: "Air (Express)", desc: "Fast air transit for urgent parcels", icon: Zap, eta: "2-3 Days" },
+                        { id: "premium", label: "Premium (Priority)", desc: "Priority ultra-fast delivery", icon: Box, eta: "24-72 Hrs" },
                       ].map((s) => (
                         <div key={s.id}>
                           <RadioGroupItem value={s.id} id={s.id} className="peer sr-only" />
@@ -355,14 +371,19 @@ export default function BookingPage() {
                             htmlFor={s.id}
                             className="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 cursor-pointer transition-all hover:bg-orange-50 peer-data-[state=checked]:border-orange-600 peer-data-[state=checked]:bg-orange-50/50"
                           >
-                            <div className="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
+                            <div className="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
                               <s.icon className="h-6 w-6" />
                             </div>
-                            <div className="flex-1">
-                              <p className="font-bold text-gray-900">{s.label}</p>
-                              <p className="text-sm text-gray-500">{s.desc}</p>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                                <p className="font-bold text-gray-900">{s.label}</p>
+                                <span className="bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full whitespace-nowrap">
+                                  {s.eta}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-500 truncate">{s.desc}</p>
                             </div>
-                            {formData.serviceType === s.id && <div className="h-4 w-4 rounded-full bg-orange-600 flex items-center justify-center"><CheckCircle className="h-3 w-3 text-white" /></div>}
+                            {formData.shippingSpeed === s.id && <div className="h-4 w-4 rounded-full bg-orange-600 flex items-center justify-center shrink-0"><CheckCircle className="h-3 w-3 text-white" /></div>}
                           </Label>
                         </div>
                       ))}
@@ -371,10 +392,13 @@ export default function BookingPage() {
                 </Card>
 
                 <Card className="glass border-none h-fit">
-                  <div className="bg-orange-600/5 p-4 border-b border-orange-100">
+                  <div className="bg-orange-600/5 p-4 border-b border-orange-100 flex items-center justify-between">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                       <Box className="h-5 w-5 text-orange-600" /> Package Info
                     </h2>
+                    <div className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">
+                      {formData.serviceType}
+                    </div>
                   </div>
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-4">
@@ -648,8 +672,8 @@ export default function BookingPage() {
                   <CardContent className="p-8 space-y-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                       <div className="space-y-1">
-                        <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Service Type</Label>
-                        <p className="text-2xl font-black capitalize text-gray-900 leading-tight">{formData.serviceType}</p>
+                        <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Service & Speed</Label>
+                        <p className="text-2xl font-black capitalize text-gray-900 leading-tight">{formData.serviceType} <span className="text-orange-600">- {formData.shippingSpeed}</span></p>
                         <p className="text-sm text-gray-500 font-medium">Actual Weight: {formData.weight} {formData.weightUnit}</p>
                       </div>
                       <div className="space-y-1">
