@@ -13,6 +13,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner"
+import AnimatedBox3D from "@/components/AnimatedBox3D"
 
 import Maintenance from "@/components/Maintenance"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
@@ -30,9 +32,10 @@ const BOX_TYPES = [
         dimensions: "42 × 42 × 27 cm",
         capacity: "Up to 30 kg",
         icon: "📦",
-        color: "from-blue-500 to-blue-600",
-        bgLight: "bg-blue-50 border-blue-200",
-        textColor: "text-blue-700",
+        color: "from-slate-900 to-black",
+        bgLight: "bg-slate-50 border-slate-200",
+        textColor: "text-slate-800",
+        colorTheme: "black-orange",
     },
     {
         id: "nova",
@@ -48,6 +51,7 @@ const BOX_TYPES = [
         color: "from-orange-500 to-orange-600",
         bgLight: "bg-orange-50 border-orange-200",
         textColor: "text-orange-700",
+        colorTheme: "orange",
     },
 ]
 
@@ -774,7 +778,13 @@ export default function StudentMovePage() {
                                     ].map((college) => (
                                         <Card 
                                             key={college}
-                                            onClick={() => setSelectedCollege(college)}
+                                            onClick={() => {
+                                                if (college === "IIT ISM Dhanbad" || college === "BIT Mesra") {
+                                                    setSelectedCollege(college);
+                                                } else {
+                                                    toast.info("We'll be right back here soon!");
+                                                }
+                                            }}
                                             className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${selectedCollege === college ? 'ring-4 ring-orange-500 border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-orange-300'}`}
                                         >
                                             <CardContent className="p-6 flex items-center gap-4">
@@ -1038,7 +1048,7 @@ export default function StudentMovePage() {
                                                     80% Off
                                                 </div>
 
-                                                <span className="text-5xl block mb-2">{box.icon}</span>
+                                                <AnimatedBox3D colorTheme={box.colorTheme} />
                                                 <h3 className="text-2xl font-black">{box.name}</h3>
                                                 <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest mt-2">
                                                     {box.dimensions}
