@@ -938,6 +938,16 @@ export default function CityParcelPage() {
                                             ? "Add dimensions and weight for each item you want to ship" 
                                             : "Select the box sizes and quantities you need for your move"}
                                     </p>
+                                    <div className="inline-flex items-center gap-2 mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-full text-sm font-bold animate-pulse">
+                                        <Zap className="w-4 h-4 text-green-600" />
+                                        <span>{(() => {
+                                            const baseDate = new Date('2026-07-21');
+                                            const now = new Date();
+                                            const diffDays = Math.floor((now - baseDate) / (1000 * 60 * 60 * 24));
+                                            const increments = Math.floor(diffDays / 6);
+                                            return (1003 + (increments * 10)).toLocaleString();
+                                        })()}+ Boxes Sold in Last 15 Days</span>
+                                    </div>
                                 </div>
 
                                 {/* ───── STANDARD BOX SELECTOR ───── */}
