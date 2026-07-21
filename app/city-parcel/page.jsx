@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import AnimatedBox3D from "@/components/AnimatedBox3D"
 
 import Maintenance from "@/components/Maintenance"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
@@ -26,12 +27,13 @@ const BOX_TYPES = [
         originalPrice: 1999,
         edlPrice: 1999,
         description: "Pack anything that fits. Ship anywhere in India.",
-        dimensions: "Standard Size",
+        dimensions: "42 × 42 × 27 cm",
         capacity: "Up to 30 kg",
         icon: "📦",
-        color: "from-blue-500 to-blue-600",
-        bgLight: "bg-blue-50 border-blue-200",
-        textColor: "text-blue-700",
+        color: "from-slate-900 to-black",
+        bgLight: "bg-slate-50 border-slate-200",
+        textColor: "text-slate-800",
+        colorTheme: "black-orange",
     },
     {
         id: "atlasbox",
@@ -40,12 +42,13 @@ const BOX_TYPES = [
         originalPrice: 2499,
         edlPrice: 2499,
         description: "The bigger one. Ship anything up to 60kg.",
-        dimensions: "Large Size",
+        dimensions: "60 × 35 × 40 cm",
         capacity: "Up to 60 kg",
         icon: "🚀",
         color: "from-orange-500 to-orange-600",
         bgLight: "bg-orange-50 border-orange-200",
         textColor: "text-orange-700",
+        colorTheme: "orange",
     }
 ]
 
@@ -957,7 +960,7 @@ export default function CityParcelPage() {
                                                     80% Off
                                                 </div>
 
-                                                <span className="text-5xl block mb-2">{box.icon}</span>
+                                                <AnimatedBox3D colorTheme={box.colorTheme} />
                                                 <h3 className="text-2xl font-black">{box.name}</h3>
                                                 <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest mt-2">
                                                     {box.dimensions}
