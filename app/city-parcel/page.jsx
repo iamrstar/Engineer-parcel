@@ -598,7 +598,7 @@ export default function CityParcelPage() {
 
     return (
         <>
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-x-hidden">
             {/* ────── City Parcel Banner ────── */}
             <div className="bg-gradient-to-r from-purple-600 via-orange-600 to-purple-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50 animate-pulse">
                 <span className="mr-2">⚡</span>
