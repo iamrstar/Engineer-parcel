@@ -12,7 +12,7 @@ import axios from "axios";
 
 // Dynamically import CelebrationPopup (client-only)
 const CelebrationPopup = dynamic(() => import("./CelebrationAnimation"), { ssr: false });
-const PromoPopup = dynamic(() => import("@/components/PromoPopup"), { ssr: false });
+// const PromoPopup = dynamic(() => import("@/components/PromoPopup"), { ssr: false });
 const BookNowModal = dynamic(() => import("@/components/BookNowModal"), { ssr: false });
 
 export default function Home() {
@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <div className="relative overflow-hidden bg-white">
       {/* <CelebrationPopup /> */}
-      <PromoPopup />
+      {/* <PromoPopup /> */}
       <BookNowModal isOpen={isBookNowOpen} onClose={() => setIsBookNowOpen(false)} />
 
       {/* Background Decorative Elements */}
