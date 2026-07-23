@@ -93,18 +93,34 @@ export default function Home() {
                 Ship anything, anywhere.
               </p>
 
-              <div className="flex flex-wrap gap-6 items-center mb-10">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center mb-10">
                 <Button 
                   onClick={() => setIsBookNowOpen(true)}
-                  className="bg-gray-900 hover:bg-black text-white px-10 h-16 rounded-2xl text-xl font-black transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-900/20 group relative overflow-hidden"
+                  className="flex flex-col items-center justify-center h-auto py-3 px-8 bg-gray-900 hover:bg-black text-white rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-gray-900/20 group relative overflow-hidden w-full sm:w-auto"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
-                  Book Now <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <div className="flex items-center text-xl font-black">
+                    Book Anything <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <span className="text-xs font-medium text-gray-400 mt-1">Courier, shifting, documents & more</span>
                 </Button>
-                <Button asChild variant="outline" className="bg-white/30 backdrop-blur-md border border-white/50 hover:bg-white/50 text-gray-900 px-8 h-16 rounded-2xl text-lg font-bold transition-all hover:scale-105 active:scale-95 shadow-xl">
-                  <Link href="/city-parcel">Book OneBox</Link>
+                
+                <Button asChild variant="outline" className="flex flex-col items-center justify-center h-auto py-3 px-8 bg-white/30 backdrop-blur-md border border-white/50 hover:bg-white/50 text-gray-900 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl w-full sm:w-auto">
+                  <Link href="/city-parcel">
+                    <div className="flex items-center text-xl font-black">
+                      <Package className="mr-2 w-5 h-5 text-orange-600" /> Book OneBox
+                    </div>
+                    <span className="text-xs font-bold text-orange-700 mt-1">Up to 30kg. No questions asked.</span>
+                  </Link>
                 </Button>
               </div>
+              <a 
+                href="#compare" 
+                onClick={(e) => { e.preventDefault(); document.getElementById('compare')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
+                className="text-sm text-gray-400 hover:text-orange-600 font-medium transition-colors cursor-pointer flex items-center gap-1 mb-10"
+              >
+                Not sure which to pick? See the difference ↓
+              </a>
 
               <div className="flex items-center gap-6">
                 <div className="flex -space-x-3 items-center">
@@ -179,7 +195,124 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══════════ WHICH ONE IS RIGHT FOR YOU? ══════════ */}
+      <section id="compare" className="py-24 bg-white relative overflow-hidden scroll-mt-20">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-orange-50 to-blue-50 rounded-full blur-[120px] -z-10 opacity-60" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Which one is right for you?</h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">Two simple paths. Pick the one that fits your need — no confusion, no hassle.</p>
+          </motion.div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Book Anything Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative group bg-gray-950 text-white p-8 md:p-10 rounded-[32px] border border-gray-800 shadow-2xl hover:shadow-gray-900/30 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Truck className="w-7 h-7 text-orange-400" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-black mb-2">Book Anything</h3>
+                <p className="text-sm text-gray-400 font-medium mb-6">Full-service logistics for all your needs</p>
+                
+                <ul className="space-y-3 mb-8">
+                  {[
+                    "Documents & small parcels",
+                    "Medicines & fragile items",
+                    "Home & office shifting",
+                    "Multi-item courier",
+                    "International shipping",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-gray-300">
+                      <CheckCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                      <span className="text-sm font-medium">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-8">
+                  <Zap className="w-4 h-4 text-orange-400" />
+                  <span className="text-xs text-gray-400">Price varies by weight, distance & service type</span>
+                </div>
+
+                <Button 
+                  onClick={() => setIsBookNowOpen(true)}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white h-14 text-lg font-black rounded-xl shadow-lg shadow-orange-600/20 transition-all hover:scale-[1.02] active:scale-95 group/btn"
+                >
+                  Book Anything <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                </Button>
+              </div>
+            </motion.div>
+
+            {/* Book OneBox Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative group bg-gradient-to-br from-orange-50 to-white p-8 md:p-10 rounded-[32px] border-2 border-orange-200 shadow-xl hover:shadow-orange-200/50 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+            >
+              <div className="absolute top-4 right-4 bg-orange-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</div>
+              <div className="absolute bottom-0 right-0 w-40 h-40 bg-orange-200/30 rounded-full blur-3xl translate-y-1/2 translate-x-1/2" />
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Package className="w-7 h-7 text-orange-600" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Book OneBox</h3>
+                <p className="text-sm text-gray-500 font-medium mb-6">Pack it. Ship it. Done. No questions asked.</p>
+                
+                <ul className="space-y-3 mb-8">
+                  {[
+                    "One box — up to 30kg",
+                    "Fixed price, no surprises",
+                    "We provide the box & packing",
+                    "Ideal for students & hostellers",
+                    "Simplest way to ship your stuff",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-gray-700">
+                      <CheckCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                      <span className="text-sm font-medium">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex items-center gap-3 bg-orange-100/60 border border-orange-200 rounded-xl px-4 py-3 mb-8">
+                  <span className="text-2xl font-black text-gray-900">₹299</span>
+                  <span className="text-xs text-gray-500 font-bold">starting price per box</span>
+                </div>
+
+                <Button asChild className="w-full bg-gray-900 hover:bg-black text-white h-14 text-lg font-black rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 group/btn">
+                  <Link href="/city-parcel">
+                    Book OneBox <ArrowRight className="ml-2 w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Not sure hint */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="text-center text-sm text-gray-400 mt-8"
+          >
+            Still not sure? <a href="https://wa.me/919693245615" target="_blank" rel="noopener noreferrer" className="text-orange-600 font-bold hover:underline">WhatsApp us</a> and we'll guide you in 30 seconds.
+          </motion.p>
+        </div>
+      </section>
 
       {/* ══════════ TRUST LOGOS SECTION ══════════ */}
       <section className="py-10 border-y border-gray-100 bg-white overflow-hidden relative">
