@@ -4,8 +4,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Award, Clock, Shield, Truck, Users, MessageCircle,
-  IndianRupee, BrainCircuit, ChartCandlestick, Cpu,
-  QrCode, Cog, ArrowRight, Star, Zap, Globe, Package, User
+  IndianRupee, ChartCandlestick,
+  QrCode, ArrowRight, Star, Zap, Globe, Package, User, Phone, MapPin, Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -51,11 +51,11 @@ export default function AboutPage() {
               ESTABLISHED BY IIT(ISM) & CSIR
             </div>
             <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8">
-              We’re Building the <br />
-              <span className="text-orange-600">Future of Logistics.</span>
+              Logistics, Done <br />
+              <span className="text-orange-600">Honestly.</span>
             </h1>
             <p className="text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed mb-12">
-              EngineersParcel is transforming India's logistics landscape with cutting-edge AI and IoT technology. We're creating a smarter, safer, and more transparent delivery ecosystem.
+              No gimmicks, no empty buzzwords. EngineersParcel is built by engineers who believe in straightforward, reliable shipping. We pick up your stuff, pack it carefully, and deliver it safely — that's it.
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100">
@@ -112,9 +112,9 @@ export default function AboutPage() {
               },
               {
                 year: "2023",
-                title: "Tech-First Scaling",
-                desc: "Integrated core AI routing and launched app-based tracking. Expanded beyond the campus to service local city parcels.",
-                icon: <Cpu className="w-6 h-6 text-white" />
+                title: "Beyond Campus",
+                desc: "Launched app-based tracking and expanded beyond the campus to serve local city parcels across Dhanbad.",
+                icon: <MapPin className="w-6 h-6 text-white" />
               },
               {
                 year: "2024",
@@ -124,15 +124,21 @@ export default function AboutPage() {
               },
               {
                 year: "2025",
-                title: "Intelligent Automation",
-                desc: "Deployed advanced IoT solutions for real-time fleet tracking and automated warehousing systems.",
-                icon: <Zap className="w-6 h-6 text-white" />
+                title: "Operational Growth",
+                desc: "Strengthened partnerships, expanded delivery fleet, and built a reputation for reliable, on-time deliveries across India.",
+                icon: <Truck className="w-6 h-6 text-white" />
               },
               {
-                year: "2026 & Beyond",
-                title: "The Future of Logistics",
-                desc: "We aren't just moving boxes anymore; we are the technological backbone defining India's delivery quality.",
-                icon: <ChartCandlestick className="w-6 h-6 text-white" />
+                year: "2026",
+                title: "OneBox Launch",
+                desc: "Introduced OneBox — a fixed-price, no-questions-asked single box shipping service that simplified logistics for thousands.",
+                icon: <Package className="w-6 h-6 text-white" />
+              },
+              {
+                year: "What's Next",
+                title: "Growing with You",
+                desc: "Building a logistics brand that people trust — one honest delivery at a time. More cities, better service, same values.",
+                icon: <Heart className="w-6 h-6 text-white" />
               }
             ].map((item, index) => (
               <motion.div 
@@ -171,7 +177,7 @@ export default function AboutPage() {
             >
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">Our DNA</h2>
               <p className="text-lg text-gray-500 leading-relaxed">
-                The principles that guide every AI algorithm we write and every package we deliver.
+                The principles that guide every decision we make and every package we deliver.
               </p>
             </motion.div>
           </div>
@@ -185,14 +191,14 @@ export default function AboutPage() {
             />
             <ValueCard
               icon={<Users className="w-8 h-8" />}
-              title="Human-Centric AI"
-              desc="Technology is our tool, but people are our purpose. We build systems that solve real human problems."
+              title="People First"
+              desc="Technology is our tool, but people are our purpose. We hire carefully, train rigorously, and treat your parcel like our own."
               delay={0.2}
             />
             <ValueCard
               icon={<Award className="w-8 h-8" />}
-              title="Engineered Excellence"
-              desc="Good enough isn't enough. We strive for mathematical precision in every delivery route."
+              title="Honest Service"
+              desc="No fake promises. We give you real timelines, fair prices, and updates you can actually trust."
               delay={0.3}
             />
           </div>
@@ -210,38 +216,38 @@ export default function AboutPage() {
           >
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-6 underline decoration-orange-600 decoration-8 underline-offset-8">
-                Why We’re Different
+                Why We're Different
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               <div className="space-y-6">
                 <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-orange-600/20">
-                  <Cpu className="w-8 h-8" />
+                  <Shield className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900">AI-IoT Core</h3>
-                <p className="text-gray-500 leading-relaxed italic">
-                  "India’s First AI-IoT Logistics Platform. We don't just track; we predict and optimize."
+                <h3 className="text-2xl font-black text-gray-900">100% Insured</h3>
+                <p className="text-gray-500 leading-relaxed">
+                  Every parcel is fully insured. If something goes wrong, we take responsibility — no excuses.
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/20">
-                  <ChartCandlestick className="w-8 h-8" />
+                  <IndianRupee className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900">Dynamic Pricing</h3>
-                <p className="text-gray-500 leading-relaxed italic">
-                  "Algorithmically adapted pricing. No hidden costs, just fair value calculated in real-time."
+                <h3 className="text-2xl font-black text-gray-900">Transparent Pricing</h3>
+                <p className="text-gray-500 leading-relaxed">
+                  What we quote is what you pay. No hidden charges, no surge pricing, no last-minute surprises.
                 </p>
               </div>
 
               <div className="space-y-6">
-                <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-purple-600/20">
-                  <QrCode className="w-8 h-8" />
+                <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-green-600/20">
+                  <Phone className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900">Instant Updates</h3>
-                <p className="text-gray-500 leading-relaxed italic">
-                  "Automated hub scan notifications via WhatsApp. You're never in the dark about your parcel."
+                <h3 className="text-2xl font-black text-gray-900">Real Human Support</h3>
+                <p className="text-gray-500 leading-relaxed">
+                  Call or WhatsApp us anytime. You'll talk to a real person who knows where your parcel is.
                 </p>
               </div>
             </div>
@@ -260,23 +266,23 @@ export default function AboutPage() {
               transition={{ duration: 0.8 }}
               className="relative order-2 lg:order-1"
             >
-              <div className="absolute -inset-4 bg-blue-600/10 rounded-[4rem] blur-3xl transition-transform duration-700"></div>
+              <div className="absolute -inset-4 bg-orange-600/10 rounded-[4rem] blur-3xl transition-transform duration-700"></div>
               <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
                   src="/ai-packer-mover.jpg"
-                  alt="AI Packers and Movers"
+                  alt="Professional Packers and Movers"
                   width={800}
                   height={600}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-x-6 bottom-6 glass p-6 rounded-3xl border-white/40">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-                      <BrainCircuit className="w-5 h-5" />
+                    <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center text-white">
+                      <Truck className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-gray-900">AI Surveyor</p>
-                      <p className="text-xs text-gray-500">Auto Space Estimation</p>
+                      <p className="text-sm font-black text-gray-900">Trained Team</p>
+                      <p className="text-xs text-gray-500">Professional Packing & Handling</p>
                     </div>
                   </div>
                 </div>
@@ -291,18 +297,18 @@ export default function AboutPage() {
               className="order-1 lg:order-2"
             >
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
-                AI-Powered <br />
-                <span className="text-blue-600">Packers & Movers.</span>
+                Professional <br />
+                <span className="text-orange-600">Packers & Movers.</span>
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Traditional moving is broken. We fixed it with AI and IoT. Our systems ensure safety, transparency, and efficiency at every step of your journey.
+                Moving is stressful enough. We handle the packing, loading, transporting, and unpacking — so you don't have to worry about a thing.
               </p>
 
               <ul className="space-y-4">
-                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="App-based Video Survey for auto-estimation." />
-                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Smart Load Balancing Algorithms." />
-                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="IoT Barcode Labels for box-level tracking." />
-                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Auto Damage Reporting via app photos." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Trained team for careful packing & handling." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Transparent quotes — no hidden charges." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Real-time WhatsApp updates on your shipment." />
+                <ServiceFeature icon={<Zap className="w-4 h-4" />} text="Fully insured — damage protection on every item." />
               </ul>
             </motion.div>
           </div>
@@ -353,8 +359,8 @@ export default function AboutPage() {
                 <div className="w-24 h-24 bg-orange-100 rounded-3xl flex items-center justify-center text-orange-600 mx-auto mb-8 animate-bounce-slow">
                   <Truck className="w-12 h-12" />
                 </div>
-                <h3 className="text-3xl font-black text-gray-900 mb-4">Same-Area Clustering</h3>
-                <p className="text-gray-500 italic">"Our algorithms group pickups in real-time, reducing carbon footprint and increasing speed."</p>
+                <h3 className="text-3xl font-black text-gray-900 mb-4">Batch Pickups</h3>
+                <p className="text-gray-500">We group nearby pickups together to save time and deliver faster — simple, efficient logistics.</p>
               </div>
             </motion.div>
           </div>
