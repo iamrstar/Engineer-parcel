@@ -388,9 +388,9 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <TeamMember name="Subham Sawarnkar" role="Founder & CEO" delay={0.1} />
+            <TeamMember name="Subham Sawarnkar" role="Founder & CEO" delay={0.1} image="/avatars/subham-sawarnkar.jpg" />
             <TeamMember name="Sabir" role="Operations Director" delay={0.2} />
-            <TeamMember name="Raj Chatterjee" role="Technology Head" delay={0.3} />
+            <TeamMember name="Raj Chatterjee" role="Technology Head" delay={0.3} image="/avatars/raj-chatterjee.jpg" />
             <TeamMember name="Suraj" role="Customer Relations" delay={0.4} />
           </div>
         </div>
@@ -455,7 +455,7 @@ function ValueCard({ icon, title, desc, delay }) {
   );
 }
 
-function TeamMember({ name, role, delay }) {
+function TeamMember({ name, role, delay, image }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -465,7 +465,16 @@ function TeamMember({ name, role, delay }) {
       className="group"
     >
       <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 bg-[#0B2434] border border-white/5 flex items-center justify-center transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-blue-900/20">
-        <Users className="w-1/2 h-1/2 text-[#38BDF8] drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]" />
+        {image ? (
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <Users className="w-1/2 h-1/2 text-[#38BDF8] drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B2434] to-transparent opacity-40"></div>
       </div>
       <h3 className="text-xl font-black text-white mb-1">{name}</h3>
