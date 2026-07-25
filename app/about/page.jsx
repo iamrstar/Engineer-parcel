@@ -388,10 +388,10 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <TeamMember name="Subham Sawarnkar" role="Founder & CEO" delay={0.1} image="/avatars/subham-sawarnkar.jpg" />
-            <TeamMember name="Sabir" role="Operations Director" delay={0.2} />
+            <TeamMember name="Subham Sawarnkar" role="Co-Founder & Strategy Head" delay={0.1} image="/avatars/subham-sawarnkar.jpg" />
+            <TeamMember name="Sabir" role="Director & Decision Head" delay={0.2} />
             <TeamMember name="Raj Chatterjee" role="Technology Head" delay={0.3} image="/avatars/raj-chatterjee.jpg" />
-            <TeamMember name="Suraj" role="Customer Relations" delay={0.4} />
+            <TeamMember name="Prof. (Retd.) Nirmal Kumar Singh" role="Chief Advisor & Board Member" delay={0.4} />
           </div>
         </div>
       </section>
