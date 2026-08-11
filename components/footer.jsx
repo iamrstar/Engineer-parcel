@@ -34,9 +34,9 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-orange-400 transition-colors"><Facebook className="w-4 h-4" /></a>
             <a href="#" className="hover:text-orange-400 transition-colors"><MessageCircle className="w-4 h-4" /></a>
-            <a href="#" className="hover:text-orange-400 transition-colors"><Linkedin className="w-4 h-4" /></a>
+            <a href="https://www.linkedin.com/company/engineersparcel" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors"><Linkedin className="w-4 h-4" /></a>
             <a href="#" className="hover:text-orange-400 transition-colors"><Twitter className="w-4 h-4" /></a>
-            <a href="#" className="hover:text-orange-400 transition-colors"><Instagram className="w-4 h-4" /></a>
+            <a href="https://www.instagram.com/engineersparcel" target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors"><Instagram className="w-4 h-4" /></a>
             <a href="#" className="hover:text-orange-400 transition-colors"><Youtube className="w-4 h-4" /></a>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function Footer() {
               />
             </Link>
             <h4 className="text-orange-500 font-bold uppercase tracking-widest text-xs border-l-2 border-orange-500 pl-3">
-              Simplifying Your Business
+              Making Life Simple
             </h4>
             <p className="text-gray-300 text-sm leading-relaxed font-bold">
               Engineers Parcel Pvt. Ltd.
@@ -94,11 +94,11 @@ export default function Footer() {
             </FooterCol>
 
             <FooterCol title="Primary Services">
-              <FooterLink href="/services#courier">Express - Full Truck Load</FooterLink>
-              <FooterLink href="/services#shifting">Express - Part Truck Load</FooterLink>
-              <FooterLink href="/services#local">Speed Trucking</FooterLink>
-              <FooterLink href="/activities">Air & Rail Services</FooterLink>
-              <FooterLink href="/services#shifting">Warehousing Services</FooterLink>
+              <FooterLink href="/services#courier">Courier Service</FooterLink>
+              <FooterLink href="/services#shifting">Shifting & Moving</FooterLink>
+              <FooterLink href="/campus-parcel">Campus Logistics</FooterLink>
+              <FooterLink href="/activities">Activities & Fun</FooterLink>
+              <FooterLink href="/services#international">International Logistics</FooterLink>
             </FooterCol>
 
             <FooterCol title="Policy & Support">
