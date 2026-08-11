@@ -70,6 +70,16 @@ function BookingContent() {
   const [manualCoupon, setManualCoupon] = useState("");
   const [loadingCoupons, setLoadingCoupons] = useState(false);
 
+  // EDL & Pincode State
+  const [pincodeStatus, setPincodeStatus] = useState(null); // 'checking', 'serviceable', 'unserviceable', null
+  const [pincodeError, setPincodeError] = useState("");
+  const [pickupPincodeStatus, setPickupPincodeStatus] = useState(null); // 'checking', 'serviceable', 'unserviceable', null
+  const [pickupPincodeError, setPickupPincodeError] = useState("");
+  const [pickupEdlValue, setPickupEdlValue] = useState(0);
+  const [edlValue, setEdlValue] = useState(0);
+  const [showEdlWarning, setShowEdlWarning] = useState(false);
+  const [deliveryDays, setDeliveryDays] = useState("");
+
   const [formData, setFormData] = useState({
     serviceType: ["courier", "local", "international", "shifting"].includes(initialService) ? initialService : "courier",
     shippingSpeed: "surface",
@@ -130,7 +140,9 @@ function BookingContent() {
             width: parseFloat(formData.width) || 0,
             height: parseFloat(formData.height) || 0,
             fragile: formData.fragile,
-            value: parseFloat(formData.value) || 0,
+            value: formData.insuranceRequired ? (parseFloat(formData.value) || 0) : 0,
+            isEdl: edlValue > 0 || pickupEdlValue > 0,
+            edlDistance: edlValue + pickupEdlValue,
           });
           if (res.data.success) {
             setPriceDetails(res.data.data);
@@ -142,7 +154,104 @@ function BookingContent() {
       const timeoutId = setTimeout(calculatePrice, 500);
       return () => clearTimeout(timeoutId);
     }
-  }, [formData.weight, formData.weightUnit, formData.serviceType, formData.length, formData.width, formData.height, formData.fragile, formData.value]);
+  }, [formData.weight, formData.weightUnit, formData.serviceType, formData.length, formData.width, formData.height, formData.fragile, formData.value, formData.insuranceRequired, formData.shippingSpeed, edlValue, pickupEdlValue]);
+
+  // Pincode checking logic
+  useEffect(() => {
+    const pincode = formData.deliveryPincode;
+    if (!pincode) {
+        setPincodeStatus(null);
+        setPincodeError("");
+        setEdlValue(0);
+        return;
+    }
+
+    if (pincode.length !== 6) {
+        setPincodeStatus("error");
+        setPincodeError("Pincode must be 6 digits");
+        setEdlValue(0);
+        return;
+    }
+
+    const checkPincode = async () => {
+        setPincodeStatus("checking");
+        setPincodeError("");
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/pincode/check/${pincode}`);
+            const data = await res.json();
+
+            if (res.ok && data.data?.isServiceable) {
+                const edlResult = data.data.edl || 0;
+                setEdlValue(edlResult);
+                setDeliveryDays(data.data.deliveryDays || "");
+                setPincodeStatus("serviceable");
+                
+                if (edlResult > 0) {
+                    setShowEdlWarning(true);
+                }
+            } else {
+                setPincodeStatus("unserviceable");
+                setPincodeError("Delivery not available at this pincode");
+                setEdlValue(0);
+            }
+        } catch (error) {
+            console.error("Error checking pincode:", error);
+            setPincodeStatus("error");
+            setPincodeError("Unable to verify pincode");
+            setEdlValue(0);
+        }
+    };
+
+    const debounce = setTimeout(checkPincode, 500);
+    return () => clearTimeout(debounce);
+  }, [formData.deliveryPincode]);
+
+  // Pickup Pincode checking logic
+  useEffect(() => {
+    const pincode = formData.pickupPincode;
+    if (!pincode) {
+        setPickupPincodeStatus(null);
+        setPickupPincodeError("");
+        return;
+    }
+
+    if (pincode.length !== 6) {
+        setPickupPincodeStatus("error");
+        setPickupPincodeError("Pincode must be 6 digits");
+        return;
+    }
+
+    const checkPickupPincode = async () => {
+        setPickupPincodeStatus("checking");
+        setPickupPincodeError("");
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/pincode/check/${pincode}`);
+            const data = await res.json();
+
+            if (res.ok && data.data?.isServiceable) {
+                const edlResult = data.data.edl || 0;
+                setPickupEdlValue(edlResult);
+                setPickupPincodeStatus("serviceable");
+
+                if (edlResult > 0) {
+                    setShowEdlWarning(true);
+                }
+            } else {
+                setPickupPincodeStatus("unserviceable");
+                setPickupPincodeError("Pickup not available at this pincode");
+                setPickupEdlValue(0);
+            }
+        } catch (error) {
+            console.error("Error checking pickup pincode:", error);
+            setPickupPincodeStatus("error");
+            setPickupPincodeError("Unable to verify pincode");
+            setPickupEdlValue(0);
+        }
+    };
+
+    const debounce = setTimeout(checkPickupPincode, 500);
+    return () => clearTimeout(debounce);
+  }, [formData.pickupPincode]);
 
   const handleInputChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -205,7 +314,7 @@ function BookingContent() {
           height: Number(formData.height) || 0,
         },
         description: formData.parcelContents,
-        value: Number(formData.value) || 0,
+        value: formData.insuranceRequired ? (Number(formData.value) || 0) : 0,
         fragile: formData.fragile,
       },
       notes: formData.specialInstructions,
@@ -408,6 +517,7 @@ function BookingContent() {
                           <Input
                             id="weight"
                             type="number"
+                            min="0"
                             value={formData.weight}
                             onChange={handleInputChange}
                             className="h-12 border-gray-100 focus:border-orange-500 focus:ring-orange-500/20"
@@ -428,9 +538,9 @@ function BookingContent() {
                       <div className="space-y-2">
                         <Label className="text-sm font-bold ml-1">Dimensions (LxWxH in cm)</Label>
                         <div className="grid grid-cols-3 gap-2">
-                          <Input id="length" placeholder="L" value={formData.length} onChange={handleInputChange} className="h-11 text-center" />
-                          <Input id="width" placeholder="W" value={formData.width} onChange={handleInputChange} className="h-11 text-center" />
-                          <Input id="height" placeholder="H" value={formData.height} onChange={handleInputChange} className="h-11 text-center" />
+                          <Input id="length" type="number" min="0" placeholder="L" value={formData.length} onChange={handleInputChange} className="h-11 text-center" />
+                          <Input id="width" type="number" min="0" placeholder="W" value={formData.width} onChange={handleInputChange} className="h-11 text-center" />
+                          <Input id="height" type="number" min="0" placeholder="H" value={formData.height} onChange={handleInputChange} className="h-11 text-center" />
                         </div>
                       </div>
 
@@ -466,13 +576,30 @@ function BookingContent() {
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 text-orange-600 mb-2">
                         <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center font-bold">1</div>
-                        <h3 className="text-lg font-bold">Pickup Information</h3>
+                        <h3 className="text-lg font-bold">Pickup Location</h3>
                       </div>
 
-                      <div className="space-y-4 ml-10">
+                        <div className="space-y-4 ml-0 lg:ml-10">
                         <div className="space-y-2">
                           <Label htmlFor="pickupPincode">Pincode</Label>
-                          <Input id="pickupPincode" value={formData.pickupPincode} onChange={handleInputChange} placeholder="826004" className="h-11" />
+                          <div className="relative">
+                            <Input id="pickupPincode" value={formData.pickupPincode} onChange={handleInputChange} placeholder="826004" className={`h-11 ${pickupPincodeStatus === 'serviceable' ? 'border-green-500 bg-green-50/20 focus-visible:ring-green-500' : pickupPincodeStatus === 'unserviceable' || pickupPincodeStatus === 'error' ? 'border-red-500 bg-red-50/20 focus-visible:ring-red-500' : ''}`} maxLength={6} />
+                            {pickupPincodeStatus === "checking" && (
+                                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-orange-500" />
+                            )}
+                            {pickupPincodeStatus === "serviceable" && pickupEdlValue === 0 && (
+                                <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />
+                            )}
+                            {pickupPincodeStatus === "serviceable" && pickupEdlValue > 0 && (
+                                <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-amber-500 cursor-pointer" onClick={() => setShowEdlWarning(true)} />
+                            )}
+                          </div>
+                          {pickupPincodeError && <p className="text-xs text-red-500 font-bold">{pickupPincodeError}</p>}
+                          {pickupPincodeStatus === "serviceable" && pickupEdlValue > 0 && (
+                              <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest bg-amber-50 p-1.5 rounded-lg border border-amber-200 inline-block mt-1">
+                                  EDL Surcharge Applicable
+                              </p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="pickupAddress">Street Address</Label>
@@ -488,13 +615,30 @@ function BookingContent() {
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 text-orange-600 mb-2">
                         <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center font-bold">2</div>
-                        <h3 className="text-lg font-bold">Delivery Information</h3>
+                        <h3 className="text-lg font-bold">Drop-off Location</h3>
                       </div>
 
-                      <div className="space-y-4 ml-10">
+                      <div className="space-y-4 ml-0 lg:ml-10">
                         <div className="space-y-2">
                           <Label htmlFor="deliveryPincode">Pincode</Label>
-                          <Input id="deliveryPincode" value={formData.deliveryPincode} onChange={handleInputChange} placeholder="700001" className="h-11" />
+                          <div className="relative">
+                            <Input id="deliveryPincode" value={formData.deliveryPincode} onChange={handleInputChange} placeholder="700001" className={`h-11 ${pincodeStatus === 'serviceable' ? 'border-green-500 bg-green-50/20 focus-visible:ring-green-500' : pincodeStatus === 'unserviceable' || pincodeStatus === 'error' ? 'border-red-500 bg-red-50/20 focus-visible:ring-red-500' : ''}`} maxLength={6} />
+                            {pincodeStatus === "checking" && (
+                                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 animate-spin text-orange-500" />
+                            )}
+                            {pincodeStatus === "serviceable" && edlValue === 0 && (
+                                <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />
+                            )}
+                            {pincodeStatus === "serviceable" && edlValue > 0 && (
+                                <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-amber-500 cursor-pointer" onClick={() => setShowEdlWarning(true)} />
+                            )}
+                          </div>
+                          {pincodeError && <p className="text-xs text-red-500 font-bold">{pincodeError}</p>}
+                          {pincodeStatus === "serviceable" && edlValue > 0 && (
+                              <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest bg-amber-50 p-1.5 rounded-lg border border-amber-200 inline-block mt-1">
+                                  EDL Surcharge Applicable
+                              </p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="deliveryAddress">Street Address</Label>
@@ -508,53 +652,57 @@ function BookingContent() {
                     </div>
                   </div>
 
-                  <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-orange-600/5 rounded-2xl border border-orange-600/10">
-                    <div className="space-y-2">
-                      <Label>Pickup Date</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full h-11 justify-start text-left font-normal border-white/50 bg-white/50 backdrop-blur-sm">
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                    <div className="flex gap-4 mt-8">
+                      <Button variant="outline" onClick={handleBack} className="h-12 px-8">Back</Button>
+                      <Button onClick={handleNext} disabled={pincodeStatus !== 'serviceable' || pickupPincodeStatus !== 'serviceable'} className="h-12 flex-1 bg-orange-600 hover:bg-orange-700">Next <ChevronRight className="ml-2 h-4 w-4" /></Button>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Preferred Time Slot</Label>
-                      <Select value={formData.pickupTime} onValueChange={(v) => handleSelectChange("pickupTime", v)}>
-                        <SelectTrigger className="h-11 border-white/50 bg-white/50 backdrop-blur-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="morning">Morning (9 AM - 12 PM)</SelectItem>
-                          <SelectItem value="afternoon">Afternoon (12 PM - 3 PM)</SelectItem>
-                          <SelectItem value="evening">Evening (3 PM - 6 PM)</SelectItem>
-                          <SelectItem value="night">Night (6 PM - 9 PM)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
 
-                  <div className="flex gap-4 mt-8">
-                    <Button variant="outline" onClick={handleBack} className="h-12 px-8">Back</Button>
-                    <Button onClick={handleNext} className="h-12 flex-1 bg-orange-600 hover:bg-orange-700">Next <ChevronRight className="ml-2 h-4 w-4" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
+            {/* EDL WARNING MODAL */}
+            <AnimatePresence>
+                {showEdlWarning && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl"
+                        >
+                            <div className="bg-blue-600 p-8 text-center text-white relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+                                <Info className="w-16 h-16 mx-auto mb-4 opacity-90" />
+                                <h3 className="text-2xl font-black mb-2">Service Information</h3>
+                                <p className="text-blue-50 text-sm opacity-90">Please review this update regarding your location</p>
+                            </div>
+                            <div className="p-8 space-y-6">
+                                <div className="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-2xl">
+                                    <p className="text-blue-900 font-bold leading-relaxed text-sm">
+                                        Your destination is outside our standard delivery network. We can still deliver your parcel using our extended logistics partners, but please note that an Extra Delivery Location (EDL) surcharge will be added to your final checkout total.
+                                    </p>
+                                </div>
+                                <div className="space-y-3">
+                                    <Button
+                                        onClick={() => setShowEdlWarning(false)}
+                                        className="w-full bg-blue-600 hover:bg-blue-700 h-14 text-lg font-black shadow-lg shadow-blue-200 rounded-2xl transition-all active:scale-95"
+                                    >
+                                        I Understand
+                                    </Button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-          {step === 3 && (
+            {step === 3 && (
             <motion.div
               key="step3"
               initial={{ opacity: 0, x: 20 }}
@@ -566,7 +714,7 @@ function BookingContent() {
                 <Card className="glass border-none">
                   <div className="bg-orange-600/5 p-4 border-b border-orange-100 flex items-center justify-between">
                     <h2 className="text-xl font-bold flex items-center gap-2 tracking-tight">
-                      <User className="h-5 w-5 text-orange-600" /> Sender Info
+                      <User className="h-5 w-5 text-orange-600" /> Sender Details
                     </h2>
                   </div>
                   <CardContent className="p-6 space-y-4">
@@ -590,7 +738,7 @@ function BookingContent() {
                 <Card className="glass border-none">
                   <div className="bg-orange-600/5 p-4 border-b border-orange-100">
                     <h2 className="text-xl font-bold flex items-center gap-2 tracking-tight">
-                      <Box className="h-5 w-5 text-orange-600" /> Receiver Info
+                      <Box className="h-5 w-5 text-orange-600" /> Recipient Details
                     </h2>
                   </div>
                   <CardContent className="p-6 space-y-4">
@@ -618,25 +766,47 @@ function BookingContent() {
                     <div className="space-y-4">
                       <Label className="font-bold flex items-center gap-2"><Info className="h-4 w-4 text-orange-600" /> Additional Details</Label>
                       <div className="space-y-4">
-                        <div className="flex items-center space-x-2 p-3 rounded-lg border border-gray-100 hover:bg-gray-50/50 transition-colors">
-                          <input
-                            type="checkbox"
-                            id="fragile"
-                            checked={formData.fragile}
-                            onChange={(e) => setFormData(prev => ({ ...prev, fragile: e.target.checked }))}
-                            className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-600"
-                          />
-                          <Label htmlFor="fragile" className="text-sm cursor-pointer font-medium">Handle with care (Fragile Item)</Label>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 p-3 rounded-lg border border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <input
+                              type="checkbox"
+                              id="fragile"
+                              checked={formData.fragile}
+                              onChange={(e) => setFormData(prev => ({ ...prev, fragile: e.target.checked }))}
+                              className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-600"
+                            />
+                            <Label htmlFor="fragile" className="text-sm cursor-pointer font-medium">Handle with care (Fragile Item)</Label>
+                          </div>
+                          {formData.fragile && (
+                            <p className="text-xs text-orange-600 font-medium px-2">A 10% surcharge applies for extra safe handling.</p>
+                          )}
                         </div>
-                        <div className="flex items-center space-x-2 p-3 rounded-lg border border-gray-100 hover:bg-gray-50/50 transition-colors">
-                          <input
-                            type="checkbox"
-                            id="insuranceRequired"
-                            checked={formData.insuranceRequired}
-                            onChange={(e) => setFormData(prev => ({ ...prev, insuranceRequired: e.target.checked }))}
-                            className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-600"
-                          />
-                          <Label htmlFor="insuranceRequired" className="text-sm cursor-pointer font-medium">Add Shipping Insurance</Label>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 p-3 rounded-lg border border-gray-100 hover:bg-gray-50/50 transition-colors">
+                            <input
+                              type="checkbox"
+                              id="insuranceRequired"
+                              checked={formData.insuranceRequired}
+                              onChange={(e) => setFormData(prev => ({ ...prev, insuranceRequired: e.target.checked }))}
+                              className="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-600"
+                            />
+                            <Label htmlFor="insuranceRequired" className="text-sm cursor-pointer font-medium">Add Shipping Insurance</Label>
+                          </div>
+                          {formData.insuranceRequired && (
+                            <div className="p-4 bg-orange-50/50 border border-orange-100 rounded-lg space-y-2 mt-2">
+                              <Label htmlFor="value" className="text-sm font-bold text-gray-700">Declared Parcel Value (₹)</Label>
+                              <Input
+                                id="value"
+                                type="number"
+                                min="0"
+                                value={formData.value}
+                                onChange={handleInputChange}
+                                className="h-10 text-sm bg-white"
+                                placeholder="e.g. 5000"
+                              />
+                              <p className="text-[10px] text-gray-500 font-medium">A 2% insurance fee will be applied based on this value.</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -676,11 +846,6 @@ function BookingContent() {
                         <p className="text-2xl font-black capitalize text-gray-900 leading-tight">{formData.serviceType} <span className="text-orange-600">- {formData.shippingSpeed}</span></p>
                         <p className="text-sm text-gray-500 font-medium">Actual Weight: {formData.weight} {formData.weightUnit}</p>
                       </div>
-                      <div className="space-y-1">
-                        <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Pickup Date</Label>
-                        <p className="text-2xl font-black text-gray-900 leading-tight">{date ? format(date, "MMM dd, yyyy") : "N/A"}</p>
-                        <p className="text-sm text-gray-500 font-medium capitalize">{formData.pickupTime} Slot</p>
-                      </div>
                     </div>
 
                     <div className="relative border-4 border-dashed border-gray-50 rounded-3xl p-8 bg-gray-50/30">
@@ -700,7 +865,7 @@ function BookingContent() {
                             <div className="h-4 w-4 rounded-full bg-blue-600 ring-4 ring-blue-100" />
                             <div className="flex-1 w-1 border-2 border-dashed border-gray-200 mt-1" />
                           </div>
-                          <Label className="block text-xs font-black text-blue-600 uppercase tracking-tighter">Receiver</Label>
+                          <Label className="block text-xs font-black text-blue-600 uppercase tracking-tighter">Recipient</Label>
                           <p className="font-black text-lg text-gray-900">{formData.receiverName}</p>
                           <p className="text-sm text-gray-600 leading-relaxed font-medium">{formData.deliveryAddress}, {formData.deliveryPincode}</p>
                           <p className="text-xs text-gray-400 font-bold">{formData.receiverPhone}</p>
@@ -784,6 +949,24 @@ function BookingContent() {
                         <span className="font-bold uppercase text-xs tracking-widest text-gray-400">Standard Rate</span>
                         <span className="text-xl font-bold">₹{priceDetails?.basePrice || 0}</span>
                       </div>
+                      {priceDetails?.edlSurcharge > 0 && (
+                        <div className="flex justify-between items-center text-amber-300">
+                          <span className="font-bold uppercase text-xs tracking-widest text-amber-400/80">EDL Surcharge</span>
+                          <span className="text-xl font-bold">₹{priceDetails.edlSurcharge}</span>
+                        </div>
+                      )}
+                      {priceDetails?.valueCharge > 0 && (
+                        <div className="flex justify-between items-center text-blue-300">
+                          <span className="font-bold uppercase text-xs tracking-widest text-blue-400/80">Insurance Cover</span>
+                          <span className="text-xl font-bold">₹{priceDetails.valueCharge}</span>
+                        </div>
+                      )}
+                      {priceDetails?.fragileCharge > 0 && (
+                        <div className="flex justify-between items-center text-pink-300">
+                          <span className="font-bold uppercase text-xs tracking-widest text-pink-400/80">Fragile Handling</span>
+                          <span className="text-xl font-bold">₹{priceDetails.fragileCharge}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between items-center text-gray-300">
                         <span className="font-bold uppercase text-xs tracking-widest text-gray-400">GST (18%)</span>
                         <span className="text-xl font-bold">₹{priceDetails?.tax || 0}</span>
