@@ -646,7 +646,7 @@ export default function StudentMovePage() {
                         className="inline-flex items-center gap-2 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 text-orange-300 text-sm px-4 py-1.5 rounded-full mb-6"
                     >
                         <GraduationCap className="w-4 h-4" />
-                        Exclusively for IIT ISM Dhanbad Students
+                        Exclusively for SNMMCH Dhanbad Students
                     </motion.div>
 
                     <motion.h1 
@@ -767,10 +767,11 @@ export default function StudentMovePage() {
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     {[
+                                        "IIT ISM Dhanbad",
+                                        "SNMMCH Dhanbad",
                                         "BIT Mesra",
                                         "NIT Durgapur",
                                         "NIT Jamshedpur",
-                                        "IIT ISM Dhanbad",
                                         "IIT Patna",
                                         "IIT Kharagpur",
                                         "NIT Patna",
@@ -779,7 +780,7 @@ export default function StudentMovePage() {
                                         <Card 
                                             key={college}
                                             onClick={() => {
-                                                if (college === "IIT ISM Dhanbad" || college === "BIT Mesra") {
+                                                if (college === "IIT ISM Dhanbad" || college === "BIT Mesra" || college === "SNMMCH Dhanbad") {
                                                     setSelectedCollege(college);
                                                 } else {
                                                     toast.info("We'll be right back here soon!");
