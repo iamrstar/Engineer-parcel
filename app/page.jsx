@@ -126,7 +126,7 @@ export default function Home() {
                 <div className="flex -space-x-3 items-center">
                   {['/avatars/hero_avatar_1.png', '/avatars/hero_avatar_2.png', '/avatars/hero_avatar_3.png', '/avatars/hero_avatar_4.png'].map((src, i) => (
                     <div key={i} className="w-12 h-12 rounded-full border-2 border-white bg-gray-200 overflow-hidden ring-2 ring-orange-50 relative">
-                      <Image src={src} alt="user" fill className="object-cover" />
+                      <Image src={src} alt="user" fill sizes="48px" className="object-cover" />
                     </div>
                   ))}
                 </div>
@@ -202,7 +202,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "300px" }}
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Which one is right for you?</h2>
@@ -214,7 +214,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "300px" }}
               transition={{ duration: 0.6 }}
               className="relative group bg-gray-950 text-white p-8 md:p-10 rounded-[32px] border border-gray-800 shadow-2xl hover:shadow-gray-900/30 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
             >
@@ -259,7 +259,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "300px" }}
               transition={{ duration: 0.6 }}
               className="relative group bg-gradient-to-br from-orange-50 to-white p-8 md:p-10 rounded-[32px] border-2 border-orange-200 shadow-xl hover:shadow-orange-200/50 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
             >
@@ -305,7 +305,7 @@ export default function Home() {
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "300px" }}
             transition={{ delay: 0.4 }}
             className="text-center text-sm text-gray-400 mt-8"
           >
@@ -322,7 +322,7 @@ export default function Home() {
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
             {['/partner1.png', '/partner2.png', '/partner3.png', '/partner4.png', '/partner5.png', '/partner6.png', '/partner7.png', '/partner8.png'].map((src, idx) => (
               <div key={idx} className="relative w-24 h-24 sm:w-32 sm:h-32">
-                <Image src={src} alt={`Partner ${idx + 1}`} fill className="object-contain" />
+                <Image src={src} alt={`Partner ${idx + 1}`} fill sizes="(max-width: 640px) 96px, 128px" className="object-contain" />
               </div>
             ))}
           </div>
@@ -336,7 +336,7 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "300px" }}
             >
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">Our Core Services</h2>
               <p className="text-lg text-gray-500 leading-relaxed">
@@ -384,7 +384,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "300px" }}
             className="relative bg-gray-900 rounded-3xl overflow-hidden p-8 md:p-16"
           >
             {/* Animated Background Elements */}
@@ -528,6 +528,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══════════ OUR MOMENTS BANNER ══════════ */}
+      <section className="py-24 relative overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-[40px] p-12 md:p-16 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10 shadow-2xl shadow-orange-500/20">
+            {/* Background Decorations */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+            
+            <div className="relative z-10 md:w-1/2 text-white">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold mb-6">
+                <Star className="w-4 h-4" /> Activities & Fun
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">Explore Our Moments</h2>
+              <p className="text-orange-50 text-lg md:text-xl leading-relaxed mb-8">
+                A visual journey through our operations, team celebrations, and commitment to excellence. See the people behind the parcels.
+              </p>
+              <Button asChild className="bg-white text-orange-600 hover:bg-gray-50 h-14 px-8 text-lg font-black rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl">
+                <Link href="/activities">
+                  View Gallery <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
+            </div>
+            
+            <div className="relative z-10 md:w-1/2 w-full grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4 translate-y-8">
+                <div className="relative aspect-square rounded-3xl overflow-hidden border-4 border-white/20 shadow-lg">
+                  <Image src="/activities/happy-customer.jpeg" alt="Moment 1" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover hover:scale-110 transition-transform duration-700" />
+                </div>
+                <div className="relative aspect-square rounded-3xl overflow-hidden border-4 border-white/20 shadow-lg">
+                  <Image src="/activities/blanket-donate.jpeg" alt="Moment 2" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover hover:scale-110 transition-transform duration-700" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-4 -translate-y-8">
+                <div className="relative aspect-square rounded-3xl overflow-hidden border-4 border-white/20 shadow-lg">
+                  <Image src="/activities/dinner-wth-team.jpeg" alt="Moment 3" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover hover:scale-110 transition-transform duration-700" />
+                </div>
+                <div className="relative aspect-square rounded-3xl overflow-hidden border-4 border-white/20 shadow-lg">
+                  <Image src="/activities/mla-meet.jpeg" alt="Moment 4" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover hover:scale-110 transition-transform duration-700" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════ CTA SECTION ══════════ */}
       <section className="py-32 relative overflow-hidden text-center bg-gray-950 border-t border-white/5">
         <div className="absolute inset-0 pointer-events-none opacity-50">
@@ -538,7 +583,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "300px" }}
           >
             <h2 className="text-4xl md:text-6xl font-black text-white mb-8">Ready to move something?</h2>
             <p className="text-xl text-gray-400 mb-12 leading-relaxed">
@@ -566,7 +611,7 @@ function ServiceCard({ icon, title, desc, link, delay }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "300px" }}
       transition={{ delay, duration: 0.5 }}
       className="group relative bg-white p-8 rounded-[32px] shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-2"
     >
@@ -587,7 +632,7 @@ function QuickAccessCard({ title, desc, btnText, link, icon, gradient }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "300px" }}
       className={`bg-gradient-to-br ${gradient} p-10 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden group`}
     >
       <div className="relative z-10">
@@ -612,7 +657,7 @@ function TestimonialsSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "300px" }}
         >
           <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">Loved by Thousands</h2>
           <p className="text-xl text-gray-500 mb-20 max-w-3xl mx-auto">
@@ -630,7 +675,7 @@ function TestimonialsSection() {
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "300px" }}
               transition={{ delay: i * 0.1 }}
               className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 relative group hover:shadow-2xl transition-all duration-500"
             >
