@@ -1,19 +1,35 @@
 export default function PrivacyPolicyPage() {
   return (
-    <div>
-      {/* Hero Section */}    
-      <section className="bg-orange-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-          <p className="text-lg max-w-3xl mx-auto">How we collect, use, and protect your personal information</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white py-24 overflow-hidden">
+        {/* Decorative Glowing Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl pointer-events-none translate-y-1/3 -translate-x-1/3" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="inline-block mb-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-orange-400 border border-orange-500/20">
+            Legal Agreement
+          </div>
+          <h1 className="text-5xl md:text-6xl font-black mb-6">Privacy Policy</h1>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            How we collect, use, and protect your personal information
+          </p>
         </div>
       </section>
 
       {/* Privacy Policy Content */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="prose prose-orange max-w-none">
-            <p className="text-gray-600">Last Updated: April 19, 2024</p>
+          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12">
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-8 pb-8 border-b border-gray-200">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Last Updated: April 19, 2024
+            </div>
+            
+            <div className="prose prose-orange max-w-none">
 
             <h2>1. Introduction</h2>
             <p>
@@ -113,6 +129,7 @@ export default function PrivacyPolicyPage() {
               <br />
               Address: 4th Floor, I2H Building, IIT (ISM), Dhanbad
             </p>
+          </div>
           </div>
         </div>
       </section>
