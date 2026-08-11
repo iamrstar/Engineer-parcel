@@ -90,11 +90,8 @@ function BookingContent() {
     deliveryAddress: "",
     deliveryLandmark: "",
     pickupTime: "morning",
-    weight: "1",
+    packages: [{ weight: "1", length: "", width: "", height: "" }],
     weightUnit: "kg",
-    length: "",
-    width: "",
-    height: "",
     parcelContents: "",
     specialInstructions: "",
     name: "",
@@ -128,17 +125,14 @@ function BookingContent() {
 
   // Price Calculation
   useEffect(() => {
-    if (formData.weight && formData.serviceType) {
+    if (formData.packages && formData.packages.length > 0 && formData.packages[0].weight && formData.serviceType) {
       const calculatePrice = async () => {
         try {
           const res = await axios.post(`${API_BASE_URL}/api/calculate-price`, {
             serviceType: formData.serviceType,
             shippingSpeed: formData.shippingSpeed,
-            weight: parseFloat(formData.weight),
+            packages: formData.packages,
             weightUnit: formData.weightUnit,
-            length: parseFloat(formData.length) || 0,
-            width: parseFloat(formData.width) || 0,
-            height: parseFloat(formData.height) || 0,
             fragile: formData.fragile,
             value: formData.insuranceRequired ? (parseFloat(formData.value) || 0) : 0,
             isEdl: edlValue > 0 || pickupEdlValue > 0,
@@ -154,7 +148,7 @@ function BookingContent() {
       const timeoutId = setTimeout(calculatePrice, 500);
       return () => clearTimeout(timeoutId);
     }
-  }, [formData.weight, formData.weightUnit, formData.serviceType, formData.length, formData.width, formData.height, formData.fragile, formData.value, formData.insuranceRequired, formData.shippingSpeed, edlValue, pickupEdlValue]);
+  }, [formData.packages, formData.weightUnit, formData.serviceType, formData.fragile, formData.value, formData.insuranceRequired, formData.shippingSpeed, edlValue, pickupEdlValue]);
 
   // Pincode checking logic
   useEffect(() => {
@@ -262,6 +256,29 @@ function BookingContent() {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
+  const handlePackageChange = (index, field, value) => {
+    setFormData(prev => {
+      const newPackages = [...prev.packages];
+      newPackages[index] = { ...newPackages[index], [field]: value };
+      return { ...prev, packages: newPackages };
+    });
+  };
+
+  const addPackage = () => {
+    setFormData(prev => ({
+      ...prev,
+      packages: [...prev.packages, { weight: "1", length: "", width: "", height: "" }]
+    }));
+  };
+
+  const removePackage = (index) => {
+    if (formData.packages.length <= 1) return;
+    setFormData(prev => ({
+      ...prev,
+      packages: prev.packages.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleNext = () => setStep(prev => Math.min(prev + 1, 4));
   const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
 
@@ -306,13 +323,15 @@ function BookingContent() {
       pickupSlot: formData.pickupTime,
       paymentMethod,
       packageDetails: {
-        weight: Number(formData.weight),
         weightUnit: formData.weightUnit,
-        dimensions: {
-          length: Number(formData.length) || 0,
-          width: Number(formData.width) || 0,
-          height: Number(formData.height) || 0,
-        },
+        packages: formData.packages.map(p => ({
+          weight: Number(p.weight) || 0,
+          dimensions: {
+            length: Number(p.length) || 0,
+            width: Number(p.width) || 0,
+            height: Number(p.height) || 0,
+          }
+        })),
         description: formData.parcelContents,
         value: formData.insuranceRequired ? (Number(formData.value) || 0) : 0,
         fragile: formData.fragile,
@@ -510,39 +529,71 @@ function BookingContent() {
                     </div>
                   </div>
                   <CardContent className="p-6 space-y-6">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-bold ml-1">Actual Weight</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="weight"
-                            type="number"
-                            min="0"
-                            value={formData.weight}
-                            onChange={handleInputChange}
-                            className="h-12 border-gray-100 focus:border-orange-500 focus:ring-orange-500/20"
-                            placeholder="Enter Weight"
-                          />
-                          <Select value={formData.weightUnit} onValueChange={(v) => handleSelectChange("weightUnit", v)}>
-                            <SelectTrigger className="w-24 h-12 border-gray-100">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="kg">KG</SelectItem>
-                              <SelectItem value="g">GMS</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
+                    <div className="space-y-6">
+                      {formData.packages.map((pkg, index) => (
+                        <div key={index} className="space-y-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-bold text-gray-700">Package {index + 1}</h3>
+                            {formData.packages.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removePackage(index)}
+                                className="text-red-500 hover:text-red-600 transition-colors p-1"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label className="text-sm font-bold ml-1">Actual Weight</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                type="number"
+                                min="0"
+                                value={pkg.weight}
+                                onChange={(e) => handlePackageChange(index, "weight", e.target.value)}
+                                className="h-12 border-gray-200 focus:border-orange-500 focus:ring-orange-500/20 bg-white"
+                                placeholder="Enter Weight"
+                              />
+                              {index === 0 && (
+                                <Select value={formData.weightUnit} onValueChange={(v) => handleSelectChange("weightUnit", v)}>
+                                  <SelectTrigger className="w-24 h-12 border-gray-200 bg-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="kg">KG</SelectItem>
+                                    <SelectItem value="g">GMS</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              )}
+                              {index > 0 && (
+                                <div className="w-24 h-12 flex items-center justify-center border border-gray-200 bg-gray-100 rounded-md text-gray-500 text-sm">
+                                  {formData.weightUnit.toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-                      <div className="space-y-2">
-                        <Label className="text-sm font-bold ml-1">Dimensions (LxWxH in cm)</Label>
-                        <div className="grid grid-cols-3 gap-2">
-                          <Input id="length" type="number" min="0" placeholder="L" value={formData.length} onChange={handleInputChange} className="h-11 text-center" />
-                          <Input id="width" type="number" min="0" placeholder="W" value={formData.width} onChange={handleInputChange} className="h-11 text-center" />
-                          <Input id="height" type="number" min="0" placeholder="H" value={formData.height} onChange={handleInputChange} className="h-11 text-center" />
+                          <div className="space-y-2">
+                            <Label className="text-sm font-bold ml-1">Dimensions (LxWxH in cm)</Label>
+                            <div className="grid grid-cols-3 gap-2">
+                              <Input type="number" min="0" placeholder="L" value={pkg.length} onChange={(e) => handlePackageChange(index, "length", e.target.value)} className="h-11 text-center bg-white" />
+                              <Input type="number" min="0" placeholder="W" value={pkg.width} onChange={(e) => handlePackageChange(index, "width", e.target.value)} className="h-11 text-center bg-white" />
+                              <Input type="number" min="0" placeholder="H" value={pkg.height} onChange={(e) => handlePackageChange(index, "height", e.target.value)} className="h-11 text-center bg-white" />
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={addPackage}
+                        className="w-full py-3 border-2 border-dashed border-orange-200 rounded-xl text-orange-600 font-bold hover:bg-orange-50/50 hover:border-orange-300 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                        Add another package
+                      </button>
 
                       <div className="flex items-center gap-2 p-3 bg-blue-50/50 border border-blue-100/50 rounded-xl text-xs text-blue-700">
                         <Info className="h-4 w-4" />
@@ -844,7 +895,7 @@ function BookingContent() {
                       <div className="space-y-1">
                         <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Service & Speed</Label>
                         <p className="text-2xl font-black capitalize text-gray-900 leading-tight">{formData.serviceType} <span className="text-orange-600">- {formData.shippingSpeed}</span></p>
-                        <p className="text-sm text-gray-500 font-medium">Actual Weight: {formData.weight} {formData.weightUnit}</p>
+                        <p className="text-sm text-gray-500 font-medium">{formData.packages.length} Package{formData.packages.length > 1 ? 's' : ''} • Approx Weight: {formData.packages.reduce((acc, pkg) => acc + Number(pkg.weight || 0), 0)} {formData.weightUnit.toUpperCase()}</p>
                       </div>
                     </div>
 
