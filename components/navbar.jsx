@@ -42,35 +42,40 @@ export default function Navbar() {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center"
+            className="flex items-center gap-3"
           >
             <Link href="/" className="relative group">
               <div className="absolute -inset-2 bg-orange-500/10 rounded-xl blur-lg transition-all duration-500 group-hover:bg-orange-500/20 opacity-0 group-hover:opacity-100" />
-              <Image
-                src="/logo.jpeg"
-                alt="EngineersParcel Logo"
-                width={130}
-                height={45}
-                className="relative drop-shadow-sm transition-transform duration-500 group-hover:scale-105"
-                priority
-              />
+              <div className="bg-white rounded-lg p-1.5 shadow-sm relative z-10">
+                <Image
+                  src="/logo.jpeg"
+                  alt="EngineersParcel Logo"
+                  width={120}
+                  height={42}
+                  className="relative transition-transform duration-500 group-hover:scale-105"
+                  priority
+                />
+              </div>
             </Link>
+            <div className="hidden md:flex flex-col justify-center border-l-2 border-orange-500 pl-3 h-10">
+              <span className="text-[10px] font-black text-gray-800 tracking-[0.2em] uppercase leading-tight">
+                Making Life
+              </span>
+              <span className="text-[10px] font-black text-orange-600 tracking-[0.2em] uppercase leading-tight">
+                Simple
+              </span>
+            </div>
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <div className="flex items-center gap-8">
               {navLinks.map((link, idx) => (
-                <Link key={link.name} href={link.href} className="relative group">
-                  <span className="text-sm font-bold text-gray-600 hover:text-orange-600 transition-colors duration-300">
+                <Link key={link.name} href={link.href} className="relative group py-2">
+                  <span className="text-sm font-bold text-gray-600 group-hover:text-orange-600 transition-colors duration-300">
                     {link.name}
                   </span>
-                  <motion.div
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100"
-                    layoutId="navHover"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500 rounded-full opacity-0 group-hover:opacity-100 transform scale-x-0 group-hover:scale-x-100 transition-all duration-300 origin-center" />
                 </Link>
               ))}
             </div>
