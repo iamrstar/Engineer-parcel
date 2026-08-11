@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Package, Truck, GraduationCap, MapPin, ChevronRight, Zap } from "lucide-react";
+import { Package, Truck, GraduationCap, MapPin, ChevronRight, Zap, Box } from "lucide-react";
 import { motion } from "framer-motion";
 
 const options = [
@@ -18,11 +18,11 @@ const options = [
     badge: "Popular"
   },
   {
-    id: "local",
-    title: "Local Parcel (Same Day)",
-    description: "Lightning-fast same-day delivery within the city.",
-    icon: <MapPin className="w-6 h-6 text-blue-500" />,
-    path: "/booking?service=local",
+    id: "onebox",
+    title: "One Box",
+    description: "Up to 30kg. No questions asked. Flat pricing.",
+    icon: <Box className="w-6 h-6 text-blue-500" />,
+    path: "/city-parcel",
     color: "bg-blue-50",
     hoverColor: "hover:bg-blue-100",
     borderColor: "border-blue-200",
