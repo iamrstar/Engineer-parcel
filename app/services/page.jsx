@@ -94,7 +94,7 @@ export default function ServicesPage() {
             "Free sturdy box provided",
             "No questions asked packing"
           ]}
-          imgSrc="/cardboard-box.png"
+          imgSrc="/black-box.png"
           imgAlt="OneBox Service"
           ctaLink="/booking"
           ctaText="Book OneBox"
