@@ -21,12 +21,12 @@ export default function Footer() {
       {/* ══════════ TOP UTILITY BAR ══════════ */}
       <div className="bg-transparent border-b border-white/10 py-3 text-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-6">
-            <a href="tel:+919525801506" className="flex items-center gap-2 hover:text-orange-400 transition-colors">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+            <a href="tel:+919525801506" className="flex items-center gap-2 hover:text-orange-400 transition-colors whitespace-nowrap">
               <PhoneCall className="w-4 h-4" />
               <span>+91 9525-801-506</span>
             </a>
-            <a href="mailto:engineersparcel@gmail.com" className="flex items-center gap-2 hover:text-orange-400 transition-colors">
+            <a href="mailto:engineersparcel@gmail.com" className="flex items-center gap-2 hover:text-orange-400 transition-colors whitespace-nowrap">
               <Mail className="w-4 h-4" />
               <span>engineersparcel@gmail.com</span>
             </a>
