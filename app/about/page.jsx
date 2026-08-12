@@ -315,57 +315,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ══════════ HYPERLOCAL SECTION ══════════ */}
-      <section className="py-24 relative bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">
-                Hyperlocal <br />
-                <span className="text-orange-600">Pick & Drop.</span>
-              </h2>
-              <p className="text-lg text-gray-600 leading-relaxed mb-12">
-                Seamless same-city delivery designed for the fast-paced lifestyle. From hostels to homes, we pick up instantly.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-orange-200 transition-colors">
-                  <Clock className="w-8 h-8 text-orange-600 mb-4" />
-                  <h4 className="font-black text-gray-900 mb-2">Instant Pickup</h4>
-                  <p className="text-sm text-gray-500 italic">QR scan collection from your doorstep.</p>
-                </div>
-                <div className="p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-blue-200 transition-colors">
-                  <MessageCircle className="w-8 h-8 text-blue-600 mb-4" />
-                  <h4 className="font-black text-gray-900 mb-2">WhatsApp Booking</h4>
-                  <p className="text-sm text-gray-500 italic">Book on the go with our smart chatbot.</p>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 bg-orange-600/5 rounded-[4rem] border-2 border-dashed border-orange-600/20"></div>
-              <div className="relative p-12 lg:p-20 text-center">
-                <div className="w-24 h-24 bg-orange-100 rounded-3xl flex items-center justify-center text-orange-600 mx-auto mb-8 animate-bounce-slow">
-                  <Truck className="w-12 h-12" />
-                </div>
-                <h3 className="text-3xl font-black text-gray-900 mb-4">Batch Pickups</h3>
-                <p className="text-gray-500">We group nearby pickups together to save time and deliver faster — simple, efficient logistics.</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
       {/* ══════════ OUR TEAM ══════════ */}
       <section className="py-32 bg-gray-900 relative overflow-hidden">
