@@ -71,7 +71,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <Script 
           src="https://admin-api.engineersparcel.in/tracking.js" 
-          strategy="afterInteractive" 
+          strategy="lazyOnload" 
         />
         <Toaster richColors position="top-center" />
         <AuthProvider>
