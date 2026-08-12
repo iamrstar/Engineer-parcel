@@ -57,14 +57,14 @@ export default function Navbar() {
                 />
               </div>
             </Link>
-            <div className="hidden md:flex flex-col justify-center border-l-2 border-orange-500 pl-3 h-10">
-              <span className="text-[10px] font-black text-gray-800 tracking-[0.2em] uppercase leading-tight">
-                Making Life
-              </span>
-              <span className="text-[10px] font-black text-orange-600 tracking-[0.2em] uppercase leading-tight">
-                Simple
-              </span>
-            </div>
+              <div className="flex flex-col justify-center border-l-2 border-orange-500 pl-2 sm:pl-3 h-8 sm:h-10">
+                <span className="text-[8px] sm:text-[10px] font-black text-gray-800 tracking-[0.2em] uppercase leading-tight">
+                  Making Life
+                </span>
+                <span className="text-[8px] sm:text-[10px] font-black text-orange-600 tracking-[0.2em] uppercase leading-tight">
+                  Simple
+                </span>
+              </div>
           </motion.div>
 
           {/* Desktop Navigation */}
