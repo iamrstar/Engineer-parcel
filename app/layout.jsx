@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google"
+
 import Script from "next/script"
 import "./globals.css"
 import Navbar from "@/components/navbar"
@@ -6,7 +6,7 @@ import Footer from "@/components/footer"
 import WhatsAppButton from "@/components/WhatsAppButton"
 import ExitIntentPopup from "@/components/ExitIntentPopup"
 
-const inter = Inter({ subsets: ["latin"] })
+
 
 export const metadata = {
   title: {
@@ -68,7 +68,7 @@ import { Toaster } from "sonner"
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className="font-sans antialiased bg-gray-50 text-gray-900">
         <Script 
           src="https://admin-api.engineersparcel.in/tracking.js" 
           strategy="lazyOnload" 
