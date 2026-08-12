@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import {
   Box, Clock, Globe, MapPin, Package, Truck,
   ArrowRight, CheckCircle2, Zap, Shield, Sparkles,
-  ZapIcon as Flash, IndianRupee, Map
+  ZapIcon as Flash, IndianRupee, Map, GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -55,7 +55,7 @@ export default function ServicesPage() {
               <span className="text-orange-600">Universal Coverage.</span>
             </h1>
             <p className="text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed">
-              From hyperlocal parcel drops to global supply chain management, we combine AI technology with physical precision to move your world.
+              From seamless parcel drops to global supply chain management, we combine AI technology with physical precision to move your world.
             </p>
           </motion.div>
         </div>
@@ -63,6 +63,43 @@ export default function ServicesPage() {
 
       {/* ══════════ MAIN SERVICES ══════════ */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-32 pb-32">
+
+        {/* 1. Campus Logistics */}
+        <ServiceSection
+          id="campus-logistics"
+          icon={<GraduationCap className="w-8 h-8" />}
+          title="Campus Logistics"
+          subtitle="Smart delivery for smart campuses."
+          desc="Tailored parcel, shifting, and document logistics exclusively for university students and campus residents. We understand campus life."
+          features={[
+            "Direct hostel room pick-ups",
+            "Special student discounted rates",
+            "End-of-semester luggage shifting"
+          ]}
+          imgSrc="/campus_students.png"
+          imgAlt="Campus Logistics Service"
+          ctaLink="/campus-parcel"
+          ctaText="Explore Campus Parcel"
+        />
+
+        {/* 2. OneBox */}
+        <ServiceSection
+          id="onebox"
+          icon={<Package className="w-8 h-8" />}
+          title="OneBox"
+          subtitle="Up to 30kg. Flat Rate."
+          desc="Say goodbye to complicated weight calculations. Pack whatever fits in our OneBox up to 30kg, and ship it anywhere in India at a flat rate."
+          features={[
+            "Zero volumetric weight confusion",
+            "Free sturdy box provided",
+            "No questions asked packing"
+          ]}
+          imgSrc="/cardboard-box.png"
+          imgAlt="OneBox Service"
+          ctaLink="/booking"
+          ctaText="Book OneBox"
+          reverse
+        />
 
         {/* 1. Courier Service */}
         <ServiceSection
@@ -101,23 +138,7 @@ export default function ServicesPage() {
           reverse
         />
 
-        {/* 3. Local Parcel Service */}
-        <ServiceSection
-          id="local"
-          icon={<Box className="w-8 h-8" />}
-          title="Hyperlocal Delivery"
-          subtitle="City speed, redefined."
-          desc="The fastest way to move items within your city. Perfect for gift drops, document exchanges, and business deliveries."
-          features={[
-            "Instant pickup via hostel/doorstep scans",
-            "Same-day delivery within 4 hours",
-            "Optimal grouping for low-carbon delivery"
-          ]}
-          imgSrc="/local-delivery.jpg"
-          imgAlt="Local Parcel Service"
-          ctaLink="/booking"
-          ctaText="Book Local Pickup"
-        />
+
 
         {/* 4. International Service */}
         <ServiceSection
