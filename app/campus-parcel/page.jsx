@@ -204,6 +204,14 @@ export default function StudentMovePage() {
     const [pincodeError, setPincodeError] = useState("")
     const [contactNumber, setContactNumber] = useState("")
 
+    const getBoxPrice = (box) => {
+        if (selectedCollege === "SNMMCH Dhanbad") {
+            if (box.id === "alpha") return 799;
+            if (box.id === "nova") return 1599;
+        }
+        return box.price;
+    }
+
     // ─── Calculations ───
     const pricingSummary = useMemo(() => {
         let base = 0;
@@ -211,7 +219,7 @@ export default function StudentMovePage() {
         
         // 1. Calculate standard base price for ALL pincodes
         base = BOX_TYPES.reduce((sum, box) => {
-            return sum + box.price * quantities[box.id];
+            return sum + getBoxPrice(box) * quantities[box.id];
         }, 0);
         
         // Add other items cost
@@ -1074,7 +1082,7 @@ export default function StudentMovePage() {
                                                     <div className="flex flex-col items-center">
                                                         <span className="text-xs text-gray-400 line-through">₹{box.originalPrice}</span>
                                                         <div className="flex items-center gap-1">
-                                                            <span className="text-3xl font-black text-gray-900">₹{box.price}</span>
+                                                            <span className="text-3xl font-black text-gray-900">₹{getBoxPrice(box)}</span>
                                                             <span className="text-[10px] text-gray-400 font-bold uppercase">+ GST</span>
                                                         </div>
                                                     </div>
@@ -1101,7 +1109,7 @@ export default function StudentMovePage() {
 
                                                 {quantities[box.id] > 0 && (
                                                     <p className="text-center text-sm font-semibold text-gray-700">
-                                                        Subtotal: ₹{box.price * quantities[box.id]}
+                                                        Subtotal: ₹{getBoxPrice(box) * quantities[box.id]}
                                                     </p>
                                                 )}
                                             </CardContent>
@@ -1518,7 +1526,7 @@ export default function StudentMovePage() {
                                         <h3 className="font-bold text-lg text-gray-900 border-b pb-3">📦 Items</h3>
                                         {/* Standard Items Summary */}
                                         {BOX_TYPES.filter((b) => quantities[b.id] > 0).map((box) => {
-                                            const displayPrice = box.price;
+                                            const displayPrice = getBoxPrice(box);
                                             return (
                                                 <div key={box.id} className="flex items-center justify-between py-2">
                                                     <div>
