@@ -117,6 +117,12 @@ const getEdlMatrixSurcharge = (distanceKm, totalWeightKg) => {
 
 export default function CityParcelPage() {
     // ─── State ───
+    const [isRakhi, setIsRakhi] = useState(false)
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setIsRakhi(window.location.search.includes("type=rakhi"))
+        }
+    }, [])
     const [quantities, setQuantities] = useState({ flatbox: 0, atlasbox: 0 })
     const [otherItems, setOtherItems] = useState({})
     const [step, setStep] = useState(0) // 0=pincode, 1=boxes, 2=details, 3=summary, 4=success
@@ -233,7 +239,7 @@ export default function CityParcelPage() {
 
     }, [quantities, otherItems, edlValue, discount, formData.optInsurance, formData.itemValue])
 
-    const totalAmount = pricingSummary.total;
+    const totalAmount = isRakhi ? 70 : pricingSummary.total;
 
     const totalOtherItemsCount = useMemo(() => {
         return Object.values(otherItems).reduce((a, b) => a + b, 0);
