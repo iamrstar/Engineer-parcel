@@ -15,6 +15,8 @@ const CelebrationPopup = dynamic(() => import("./CelebrationAnimation"), { ssr: 
 // const PromoPopup = dynamic(() => import("@/components/PromoPopup"), { ssr: false });
 const BookNowModal = dynamic(() => import("@/components/BookNowModal"), { ssr: false });
 
+import PromoBanner from "@/components/PromoBanner";
+
 export default function Home() {
   const [trackingId, setTrackingId] = useState("");
   const [quoteData, setQuoteData] = useState({ fromCity: "", toCity: "", weight: "", phone: "" });
@@ -54,7 +56,7 @@ export default function Home() {
   return (
     <div className="relative overflow-hidden bg-white">
       {/* <CelebrationPopup /> */}
-      {/* <PromoPopup /> */}
+      <PromoBanner />
       <BookNowModal isOpen={isBookNowOpen} onClose={() => setIsBookNowOpen(false)} />
 
       {/* Background Decorative Elements */}
@@ -105,6 +107,16 @@ export default function Home() {
                   <span className="text-xs font-medium text-gray-400 mt-1">Courier, shifting, documents & more</span>
                 </Button>
                 
+                <Button asChild className="flex flex-col items-center justify-center h-auto py-3 px-8 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-red-500/30 group relative overflow-hidden w-full sm:w-auto">
+                  <Link href="/rakhi-booking">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
+                    <div className="flex items-center text-xl font-black">
+                      <Package className="mr-2 w-5 h-5" /> Send Rakhi
+                    </div>
+                    <span className="text-xs font-medium mt-1">₹70 Flat • Anywhere in India</span>
+                  </Link>
+                </Button>
+
                 <Button asChild variant="outline" className="flex flex-col items-center justify-center h-auto py-3 px-8 bg-white/30 backdrop-blur-md border border-white/50 hover:bg-white/50 text-gray-900 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl w-full sm:w-auto">
                   <Link href="/city-parcel">
                     <div className="flex items-center text-xl font-black">
