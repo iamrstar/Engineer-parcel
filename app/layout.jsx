@@ -73,6 +73,7 @@ export default function RootLayout({ children }) {
           src="https://admin-api.engineersparcel.in/tracking.js" 
           strategy="lazyOnload" 
         />
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
         <Toaster richColors position="top-center" />
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
