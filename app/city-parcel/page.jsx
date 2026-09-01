@@ -126,6 +126,22 @@ export default function CityParcelPage() {
     const [quantities, setQuantities] = useState({ flatbox: 0, atlasbox: 0 })
     const [otherItems, setOtherItems] = useState({})
     const [step, setStep] = useState(0) // 0=pincode, 1=boxes, 2=details, 3=summary, 4=success
+    
+    // Auto-scroll to top when step changes
+    useEffect(() => {
+        if (step > 0) {
+            const el = document.getElementById("checkout-steps")
+            if (el) {
+                const y = el.getBoundingClientRect().top + window.scrollY - 20
+                window.scrollTo({ top: y, behavior: "smooth" })
+            } else {
+                window.scrollTo({ top: 0, behavior: "smooth" })
+            }
+        } else {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+        }
+    }, [step])
+
     const [edlStage, setEdlStage] = useState(0) // 0=none, 1=initial-fail, 2=searching, 3=resolved
     const [couponCode, setCouponCode] = useState("")
     const [appliedCoupon, setAppliedCoupon] = useState(null)
@@ -443,7 +459,7 @@ export default function CityParcelPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: Math.round(totalAmount * 100),
+                    amount: 100, // FOR TESTING (1 INR). Revert to: Math.round(totalAmount * 100)
                     currency: "INR",
                 }),
             })
@@ -551,6 +567,7 @@ export default function CityParcelPage() {
                             if (verifyData.booking) {
                                 setBookingId(verifyData.booking.bookingId)
                                 setStep(4)
+                                window.scrollTo({ top: 0, behavior: 'smooth' })
                             } else {
                                 // Fallback if booking was not created but payment was verified
                                 console.error("Payment verified but booking object missing:", verifyData);
@@ -695,7 +712,7 @@ export default function CityParcelPage() {
             </section>
 
             {/* ────── Steps Progress ────── */}
-            <div className="max-w-4xl mx-auto px-4 py-12">
+            <div id="checkout-steps" className="max-w-4xl mx-auto px-4 py-12">
                 <div className="flex items-center justify-between relative">
                     <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
                     {[
@@ -856,8 +873,8 @@ export default function CityParcelPage() {
                                                                 <CheckCircle className="w-6 h-6" />
                                                             </div>
                                                             <div>
-                                                                <p className="font-black text-green-900 text-lg">Perfect! We deliver there. 🎓</p>
-                                                                <p className="text-sm text-green-700 font-medium">Ready to move your campus life to {formData.destCity}!</p>
+                                                                <p className="font-black text-green-900 text-lg">Perfect! We deliver there. 📦</p>
+                                                                <p className="text-sm text-green-700 font-medium">Ready to ship your parcel to {formData.destCity}!</p>
                                                             </div>
                                                         </motion.div>
                                                     )}
@@ -1753,33 +1770,67 @@ export default function CityParcelPage() {
                         {/* ═══════ STEP 4 — Success ═══════ */}
                         {step === 4 && (
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="max-w-lg mx-auto text-center space-y-6 py-12"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.5 }}
+                                className="max-w-lg mx-auto text-center space-y-8 py-16 relative"
                             >
-                                <div className="w-24 h-24 mx-auto bg-green-100 rounded-full flex items-center justify-center">
-                                    <CheckCircle className="w-12 h-12 text-green-600" />
+                                <div className="relative w-32 h-32 mx-auto">
+                                    {/* Animated ping rings */}
+                                    <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" style={{ animationDuration: '2s' }}></div>
+                                    <div className="absolute inset-2 bg-green-400 rounded-full animate-pulse opacity-30"></div>
+                                    
+                                    <motion.div 
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                                        className="absolute inset-4 bg-gradient-to-tr from-green-600 to-green-400 rounded-full flex items-center justify-center shadow-2xl shadow-green-300/50"
+                                    >
+                                        <CheckCircle className="w-12 h-12 text-white" />
+                                    </motion.div>
                                 </div>
-                                <h2 className="text-3xl font-bold text-gray-900">Booking Confirmed! 🎉</h2>
-                                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 my-4">
-                                    <p className="text-blue-800 font-bold flex items-center justify-center gap-2">
-                                        <Info className="w-5 h-5" /> 
+                                <motion.h2 
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.5 }}
+                                    className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight"
+                                >
+                                    Booking Confirmed
+                                </motion.h2>
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.7 }}
+                                    className="bg-blue-50/80 backdrop-blur-md border border-blue-100 rounded-2xl p-5 my-6 shadow-sm"
+                                >
+                                    <p className="text-blue-900 font-bold flex items-center justify-center gap-2 text-sm md:text-base">
+                                        <Info className="w-5 h-5 text-blue-600" /> 
                                         A confirmation email has been sent to your email ID.
                                     </p>
-                                    <p className="text-blue-600 text-sm mt-1">
-                                        Please check your **Inbox** as well as the **Spam folder**.
+                                    <p className="text-blue-600/80 text-xs md:text-sm mt-1.5 font-medium">
+                                        Please check your Inbox as well as the Spam folder.
                                     </p>
-                                </div>
-                                <p className="text-gray-500">
-                                    Your campus parcel booking has been confirmed. We'll pick up your boxes on the selected date.
+                                </motion.div>
+                                <motion.p 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 0.9 }}
+                                    className="text-gray-500 text-base md:text-lg px-4"
+                                >
+                                    Your <span className="font-bold text-gray-900">One Box</span> booking has been confirmed. We'll pick up your boxes on the selected date.
                                     You can track your booking anytime using your Booking ID.
-                                </p>
-                                <Card className="glass shadow-2xl border-0 overflow-hidden">
-                                    <CardContent className="p-6 space-y-3">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-500">Booking / Tracking ID</span>
-                                            <span className="font-bold text-orange-600 text-base">{bookingId}</span>
-                                        </div>
+                                </motion.p>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: 1.1 }}
+                                >
+                                    <Card className="glass shadow-2xl border border-gray-100 overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+                                        <CardContent className="p-6 space-y-4">
+                                            <div className="flex justify-between text-sm items-center">
+                                                <span className="text-gray-500 font-medium">Booking / Tracking ID</span>
+                                                <span className="font-black text-orange-600 text-lg bg-orange-50 px-3 py-1 rounded-lg border border-orange-100">{bookingId}</span>
+                                            </div>
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-500">Total Paid</span>
                                             <span className="font-bold text-green-600">₹{totalAmount.toLocaleString("en-IN")}</span>
@@ -1798,6 +1849,7 @@ export default function CityParcelPage() {
                                         </div>
                                     </CardContent>
                                 </Card>
+                                </motion.div>
                                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                     <Button
                                         onClick={() => {
@@ -1806,7 +1858,7 @@ export default function CityParcelPage() {
                                                 : "TBD";
                                             const msg = `🎉 *Booking Confirmed!*
 
-Hi Engineers Parcel! My Campus Parcel booking is confirmed.
+Hi Engineers Parcel! My One Box booking is confirmed.
 
 📦 *Booking ID:* ${bookingId}
 📋 *Boxes:* ${totalBoxes}
