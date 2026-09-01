@@ -59,6 +59,22 @@ function BookingContent() {
   const initialService = searchParams.get("service");
   
   const [step, setStep] = useState(1);
+  
+  // Auto-scroll to top when step changes
+  useEffect(() => {
+    if (step > 1) {
+        const el = document.getElementById("checkout-steps")
+        if (el) {
+            const y = el.getBoundingClientRect().top + window.scrollY - 20
+            window.scrollTo({ top: y, behavior: "smooth" })
+        } else {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+        }
+    } else {
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [step]);
+
   const [date, setDate] = useState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priceDetails, setPriceDetails] = useState(null);
@@ -81,8 +97,7 @@ function BookingContent() {
   const [deliveryDays, setDeliveryDays] = useState("");
 
   const [formData, setFormData] = useState({
-    serviceType: ["courier", "local", "international", "shifting"].includes(initialService) ? initialService : "courier",
-    shippingSpeed: "surface",
+    serviceType: ["local", "international", "shifting", "surface", "express", "premium"].includes(initialService) ? initialService : (initialService === "courier" ? "surface" : "surface"),
     pickupPincode: "",
     pickupAddress: "",
     pickupLandmark: "",
@@ -130,7 +145,6 @@ function BookingContent() {
         try {
           const res = await axios.post(`${API_BASE_URL}/api/calculate-price`, {
             serviceType: formData.serviceType,
-            shippingSpeed: formData.shippingSpeed,
             packages: formData.packages,
             weightUnit: formData.weightUnit,
             fragile: formData.fragile,
@@ -318,7 +332,6 @@ function BookingContent() {
         landmark: formData.deliveryLandmark
       },
       serviceType: formData.serviceType,
-      shippingSpeed: formData.shippingSpeed,
       pickupDate: date ? date.toISOString() : new Date().toISOString(),
       pickupSlot: formData.pickupTime,
       paymentMethod,
@@ -344,7 +357,9 @@ function BookingContent() {
 
   const handleRazorpay = async (payload) => {
     try {
-      const amountPaise = Math.round((priceDetails.totalAmount - discountAmount) * 100);
+      // FOR TESTING: Hardcoded to 1 Rupee (100 paise)
+      // const amountPaise = Math.round((priceDetails.totalAmount - discountAmount) * 100);
+      const amountPaise = 100;
       const { data: orderData } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
         amount: amountPaise,
         currency: "INR"
@@ -439,7 +454,7 @@ function BookingContent() {
         </p>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 -mt-10 pb-20">
+      <div id="checkout-steps" className="max-w-5xl mx-auto px-4 -mt-10 pb-20">
         {step < 5 && (
           <div className="mb-10 overflow-x-auto pb-4 no-scrollbar">
             <div className="flex items-center justify-between min-w-[600px] px-8">
@@ -484,13 +499,13 @@ function BookingContent() {
                   </div>
                   <CardContent className="p-6">
                     <RadioGroup
-                      value={formData.shippingSpeed}
-                      onValueChange={(v) => handleSelectChange("shippingSpeed", v)}
+                      value={formData.serviceType}
+                      onValueChange={(v) => handleSelectChange("serviceType", v)}
                       className="grid grid-cols-1 gap-3"
                     >
                       {[
                         { id: "surface", label: "Surface (Economy)", desc: "Cost-effective ground shipping", icon: Truck, eta: "5-7 Days" },
-                        { id: "air", label: "Air (Express)", desc: "Fast air transit for urgent parcels", icon: Zap, eta: "2-3 Days" },
+                        { id: "express", label: "Air (Express)", desc: "Fast air transit for urgent parcels", icon: Zap, eta: "2-3 Days" },
                         { id: "premium", label: "Premium (Priority)", desc: "Priority ultra-fast delivery", icon: Box, eta: "24-72 Hrs" },
                       ].map((s) => (
                         <div key={s.id}>
@@ -511,7 +526,7 @@ function BookingContent() {
                               </div>
                               <p className="text-sm text-gray-500 truncate">{s.desc}</p>
                             </div>
-                            {formData.shippingSpeed === s.id && <div className="h-4 w-4 rounded-full bg-orange-600 flex items-center justify-center shrink-0"><CheckCircle className="h-3 w-3 text-white" /></div>}
+                            {formData.serviceType === s.id && <div className="h-4 w-4 rounded-full bg-orange-600 flex items-center justify-center shrink-0"><CheckCircle className="h-3 w-3 text-white" /></div>}
                           </Label>
                         </div>
                       ))}
@@ -894,7 +909,12 @@ function BookingContent() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                       <div className="space-y-1">
                         <Label className="uppercase text-[10px] tracking-widest text-gray-400 font-black">Service & Speed</Label>
-                        <p className="text-2xl font-black capitalize text-gray-900 leading-tight">{formData.serviceType} <span className="text-orange-600">- {formData.shippingSpeed}</span></p>
+                        <p className="text-2xl font-black capitalize text-gray-900 leading-tight">
+                          {formData.serviceType === "express" ? "Express - Air" : 
+                           formData.serviceType === "surface" ? "Surface - Economy" : 
+                           formData.serviceType === "premium" ? "Premium - Priority" : 
+                           formData.serviceType}
+                        </p>
                         <p className="text-sm text-gray-500 font-medium">{formData.packages.length} Package{formData.packages.length > 1 ? 's' : ''} • Approx Weight: {formData.packages.reduce((acc, pkg) => acc + Number(pkg.weight || 0), 0)} {formData.weightUnit.toUpperCase()}</p>
                       </div>
                     </div>
@@ -1069,64 +1089,101 @@ function BookingContent() {
           )}
 
           {step === 5 && bookingData && (
-            <motion.div
-              key="step5"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="max-w-xl mx-auto"
-            >
-              <Card className="glass border-none overflow-hidden relative">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-green-600" />
-                <CardContent className="p-10 text-center space-y-8">
-                  <div className="relative inline-block">
-                    <div className="h-24 w-24 rounded-3xl bg-green-500 text-white flex items-center justify-center shadow-2xl shadow-green-500/30 transform rotate-12 relative z-10">
-                      <CheckCircle className="h-14 w-14" />
-                    </div>
-                    <div className="absolute inset-0 h-24 w-24 rounded-3xl bg-green-200 animate-ping opacity-20" />
+              <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="max-w-lg mx-auto text-center space-y-8 py-16 relative"
+              >
+                  <div className="relative w-32 h-32 mx-auto">
+                      {/* Animated ping rings */}
+                      <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-20" style={{ animationDuration: '2s' }}></div>
+                      <div className="absolute inset-2 bg-green-400 rounded-full animate-pulse opacity-30"></div>
+                      
+                      <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                          className="absolute inset-4 bg-gradient-to-tr from-green-600 to-green-400 rounded-full flex items-center justify-center shadow-2xl shadow-green-300/50"
+                      >
+                          <CheckCircle className="w-12 h-12 text-white" />
+                      </motion.div>
                   </div>
-
-                  <div className="space-y-2">
-                    <h2 className="text-4xl font-black text-gray-900 tracking-tight">Booking Confirmed!</h2>
-                    <p className="text-gray-500 font-bold text-lg uppercase tracking-tight">Reference ID: #{bookingData.bookingId}</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-3xl p-8 border-2 border-dashed border-gray-200 text-left space-y-6">
-                    <div>
-                      <Label className="uppercase text-[10px] font-black tracking-widest text-gray-400">What happens next?</Label>
-                      <ul className="mt-2 space-y-3">
-                        {[
-                          "Courier partner will call for pickup coordinate",
-                          "Package pickup usually within 24 hours",
-                          "Track using the ID above or registered phone"
-                        ].map((text, idx) => (
-                          <li key={idx} className="flex gap-3 items-start">
-                            <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 shrink-0 mt-0.5"><CheckCircle className="h-3 w-3" /></div>
-                            <span className="text-sm font-bold text-gray-700 leading-tight">{text}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="h-px bg-gray-200" />
-                    <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-gray-100">
-                      <div className="space-y-1">
-                        <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount Paid</span>
-                        <span className="text-2xl font-black text-orange-600">₹{bookingData.pricing?.totalAmount || "0"}</span>
-                      </div>
-                      <Button variant="outline" size="sm" asChild className="rounded-xl font-bold bg-gray-50 hover:bg-gray-100"><Link href="/dashboard">View in Dashboard</Link></Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button asChild className="h-14 bg-orange-600 hover:bg-orange-700 font-bold rounded-2xl shadow-lg shadow-orange-600/20">
-                      <Link href="/">Back home</Link>
-                    </Button>
-                    <Button variant="outline" asChild className="h-14 font-black rounded-2xl hover:bg-gray-100">
-                      <Link href={`/track-order?id=${bookingData.bookingId}`}>Check Status <ChevronRight className="ml-2 h-4 w-4" /></Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                  <motion.h2 
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.5 }}
+                      className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight"
+                  >
+                      Booking Confirmed
+                  </motion.h2>
+                  <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.7 }}
+                      className="bg-blue-50/80 backdrop-blur-md border border-blue-100 rounded-2xl p-5 my-6 shadow-sm"
+                  >
+                      <p className="text-blue-900 font-bold flex items-center justify-center gap-2 text-sm md:text-base">
+                          <Info className="w-5 h-5 text-blue-600" /> 
+                          A confirmation email has been sent to your email ID.
+                      </p>
+                      <p className="text-blue-600/80 text-xs md:text-sm mt-1.5 font-medium">
+                          Please check your Inbox as well as the Spam folder.
+                      </p>
+                  </motion.div>
+                  <motion.p 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.9 }}
+                      className="text-gray-500 text-base md:text-lg px-4"
+                  >
+                      Your <span className="font-bold text-gray-900">booking</span> has been confirmed. We'll pick up your boxes on the selected date.
+                      You can track your booking anytime using your Booking ID.
+                  </motion.p>
+                  <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 1.1 }}
+                  >
+                      <Card className="glass shadow-2xl border border-gray-100 overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
+                          <CardContent className="p-6 space-y-4">
+                              <div className="flex justify-between text-sm items-center">
+                                  <span className="text-gray-500 font-medium">Booking / Tracking ID</span>
+                                  <span className="font-black text-orange-600 text-lg bg-orange-50 px-3 py-1 rounded-lg border border-orange-100">{bookingData.bookingId}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                  <span className="text-gray-500">Total Paid</span>
+                                  <span className="font-bold text-green-600">₹{bookingData.pricing?.totalAmount || 0}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                  <span className="text-gray-500">Boxes</span>
+                                  <span className="font-bold">{formData.packages.length}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                  <span className="text-gray-500">Pickup Date</span>
+                                  <span className="font-bold">{date ? format(date, "PPP") : "TBD"}</span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                  <span className="text-gray-500">Time Slot</span>
+                                  <span className="font-bold uppercase">{formData.pickupTime}</span>
+                              </div>
+                          </CardContent>
+                      </Card>
+                  </motion.div>
+                  <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 1.2 }}
+                      className="flex flex-col sm:flex-row gap-3 justify-center mt-6 pt-4"
+                  >
+                      <Button asChild className="bg-orange-600 hover:bg-orange-700 h-12 px-8 shadow-lg shadow-orange-100">
+                          <a href={`/track-order?id=${bookingData.bookingId}`}>📦 Track Order</a>
+                      </Button>
+                      <Button asChild variant="outline" className="h-12 px-8 border-2">
+                          <a href="/">Home</a>
+                      </Button>
+                  </motion.div>
+              </motion.div>
           )}
         </AnimatePresence>
       </div>
