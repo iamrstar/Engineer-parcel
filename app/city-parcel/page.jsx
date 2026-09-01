@@ -459,7 +459,7 @@ export default function CityParcelPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: 100, // FOR TESTING (1 INR). Revert to: Math.round(totalAmount * 100)
+                    amount: Math.round(totalAmount * 100),
                     currency: "INR",
                 }),
             })
