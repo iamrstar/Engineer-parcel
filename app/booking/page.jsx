@@ -357,9 +357,7 @@ function BookingContent() {
 
   const handleRazorpay = async (payload) => {
     try {
-      // FOR TESTING: Hardcoded to 1 Rupee (100 paise)
-      // const amountPaise = Math.round((priceDetails.totalAmount - discountAmount) * 100);
-      const amountPaise = 100;
+      const amountPaise = Math.round((priceDetails.totalAmount - discountAmount) * 100);
       const { data: orderData } = await axios.post(`${API_BASE_URL}/api/payments/create-order`, {
         amount: amountPaise,
         currency: "INR"
