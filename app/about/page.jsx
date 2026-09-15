@@ -64,7 +64,7 @@ export default function AboutPage() {
                 </div>
                 <div className="text-left">
                   <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Total Volume</p>
-                  <p className="text-xl font-black text-gray-900">7,000kg+</p>
+                  <p className="text-xl font-black text-gray-900">7000+tons</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100">
@@ -338,9 +338,9 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <TeamMember name="Subham Sawarnkar" role="Co-Founder & Strategy Head" delay={0.1} image="/avatars/subham-sawarnkar.jpg" />
-            <TeamMember name="Sabir" role="Director & Decision Head" delay={0.2} />
-            <TeamMember name="Raj Chatterjee" role="Technology Head" delay={0.3} image="/avatars/raj-chatterjee.jpg" />
-            <TeamMember name="Prof. (Retd.) Nirmal Kumar Singh" role="Chief Advisor & Board Member" delay={0.4} />
+            <TeamMember name="Sabir" role="Director & Decision Head" delay={0.2} image="/avatars/sabir.PNG" imagePosition="object-top" />
+            <TeamMember name="Raj Chatterjee" role="Technology Head" delay={0.3} image="/avatars/raj.PNG" />
+            <TeamMember name="Prof. (Retd.) Nirmal Kumar Singh" role="Chief Advisor & Board Member" delay={0.4} image="/avatars/nirmal-singh.jpg" imagePosition="object-top" />
           </div>
         </div>
       </section>
@@ -404,7 +404,7 @@ function ValueCard({ icon, title, desc, delay }) {
   );
 }
 
-function TeamMember({ name, role, delay, image }) {
+function TeamMember({ name, role, delay, image, imagePosition = "object-center" }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -419,12 +419,12 @@ function TeamMember({ name, role, delay, image }) {
             src={image}
             alt={name}
             fill
-            className="object-cover"
+            className={`object-cover ${imagePosition} grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-105`}
           />
         ) : (
           <Users className="w-1/2 h-1/2 text-[#38BDF8] drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B2434] to-transparent opacity-40"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B2434] to-transparent opacity-40 group-hover:opacity-15 transition-opacity duration-500"></div>
       </div>
       <h3 className="text-xl font-black text-white mb-1">{name}</h3>
       <p className="text-orange-500 font-bold uppercase tracking-widest text-xs">{role}</p>

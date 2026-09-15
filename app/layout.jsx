@@ -8,57 +8,78 @@ import ExitIntentPopup from "@/components/ExitIntentPopup"
 
 
 
+import JsonLd from "@/components/JsonLd"
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://engineersparcel.com"
+
 export const metadata = {
+  metadataBase: new URL(baseUrl),
   title: {
-    default:
-      "EngineersParcel | Courier & Parcel Delivery Services in India",
+    default: "EngineersParcel | Fast Courier & Parcel Delivery Services in India",
     template: "%s | EngineersParcel",
   },
   description:
-    "EngineersParcel provides fast, secure, and affordable courier and parcel delivery services across India, with dedicated same-day courier and parcel delivery services in Dhanbad. B2B logistics, shifting & real-time parcel tracking.",
+    "EngineersParcel provides fast, secure, and affordable courier and parcel delivery across 19,000+ pincodes in India. Doorstep pickup, same-day city courier in Dhanbad, campus logistics, and real-time tracking.",
   keywords: [
     "courier service",
     "parcel delivery",
-    "logistics company",
-    "same day courier",
-    "parcel service near me",
     "courier service in Dhanbad",
     "parcel delivery in Dhanbad",
+    "same day courier service",
+    "doorstep parcel pickup",
+    "logistics company India",
+    "campus courier service",
+    "student luggage shifting",
+    "packers and movers",
     "B2B courier service",
+    "cheap courier service India",
+    "track parcel online",
     "EngineersParcel",
   ],
-  authors: [{ name: "EngineersParcel" }],
+  authors: [{ name: "EngineersParcel", url: baseUrl }],
   creator: "EngineersParcel",
-  metadataBase: new URL("https://engineersparcel.com"),
-
+  publisher: "EngineersParcel",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     title: "EngineersParcel | Smart Courier & Logistics Platform",
     description:
-      "India’s next-gen courier and logistics platform offering parcel delivery, shifting services, and real-time tracking.",
-    url: "https://engineersparcel.com",
+      "India’s next-gen courier and logistics platform offering parcel delivery, campus logistics, shifting services, and real-time tracking across 19,000+ pincodes.",
+    url: baseUrl,
     siteName: "EngineersParcel",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "EngineersParcel Courier Service",
+        alt: "EngineersParcel Courier & Logistics Platform - Making Life Easy",
       },
     ],
     locale: "en_IN",
     type: "website",
   },
-
   twitter: {
     card: "summary_large_image",
-    title: "EngineersParcel | Courier & Parcel Delivery",
+    title: "EngineersParcel | Smart Courier & Parcel Delivery",
     description:
-      "Fast, secure & smart parcel delivery services across India.",
+      "Fast, secure & smart parcel delivery services across India. Doorstep pickup and live tracking.",
     images: ["/og-image.png"],
   },
-
   icons: {
     icon: "/logo.jpeg",
+    apple: "/logo.jpeg",
   },
 }
 
@@ -74,6 +95,7 @@ export default function RootLayout({ children }) {
           strategy="lazyOnload" 
         />
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
+        <JsonLd />
         <Toaster richColors position="top-center" />
         <AuthProvider>
           <div className="flex flex-col min-h-screen">

@@ -1,3 +1,16 @@
+export const metadata = {
+  title: "Privacy Policy - Data Protection & Security",
+  description:
+    "Learn how EngineersParcel protects and handles your personal information, booking details, and payment transactions securely.",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

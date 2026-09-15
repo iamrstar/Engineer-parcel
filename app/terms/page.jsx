@@ -1,3 +1,16 @@
+export const metadata = {
+  title: "Terms & Conditions - Service Agreements & Policies",
+  description:
+    "Review the terms and conditions for booking courier, parcel delivery, freight, and luggage shifting services with Engineers Parcel Pvt. Ltd.",
+  alternates: {
+    canonical: "/terms",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

@@ -62,7 +62,7 @@ export default function Navbar() {
                   Making Life
                 </span>
                 <span className="text-[8px] sm:text-[10px] font-black text-orange-600 tracking-[0.2em] uppercase leading-tight">
-                  Simple
+                  Easy
                 </span>
               </div>
           </motion.div>

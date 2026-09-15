@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -10,16 +8,7 @@ const nextConfig = {
     unoptimized: true,
   },
   
-  // Redirects for SEO-friendly URLs
-  async redirects() {
-    return [
-      {
-        source: '/courier-service-in-:city',
-        destination: '/courier/:city',
-        permanent: true, // 301 redirect for SEO
-      },
-    ];
-  },
+
   
   // Rewrites for clean URLs
   async rewrites() {

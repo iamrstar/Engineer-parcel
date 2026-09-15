@@ -58,7 +58,7 @@ export default function Footer() {
               />
             </Link>
             <h4 className="text-orange-500 font-bold uppercase tracking-widest text-xs border-l-2 border-orange-500 pl-3">
-              Making Life Simple
+              Making Life Easy
             </h4>
             <p className="text-gray-300 text-sm leading-relaxed font-bold">
               Engineers Parcel Pvt. Ltd.
