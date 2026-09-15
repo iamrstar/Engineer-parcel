@@ -87,16 +87,16 @@ export default function ServicesPage() {
           id="onebox"
           icon={<Package className="w-8 h-8" />}
           title="OneBox"
-          subtitle="Up to 30kg. Flat Rate."
-          desc="Say goodbye to complicated weight calculations. Pack whatever fits in our OneBox up to 30kg, and ship it anywhere in India at a flat rate."
+          subtitle="Alpha Box (30kg) & Nova Box (60kg). Flat Rate."
+          desc="Say goodbye to complicated weight calculations. Choose between Alpha Box (up to 30kg) and Nova Box (up to 60kg). Pack whatever fits and ship anywhere in India at fixed flat rates."
           features={[
-            "Zero volumetric weight confusion",
-            "Free sturdy box provided",
-            "No questions asked packing"
+            "Alpha Box (up to 30kg) & Nova Box (up to 60kg)",
+            "Free sturdy box delivered to your room/door",
+            "Zero volumetric math — pack anything that fits"
           ]}
           imgSrc="/black-box.png"
           imgAlt="OneBox Service"
-          ctaLink="/booking"
+          ctaLink="/city-parcel"
           ctaText="Book OneBox"
           reverse
         />

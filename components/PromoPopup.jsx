@@ -174,7 +174,7 @@ export default function PromoPopup() {
                                     transition={{ delay: 0.5 }}
                                     className="text-gray-400 text-base sm:text-lg mb-8 max-w-sm mx-auto"
                                 >
-                                    Introducing <span className="text-orange-500 font-bold">OneBox</span>. One box. One price. Anywhere. Ship anything up to 30kg at just <strong className="text-white">₹999</strong>.
+                                    Introducing <span className="text-orange-500 font-bold">OneBox</span>. Choose Alpha Box or Nova Box. Ship heavy items anywhere starting at just <strong className="text-white">₹799</strong>.
                                 </motion.p>
 
                                 <motion.div

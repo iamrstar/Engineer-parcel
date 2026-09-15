@@ -273,8 +273,8 @@ export default function Home() {
                 
                 <ul className="space-y-3 mb-8">
                   {[
-                    "Two segments: Standard & Jumbo",
-                    "We provide the box — up to 30kg volumetric capacity",
+                    "Two segments: Alpha Box (up to 30kg) & Nova Box (up to 60kg)",
+                    "We provide the box — no measuring scales needed",
                     "Put anything inside (clothes, books, gear)",
                     "Doorstep pickup & direct room-to-home delivery",
                     "Fixed flat price — no hidden volumetric math",
@@ -387,7 +387,7 @@ export default function Home() {
                     "Book online in 60 seconds or just give us a simple phone call",
                     "Transparent pricing agreed upfront — at or lower than market rates",
                     "We come directly to your doorstep (or hostel room) — you don't travel an inch",
-                    "OneBox for 10+ kg: We supply the box (up to 30kg capacity). Pack anything, flat rate!",
+                    "OneBox for 10+ kg: Alpha Box (up to 30kg) & Nova Box (up to 60kg). We supply the box, pack anything, flat rate!",
                     "Direct phone & WhatsApp support with real engineers at every step",
                   ].map((text, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-sm font-medium text-gray-200">

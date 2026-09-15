@@ -22,11 +22,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 const BOX_TYPES = [
     {
         id: "flatbox",
-        name: "OneBox",
-        price: 999,
+        name: "Alpha Box",
+        price: 799,
         originalPrice: 1999,
         edlPrice: 1999,
-        description: "Pack anything that fits. Ship anywhere in India.",
+        description: "Standard OneBox. Pack anything that fits up to 30kg. Ship anywhere in India.",
         dimensions: "42 × 42 × 27 cm",
         capacity: "Up to 30 kg",
         icon: "📦",
@@ -37,11 +37,11 @@ const BOX_TYPES = [
     },
     {
         id: "atlasbox",
-        name: "Atlas Box",
+        name: "Nova Box",
         price: 1599,
         originalPrice: 2499,
         edlPrice: 2499,
-        description: "The bigger one. Ship anything up to 60kg.",
+        description: "Jumbo OneBox. Heavy shipping up to 60kg anywhere in India.",
         dimensions: "60 × 35 × 40 cm",
         capacity: "Up to 60 kg",
         icon: "🚀",
@@ -493,7 +493,7 @@ export default function CityParcelPage() {
                         ].filter(Boolean).join(", ");
 
                         const totalWeight = edlValue > 0 ? 
-                            ((quantities.flatbox * 30) + OTHER_ITEMS_TYPES.reduce((sum, item) => sum + (item.weight * otherItems[item.id] || 0), 0)) 
+                            (((quantities.flatbox || 0) * 30) + ((quantities.atlasbox || 0) * 60) + OTHER_ITEMS_TYPES.reduce((sum, item) => sum + (item.weight * otherItems[item.id] || 0), 0)) 
                             : undefined;
 
                         const bookingData = {
@@ -625,7 +625,7 @@ export default function CityParcelPage() {
             {/* ────── City Parcel Banner ────── */}
             <div className="bg-gradient-to-r from-purple-600 via-orange-600 to-purple-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50 animate-pulse">
                 <span className="mr-2">⚡</span>
-                Early Bird Deal: OneBox @ ₹999 (<s>₹1999</s>) — ⏳ Ship anything up to 30kg anywhere!
+                Early Bird Deal: OneBox (Alpha & Nova) starting @ ₹799 (<s>₹1999</s>) — ⏳ Ship heavy luggage anywhere!
                 <span className="ml-2">⚡</span>
             </div>
 

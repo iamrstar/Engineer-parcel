@@ -131,7 +131,7 @@ export default function AboutPage() {
               {
                 year: "2026",
                 title: "OneBox Launch",
-                desc: "Introduced OneBox — a fixed-price, no-questions-asked single box shipping service that simplified logistics for thousands.",
+                desc: "Introduced OneBox (Alpha & Nova segments) — fixed-price, no-questions-asked heavy box shipping that simplified logistics for thousands.",
                 icon: <Package className="w-6 h-6 text-white" />
               },
               {
