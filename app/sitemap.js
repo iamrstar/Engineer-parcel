@@ -1,7 +1,7 @@
 import cities from "@/src/data/cities";
 
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://engineersparcel.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://engineersparcel.in';
   const now = new Date();
 
   // Core static pages with tailored priorities and frequencies

@@ -10,7 +10,7 @@ import ExitIntentPopup from "@/components/ExitIntentPopup"
 
 import JsonLd from "@/components/JsonLd"
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://engineersparcel.com"
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://engineersparcel.in"
 
 export const metadata = {
   metadataBase: new URL(baseUrl),
@@ -21,6 +21,13 @@ export const metadata = {
   description:
     "EngineersParcel provides fast, secure, and affordable courier and parcel delivery across 19,000+ pincodes in India. Doorstep pickup, same-day city courier in Dhanbad, campus logistics, and real-time tracking.",
   keywords: [
+    "best courier service near me",
+    "courier service near me",
+    "parcel delivery near me",
+    "parcel service near me",
+    "doorstep parcel pickup near me",
+    "same day courier near me",
+    "courier pickup from home",
     "courier service",
     "parcel delivery",
     "courier service in Dhanbad",
@@ -42,6 +49,12 @@ export const metadata = {
   alternates: {
     canonical: "/",
   },
+  other: {
+    "geo.region": "IN-JH",
+    "geo.placename": "Dhanbad, Jharkhand, India",
+    "geo.position": "23.8143;86.4412",
+    "ICBM": "23.8143, 86.4412",
+  },
   robots: {
     index: true,
     follow: true,
@@ -52,6 +65,9 @@ export const metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  verification: {
+    google: "ADo0h2iLFotQchcWaDD_qbKBwyLvdMF5n4l81dqrVlY",
   },
   openGraph: {
     title: "EngineersParcel | Smart Courier & Logistics Platform",

@@ -14,27 +14,30 @@ export async function generateMetadata({ params }) {
   
   if (!city) return {};
 
-  const title = `Best Courier Service in ${city.city} | Top Rated Delivery | EngineersParcel`;
-  const description = `Looking for the best courier service in ${city.city}? EngineersParcel offers top-rated, fast, and affordable parcel delivery in ${city.city}, ${city.state}. Trusted by 1000+ customers. Book now!`;
+  const title = `Best Courier Service in ${city.city} Near Me | Top Rated Delivery`;
+  const description = `Looking for the best courier service near you in ${city.city}? EngineersParcel provides fast doorstep pickup, affordable parcel delivery, and shifting across ${city.areas}, ${city.state}. Rated 4.8/5. Book now!`;
 
   return {
     title,
     description,
     keywords: [
+      `best courier service near me`,
+      `courier service near me in ${city.city}`,
       `best courier service in ${city.city}`,
+      `parcel delivery near me ${city.city}`,
+      `doorstep courier pickup near me`,
+      `same day courier near me in ${city.city}`,
       `top courier service ${city.city}`,
       `best parcel delivery ${city.city}`,
-      `reliable courier ${city.city}`,
+      `reliable courier near me`,
       `trusted courier service ${city.city}`,
-      `best delivery service ${city.city}`,
-      `top rated courier ${city.city}`,
-      `#1 courier ${city.city}`,
+      `#1 courier service ${city.city}`,
     ].join(', '),
     
     openGraph: {
       title,
       description,
-      url: `https://engineersparcel.com/best-courier-service-in-${city.slug}`,
+      url: `https://engineersparcel.in/best-courier-service-in-${city.slug}`,
       siteName: 'EngineersParcel',
       locale: 'en_IN',
       type: 'website',
@@ -43,7 +46,7 @@ export async function generateMetadata({ params }) {
           url: '/Delivery-boy.png',
           width: 1200,
           height: 630,
-          alt: `Best Courier Service in ${city.city}`,
+          alt: `Best Courier Service in ${city.city} Near Me`,
         },
       ],
     },
@@ -56,7 +59,7 @@ export async function generateMetadata({ params }) {
     },
     
     alternates: {
-      canonical: `https://engineersparcel.com/best-courier-service-in-${city.slug}`,
+      canonical: `https://engineersparcel.in/best-courier-service-in-${city.slug}`,
     },
     
     robots: {
@@ -81,11 +84,11 @@ export default async function Page({ params }) {
     notFound();
   }
 
-  const jsonLd = {
+  const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: `EngineersParcel - Best Courier Service in ${city.city}`,
-    description: `Top-rated courier service in ${city.city}, ${city.state}`,
+    description: `Top-rated courier service in ${city.city}, ${city.state}. Doorstep pickup across ${city.areas}.`,
     address: {
       '@type': 'PostalAddress',
       addressLocality: city.city,
@@ -96,8 +99,9 @@ export default async function Page({ params }) {
       '@type': 'City',
       name: city.city,
     },
-    serviceType: 'Courier Service',
-    priceRange: '$$',
+    serviceType: 'Courier and Parcel Delivery Service',
+    priceRange: '₹₹',
+    telephone: '+91-9525801506',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.8',
@@ -105,11 +109,38 @@ export default async function Page({ params }) {
     },
   };
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `Which is the best courier service near me in ${city.city}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `EngineersParcel is rated the best courier service in ${city.city}, offering quick doorstep parcel pickup across ${city.areas}, affordable rates, and express delivery to 19,000+ pincodes in India.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `How do I book a doorstep courier pickup in ${city.city}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `You can book online at EngineersParcel. Enter your pickup address in ${city.city}, select package weight, and an executive will arrive at your door for instant parcel collection.`,
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <BestCourierClient city={city} />
     </>

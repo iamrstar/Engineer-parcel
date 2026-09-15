@@ -9,6 +9,7 @@ import {
   Share2, Download, Smartphone
 } from "lucide-react";
 import { motion } from "framer-motion";
+import cities from "@/src/data/cities";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -108,6 +109,24 @@ export default function Footer() {
               <FooterLink href="/our-partners">Network Partners</FooterLink>
               <FooterLink href="/dashboard">Logistics Dashboard</FooterLink>
             </FooterCol>
+          </div>
+        </div>
+
+        {/* ══════════ POPULAR COURIER LOCATIONS ACROSS INDIA (SEO INTERNAL LINKING) ══════════ */}
+        <div className="pt-8 pb-4 border-t border-white/10">
+          <p className="text-xs font-black uppercase tracking-widest text-orange-500 mb-3">
+            Popular Courier & Parcel Delivery Locations in India
+          </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-400">
+            {cities.map((city) => (
+              <Link
+                key={city.slug}
+                href={`/best-courier-service-in-${city.slug}`}
+                className="hover:text-white transition-colors"
+              >
+                Courier in {city.city}
+              </Link>
+            ))}
           </div>
         </div>
 

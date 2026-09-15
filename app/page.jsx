@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star, Loader2, CheckCircle } from "lucide-react";
+import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star, Loader2, CheckCircle, XCircle, Sparkles, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
@@ -85,11 +85,11 @@ export default function Home() {
                 </div>
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight">
-                Shipping <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-400">made simple.</span>
+                Logistics <br />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-400">made easy.</span>
               </h1>
-              <p className="text-xl text-gray-500 mb-10 max-w-xl leading-relaxed">
-                Ship anything, anywhere.
+              <p className="text-xl text-gray-600 mb-8 max-w-xl leading-relaxed font-medium">
+                No visiting courier offices. No standing in lines to ask prices. Book online or simply give us a call — we pick up from your doorstep and deliver at market-matching or lower prices.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center mb-10">
@@ -99,9 +99,9 @@ export default function Home() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
                   <div className="flex items-center text-xl font-black">
-                    Book Anything <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    Book Courier <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <span className="text-xs font-medium text-gray-400 mt-1">Courier, shifting, documents & more</span>
+                  <span className="text-xs font-medium text-gray-400 mt-1">Free doorstep pickup across India</span>
                 </Button>
                 
                 <Button asChild variant="outline" className="flex flex-col items-center justify-center h-auto py-3 px-8 bg-white/30 backdrop-blur-md border border-white/50 hover:bg-white/50 text-gray-900 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl w-full sm:w-auto">
@@ -109,7 +109,7 @@ export default function Home() {
                     <div className="flex items-center text-xl font-black">
                       <Package className="mr-2 w-5 h-5 text-orange-600" /> Book OneBox
                     </div>
-                    <span className="text-xs font-bold text-orange-700 mt-1">Up to 30kg. No questions asked.</span>
+                    <span className="text-xs font-bold text-orange-700 mt-1">Starting ₹799 • Up to 30kg capacity</span>
                   </Link>
                 </Button>
               </div>
@@ -269,15 +269,15 @@ export default function Home() {
                   <Package className="w-7 h-7 text-orange-600" />
                 </div>
                 <h3 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Book OneBox</h3>
-                <p className="text-sm text-gray-500 font-medium mb-6">Pack it. Ship it. Done. No questions asked.</p>
+                <p className="text-sm text-gray-600 font-medium mb-6">Got 10+ kg? Skip measuring tapes and weighing scales. Fill our box, we ship it.</p>
                 
                 <ul className="space-y-3 mb-8">
                   {[
-                    "One box — up to 30kg",
-                    "Fixed price, no surprises",
-                    "We provide the box & packing",
-                    "Ideal for students & hostellers",
-                    "Simplest way to ship your stuff",
+                    "Two segments: Standard & Jumbo",
+                    "We provide the box — up to 30kg volumetric capacity",
+                    "Put anything inside (clothes, books, gear)",
+                    "Doorstep pickup & direct room-to-home delivery",
+                    "Fixed flat price — no hidden volumetric math",
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-gray-700">
                       <CheckCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
@@ -287,8 +287,8 @@ export default function Home() {
                 </ul>
 
                 <div className="flex items-center gap-3 bg-orange-100/60 border border-orange-200 rounded-xl px-4 py-3 mb-8">
-                  <span className="text-2xl font-black text-gray-900">₹299</span>
-                  <span className="text-xs text-gray-500 font-bold">starting price per box</span>
+                  <span className="text-2xl font-black text-gray-900">₹799</span>
+                  <span className="text-xs text-gray-600 font-bold">starting price per box • all-inclusive</span>
                 </div>
 
                 <Button asChild className="w-full bg-gray-900 hover:bg-black text-white h-14 text-lg font-black rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 group/btn">
@@ -310,6 +310,107 @@ export default function Home() {
           >
             Still not sure? <a href="https://wa.me/919693245615" target="_blank" rel="noopener noreferrer" className="text-orange-600 font-bold hover:underline">WhatsApp us</a> and we'll guide you in 30 seconds.
           </motion.p>
+        </div>
+      </section>
+
+      {/* ══════════ THE OLD WAY VS THE ENGINEERSPARCEL WAY ══════════ */}
+      <section className="py-24 bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 text-xs font-black px-4 py-2 rounded-full uppercase tracking-wider mb-4">
+              <Sparkles className="w-3.5 h-3.5" /> Stop Visiting Courier Offices
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight mb-4">
+              Logistics Was Broken. <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">We Made It Effortless.</span>
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+              Why spend hours traveling to a courier office just to ask prices, carrying heavy 10+ kg boxes, when we bring the entire shipping counter right to your doorstep?
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            {/* The Traditional Way */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-3xl p-8 sm:p-10 border-2 border-red-100 shadow-xl shadow-red-500/5 relative overflow-hidden flex flex-col justify-between"
+            >
+              <div className="absolute top-0 right-0 bg-red-100 text-red-700 text-xs font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
+                The Painful Old Way
+              </div>
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 mb-6">
+                  <XCircle className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">Traditional Courier Offices</h3>
+                <ul className="space-y-4 mb-8">
+                  {[
+                    "Travel 5–10 km through traffic just to ask rates and compare prices",
+                    "Return home, struggle with measuring tapes and weighing scales",
+                    "Heavy 10+ kg items? Haul bulky luggage back in autos or rickshaws",
+                    "Confusing volumetric weight math and unexpected billing shocks",
+                    "Pack it yourself, wait in long queues, and deal with rude staff",
+                  ].map((text, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm font-medium text-gray-600">
+                      <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                      <span>{text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="pt-6 border-t border-red-100 bg-red-50/50 -mx-8 -mb-8 sm:-mx-10 sm:-mb-10 p-6 rounded-b-3xl">
+                <p className="text-xs font-bold text-red-700 text-center uppercase tracking-wider">
+                  Result: Wasted time, exhausted back, higher overall cost
+                </p>
+              </div>
+            </motion.div>
+
+            {/* The EngineersParcel Way */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-gray-950 text-white rounded-3xl p-8 sm:p-10 border-2 border-orange-500/30 shadow-2xl shadow-orange-600/10 relative overflow-hidden flex flex-col justify-between"
+            >
+              <div className="absolute top-0 right-0 bg-orange-600 text-white text-xs font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
+                The EngineersParcel Way
+              </div>
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-6">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4">Doorstep & OneBox Ease</h3>
+                <ul className="space-y-4 mb-8">
+                  {[
+                    "Book online in 60 seconds or just give us a simple phone call",
+                    "Transparent pricing agreed upfront — at or lower than market rates",
+                    "We come directly to your doorstep (or hostel room) — you don't travel an inch",
+                    "OneBox for 10+ kg: We supply the box (up to 30kg capacity). Pack anything, flat rate!",
+                    "Direct phone & WhatsApp support with real engineers at every step",
+                  ].map((text, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm font-medium text-gray-200">
+                      <CheckCircle className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                      <span>{text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="pt-6 border-t border-white/10 bg-white/5 -mx-8 -mb-8 sm:-mx-10 sm:-mb-10 p-6 rounded-b-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold text-orange-400 uppercase tracking-wider">Zero hassle guaranteed</p>
+                  <p className="text-white text-sm font-black">Call: +91 95258 01506</p>
+                </div>
+                <Button 
+                  onClick={() => setIsBookNowOpen(true)}
+                  className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-black text-sm px-6 h-11 rounded-xl shadow-lg shadow-orange-600/30"
+                >
+                  Book Doorstep Pickup
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -395,16 +496,16 @@ export default function Home() {
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
               <div className="max-w-2xl text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-orange-400 text-xs font-bold px-4 py-2 rounded-full mb-6">
-                  🎓 FOR IIT ISM DHANBAD STUDENTS
+                  🎓 INDIA&apos;S ONLY DEDICATED CAMPUS LOGISTICS SPECIALIST
                 </div>
                 <h3 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-                  Graduating? Moving Out? <br />
+                  The Only Logistics Built <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-200">
-                    Let Us Handle Your Stuff.
+                    Specifically For College Campuses.
                   </span>
                 </h3>
-                <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                  Fixed-price box packing and reliable delivery for hostel students. Books, clothes, or electronics — we ship it safe.
+                <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                  We are India&apos;s only logistics company with a core, dedicated focus on campus logistics. Direct hostel room pickup to hometown delivery — luggage, books, cycles, and bedding safely shipped at student-first rates.
                 </p>
                 <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center lg:justify-start w-full">
                   <Button asChild className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:w-auto h-14 sm:h-16 px-4 sm:px-10 text-lg sm:text-xl font-black rounded-2xl shadow-2xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95 group">
@@ -415,7 +516,7 @@ export default function Home() {
                   </Button>
                   <div className="flex items-center justify-center gap-3 w-full sm:w-auto px-6 py-3 sm:py-4 rounded-2xl border border-white/10 bg-white/5">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-white font-bold text-sm sm:text-base">1,200+ Students Served</span>
+                    <span className="text-white font-bold text-sm sm:text-base">10,000+ Students Served</span>
                   </div>
                 </div>
               </div>
@@ -424,9 +525,9 @@ export default function Home() {
                 <div className="relative h-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-[60px] flex items-center justify-center p-12 overflow-hidden">
                   <Package className="w-full h-full text-orange-500/20 absolute -bottom-10 -right-10 rotate-12" />
                   <div className="text-center relative z-10">
-                    <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">Starting From</p>
-                    <p className="text-7xl font-black text-white leading-none mb-4">₹299</p>
-                    <div className="bg-orange-500 text-white text-xs font-black py-1 px-3 rounded-full inline-block">PER BOX</div>
+                    <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">OneBox Starting At</p>
+                    <p className="text-6xl font-black text-white leading-none mb-4">₹799</p>
+                    <div className="bg-orange-500 text-white text-xs font-black py-1 px-3 rounded-full inline-block">UP TO 30KG CAPACITY</div>
                   </div>
                 </div>
               </div>

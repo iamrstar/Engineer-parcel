@@ -14,15 +14,18 @@ export async function generateMetadata({ params }) {
   
   if (!city) return {};
 
-  const title = `Courier Service in ${city.city} | Fast & Reliable Delivery | EngineersParcel`;
+  const title = `Courier Service in ${city.city} | Fast & Reliable Delivery`;
   const description = `Best courier and parcel delivery service in ${city.city}, ${city.state}. Same-day pickup, real-time tracking, and affordable rates. Serving ${city.areas}. Book now!`;
 
   return {
     title,
     description,
     keywords: [
+      `courier service near me`,
+      `parcel delivery near me`,
       `courier service in ${city.city}`,
       `parcel delivery ${city.city}`,
+      `doorstep courier pickup near me`,
       `courier ${city.city}`,
       `delivery service ${city.city}`,
       `same day delivery ${city.city}`,
@@ -34,7 +37,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title,
       description,
-      url: `https://engineersparcel.com/courier-service-in-${city.slug}`,
+      url: `https://engineersparcel.in/courier-service-in-${city.slug}`,
       siteName: 'EngineersParcel',
       locale: 'en_IN',
       type: 'website',
@@ -56,7 +59,7 @@ export async function generateMetadata({ params }) {
     },
     
     alternates: {
-      canonical: `https://engineersparcel.com/courier-service-in-${city.slug}`,
+      canonical: `https://engineersparcel.in/courier-service-in-${city.slug}`,
     },
     
     robots: {
