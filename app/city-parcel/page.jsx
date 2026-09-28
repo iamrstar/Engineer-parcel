@@ -676,7 +676,7 @@ export default function CityParcelPage() {
                             <div className="px-6 py-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-2">
                                 <span className="text-orange-400">✨</span>
                                 <p className="text-sm font-black tracking-[0.15em] text-white uppercase">
-                                    Permanent Everyday Flat Rate
+                                    Guaranteed Flat Rate
                                 </p>
                             </div>
 

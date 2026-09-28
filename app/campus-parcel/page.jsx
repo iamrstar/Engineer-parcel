@@ -651,7 +651,7 @@ export default function StudentMovePage() {
             {/* ────── Campus Parcel Banner ────── */}
             <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50">
                 <span className="mr-2">🎓</span>
-                Permanent Campus Special: Alpha Box @ ₹499 & Nova Box @ ₹1049 — Doorstep Hostel Room Pickup Included!
+                Campus Special: Alpha Box @ ₹499 & Nova Box @ ₹1049 — Doorstep Hostel Room Pickup Included!
                 <span className="ml-2">📦</span>
             </div>
 
@@ -702,7 +702,7 @@ export default function StudentMovePage() {
                             <div className="px-6 py-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-2">
                                 <span className="text-orange-400">🎓</span>
                                 <p className="text-sm font-black tracking-[0.15em] text-white uppercase">
-                                    Permanent Student Rates
+                                    Exclusive Student Rates
                                 </p>
                             </div>
 
