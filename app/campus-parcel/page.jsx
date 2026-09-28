@@ -24,7 +24,7 @@ const BOX_TYPES = [
     {
         id: "alpha",
         name: "Alpha Box",
-        price: 499,
+        price: 599,
         originalPrice: 1799,
         edlPrice: 1800,
 
@@ -40,7 +40,7 @@ const BOX_TYPES = [
     {
         id: "nova",
         name: "Nova Box",
-        price: 1049,
+        price: 1149,
         originalPrice: 3999,
         edlPrice: 4500,
 
@@ -221,6 +221,10 @@ export default function StudentMovePage() {
     const [contactNumber, setContactNumber] = useState("")
 
     const getBoxPrice = (box) => {
+        if (selectedCollege === "IIT ISM Dhanbad" || !selectedCollege) {
+            if (box.id === "alpha") return 599;
+            if (box.id === "nova") return 1149;
+        }
         if (selectedCollege === "SNMMCH Dhanbad") {
             if (box.id === "alpha") return 799;
             if (box.id === "nova") return 1599;
@@ -651,7 +655,7 @@ export default function StudentMovePage() {
             {/* ────── Campus Parcel Banner ────── */}
             <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50">
                 <span className="mr-2">🎓</span>
-                Campus Special: Alpha Box @ ₹499 & Nova Box @ ₹1049 — Doorstep Hostel Room Pickup Included!
+                Campus Special: Alpha Box @ ₹599 & Nova Box @ ₹1149 — Doorstep Hostel Room Pickup Included!
                 <span className="ml-2">📦</span>
             </div>
 
@@ -671,7 +675,7 @@ export default function StudentMovePage() {
                         className="inline-flex items-center gap-2 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 text-orange-300 text-sm px-4 py-1.5 rounded-full mb-6"
                     >
                         <GraduationCap className="w-4 h-4" />
-                        Exclusively for SNMMCH Dhanbad Students
+                        {selectedCollege ? `Exclusively for ${selectedCollege} Students` : "Exclusively for IIT ISM Dhanbad Students"}
                     </motion.div>
 
                     <motion.h1 
