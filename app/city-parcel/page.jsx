@@ -623,10 +623,10 @@ export default function CityParcelPage() {
         <>
         <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-x-hidden">
             {/* ────── City Parcel Banner ────── */}
-            <div className="bg-gradient-to-r from-purple-600 via-orange-600 to-purple-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50 animate-pulse">
+            <div className="bg-gradient-to-r from-purple-600 via-orange-600 to-purple-600 text-white py-3 text-center text-[10px] md:text-sm font-black tracking-[0.2em] uppercase shadow-lg relative z-50">
                 <span className="mr-2">⚡</span>
-                Early Bird Deal: OneBox (Alpha & Nova) starting @ ₹799 (<s>₹1999</s>) — ⏳ Ship heavy luggage anywhere!
-                <span className="ml-2">⚡</span>
+                Guaranteed Everyday Flat Rate: OneBox (Alpha & Nova) Starting @ ₹799 — Doorstep Delivery Anywhere in India!
+                <span className="ml-2">📦</span>
             </div>
 
 
@@ -673,15 +673,17 @@ export default function CityParcelPage() {
                             to your doorstep — <span className="text-white font-bold">affordable & hassle‑free.</span>
                         </p>
                         <div className="flex flex-wrap justify-center gap-3">
-                            <div className="px-6 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-                                <p className="text-sm font-black tracking-[0.2em] text-orange-400 uppercase italic">
-                                    🎓 Offer Ends Soon
+                            <div className="px-6 py-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-2">
+                                <span className="text-orange-400">✨</span>
+                                <p className="text-sm font-black tracking-[0.15em] text-white uppercase">
+                                    Permanent Everyday Flat Rate
                                 </p>
                             </div>
 
-                            <div className="px-6 py-2 rounded-2xl bg-orange-500/20 border border-orange-500/30 backdrop-blur-md animate-pulse">
-                                <p className="text-sm font-black tracking-[0.1em] text-orange-300 uppercase">
-                                    🔥 Upto 80% Off on Boxes
+                            <div className="px-6 py-2.5 rounded-2xl bg-orange-500/20 border border-orange-500/30 backdrop-blur-md flex items-center gap-2">
+                                <span className="text-orange-300">🛡️</span>
+                                <p className="text-sm font-black tracking-[0.15em] text-orange-300 uppercase">
+                                    Zero Hidden Charges • Doorstep Pickup
                                 </p>
                             </div>
                         </div>
