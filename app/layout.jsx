@@ -5,10 +5,10 @@ import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import WhatsAppButton from "@/components/WhatsAppButton"
 import ExitIntentPopup from "@/components/ExitIntentPopup"
+  
 
 
-
-import JsonLd from "@/components/JsonLd"
+import JsonLd from "@/components/JsonLd" 
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://engineersparcel.in"
 
