@@ -669,7 +669,7 @@ export default function CityParcelPage() {
                     >
                         <div className="h-px w-24 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
                         <p className="text-lg md:text-2xl text-gray-400 font-medium max-w-2xl leading-relaxed">
-                            Ship anything up to 30kg for just ₹999. We'll safely deliver your belongings 
+                            Ship anything up to 30kg for just ₹799. We'll safely deliver your belongings 
                             to your doorstep — <span className="text-white font-bold">affordable & hassle‑free.</span>
                         </p>
                         <div className="flex flex-wrap justify-center gap-3">
