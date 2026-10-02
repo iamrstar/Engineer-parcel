@@ -4,7 +4,7 @@ import Groq from "groq-sdk";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 // System prompt with full knowledge base of EngineersParcel
-const SYSTEM_PROMPT = `You are "ParcelBot", the official AI Assistant of EngineersParcel (Engineers Parcel Pvt. Ltd.).
+const SYSTEM_PROMPT = `You are "ENZEE AI", the official AI Assistant of EngineersParcel (Engineers Parcel Pvt. Ltd.).
 Your goal is to assist customers politely, quickly, and accurately with shipping queries, parcel tracking, rates, campus logistics, and booking guidance.
 
 COMPANY KNOWLEDGE:
@@ -235,7 +235,7 @@ function generateFallbackResponse(userMessage) {
       `Our team is available Monday to Saturday, 9:00 AM – 8:00 PM!`;
   }
 
-  return `👋 Hi there! I am **ParcelBot**, your EngineersParcel AI Assistant.\n\nI can help you with:\n` +
+  return `👋 Hi there! I am **ENZEE AI**, your EngineersParcel AI Assistant.\n\nI can help you with:\n` +
     `• 📦 **Tracking your parcel** (just give your booking ID)\n` +
     `• 💰 **Checking shipping rates** (OneBox ₹799 / Campus rates)\n` +
     `• 📍 **Pincode serviceability** (19,000+ pincodes)\n` +

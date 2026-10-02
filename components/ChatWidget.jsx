@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const INITIAL_MESSAGE = {
   role: "assistant",
-  content: `👋 **Hi! I am ParcelBot**, your EngineersParcel AI Assistant.\n\nI can help you with:\n• 📦 **Live tracking** for your active parcel\n• 💰 **Instant shipping rates** (OneBox Alpha ₹799 / Nova ₹1599)\n• 🎓 **Hostel & campus shifting** (IIT ISM rates ₹599 & ₹1149)\n• 📍 **Pincode serviceability** across 19,000+ codes\n\nHow can I help you today?`,
+  content: `👋 **Hi! I am ENZEE AI**, your EngineersParcel AI Assistant.\n\nI can help you with:\n• 📦 **Live tracking** for your active parcel\n• 💰 **Instant shipping rates** (OneBox Alpha ₹799 / Nova ₹1599)\n• 🎓 **Hostel & campus shifting** (IIT ISM rates ₹599 & ₹1149)\n• 📍 **Pincode serviceability** across 19,000+ codes\n\nHow can I help you today?`,
 };
 
 const SUGGESTIONS = [
@@ -166,14 +166,14 @@ export default function ChatWidget() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsOpen(true)}
               className="relative group flex items-center gap-3 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white px-5 py-3.5 rounded-full shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/60 transition-all border border-white/20"
-              aria-label="Open ParcelBot AI Assistant"
+              aria-label="Open ENZEE AI Assistant"
             >
               <div className="relative">
                 <Bot className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
                 <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-orange-600 animate-pulse" />
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-xs font-black tracking-wide leading-none uppercase">ParcelBot AI</p>
+                <p className="text-xs font-black tracking-wide leading-none uppercase">ENZEE AI</p>
                 <p className="text-[10px] text-orange-100 font-medium leading-tight">Instant shipping answers</p>
               </div>
               <Sparkles className="w-4 h-4 text-yellow-200 animate-pulse" />
@@ -205,14 +205,14 @@ export default function ChatWidget() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-black text-sm tracking-wide text-white">ParcelBot AI</h3>
+                    <h3 className="font-black text-sm tracking-wide text-white">ENZEE AI</h3>
                     <span className="text-[10px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded-full uppercase">
-                      Llama 3.3
+                      Groq Fast
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 flex items-center gap-1.5 font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                    EngineersParcel Live Assistant
+                    EngineersParcel AI Assistant
                   </p>
                 </div>
               </div>
@@ -293,7 +293,7 @@ export default function ChatWidget() {
                     <span className="w-2 h-2 rounded-full bg-orange-400 animate-bounce" />
                     <span className="w-2 h-2 rounded-full bg-orange-400 animate-bounce [animation-delay:0.15s]" />
                     <span className="w-2 h-2 rounded-full bg-orange-400 animate-bounce [animation-delay:0.3s]" />
-                    <span className="text-xs text-gray-400 font-medium ml-1">ParcelBot is thinking...</span>
+                    <span className="text-xs text-gray-400 font-medium ml-1">ENZEE AI is thinking...</span>
                   </div>
                 </motion.div>
               )}
