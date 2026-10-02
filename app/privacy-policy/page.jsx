@@ -99,7 +99,7 @@ export default function PrivacyPolicyPage() {
               <li>Third parties in connection with a business transaction</li>
               <li>Law enforcement or other government officials, as required by law</li>
             </ul>
-
+            
             <h2>5. Data Security</h2>
             <p>
               We implement appropriate technical and organizational measures to protect the security of your personal

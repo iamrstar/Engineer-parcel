@@ -272,7 +272,7 @@ export async function POST(req) {
 
     // First completion call with tool access
     const response = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "qwen/qwen3.8-27b",
       messages: conversation,
       tools: TOOLS,
       tool_choice: "auto",
@@ -292,7 +292,7 @@ export async function POST(req) {
 
       // Send tool result back to Groq for final natural language synthesis
       const secondResponse = await groq.chat.completions.create({
-        model: "llama-3.3-70b-versatile",
+        model: "qwen/qwen3.8-27b",
         messages: [
           ...conversation,
           responseMessage,
