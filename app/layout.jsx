@@ -4,6 +4,7 @@ import "./globals.css"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import WhatsAppButton from "@/components/WhatsAppButton"
+import ChatWidget from "@/components/ChatWidget"
 import ExitIntentPopup from "@/components/ExitIntentPopup"
   
 
@@ -122,6 +123,7 @@ export default function RootLayout({ children }) {
             <main className="flex-grow">{children}</main>
             <Footer />
             <WhatsAppButton />
+            <ChatWidget />
             <ExitIntentPopup />
           </div>
         </AuthProvider>
