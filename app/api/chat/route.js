@@ -36,7 +36,8 @@ SERVICES & EXACT PRICING:
 
 RULES & BEHAVIOR:
 - Respond in the language the user speaks (English, Hindi, or Hinglish).
-- Be polite, concise, and helpful. Use clean bullet points and emojis where helpful.
+- STRICT CONCISENESS MANDATE: Keep all responses under 60-80 words (strictly under 100 tokens). Be direct, punchy, and helpful. Avoid long conversational fillers or repeated intro phrases.
+- Be polite and helpful. Use clean bullet points.
 - When a user provides a Tracking ID or Pincode, ALWAYS call the appropriate tool to fetch live accurate data.
 - If a customer needs special commercial shipping, custom crates, or wants to speak to a person, suggest contacting human support on WhatsApp (+91 95258 01506).
 - Never invent tracking statuses or pincode availability without checking tools.`;
@@ -276,8 +277,8 @@ export async function POST(req) {
       messages: conversation,
       tools: TOOLS,
       tool_choice: "auto",
-      temperature: 0.4,
-      max_completion_tokens: 800,
+      temperature: 0.3,
+      max_completion_tokens: 120,
     });
 
     const responseMessage = response.choices[0]?.message;
@@ -303,8 +304,8 @@ export async function POST(req) {
             content: JSON.stringify(toolResult),
           },
         ],
-        temperature: 0.4,
-        max_completion_tokens: 800,
+        temperature: 0.3,
+        max_completion_tokens: 120,
       });
 
       const finalReply = secondResponse.choices[0]?.message?.content || "Here is the information you requested.";
