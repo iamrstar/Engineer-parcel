@@ -476,22 +476,7 @@ export default function BestCourierClient({ city }) {
         </div>
       </section>
 
-      {/* ══════════ CARRIER PARTNERS BAR ══════════ */}
-      <section className="py-10 border-b border-slate-100 bg-slate-50/60">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-xs uppercase tracking-wider font-bold text-slate-400 mb-6">
-            Integrated With India&apos;s Tier-1 Logistics Networks for 100% Reliable Delivery
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 opacity-75 grayscale hover:grayscale-0 transition-all">
-            <span className="text-sm font-black tracking-wider text-slate-700">DELHIVERY</span>
-            <span className="text-sm font-black tracking-wider text-slate-700">BLUEDART</span>
-            <span className="text-sm font-black tracking-wider text-slate-700">DTDC</span>
-            <span className="text-sm font-black tracking-wider text-slate-700">SHADOWFAX</span>
-            <span className="text-sm font-black tracking-wider text-slate-700">XPRESSBEES</span>
-            <span className="text-sm font-black tracking-wider text-slate-700">EKART</span>
-          </div>
-        </div>
-      </section>
+
 
       {/* ══════════ PRICING SECTION: ONEBOX FLAT RATES ══════════ */}
       <section id="pricing" className="py-20 lg:py-28 bg-white relative">
