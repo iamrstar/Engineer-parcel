@@ -21,10 +21,20 @@ export default function BestCourierClient({ city }) {
   const [pincodeStatus, setPincodeStatus] = useState(null); // null | { loading, result, error }
   const [expandedFaq, setExpandedFaq] = useState(0);
 
+  const seoConfig = city.seoConfig || {};
+  const isFreePickup = Boolean(seoConfig.freePickup);
+  const isPartner = seoConfig.pickupModel === "partner";
+  const pickupClaim = isFreePickup ? "Free Doorstep Pickup" : "Doorstep Pickup Booking";
+  const pickupCtaText = isFreePickup ? "Book Free Pickup" : "Book Doorstep Pickup";
+  const pickupTerms = seoConfig.pickupTerms && seoConfig.pickupTerms !== "TODO"
+    ? seoConfig.pickupTerms
+    : "Doorstep collection subject to serviceable pincode verification and standard booking guidelines.";
+
   // Parse localities from comma separated string
   const localityList = city.areas 
     ? city.areas.split(",").map((a) => a.trim()).filter(Boolean)
     : ["City Centre", "Main Market", "Station Road", "College Campus"];
+
 
   const handleCheckPincode = async (codeToCheck) => {
     const code = codeToCheck || pincodeInput;
@@ -165,21 +175,24 @@ export default function BestCourierClient({ city }) {
                   {city.city}
                 </span>
                 <span className="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-300 mt-2">
-                  Doorstep Pickup & Pan-India Delivery
+                  {pickupClaim} & Pan-India Delivery
                 </span>
               </h1>
 
               {/* Subtitle */}
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed">
                 Skip carrying heavy luggage to crowded courier counters in {city.city}. 
-                Book online in 60 seconds — our verified executive picks up from your home, office, or hostel room with free boxes, flat pricing, and live tracking to 19,000+ pincodes.
+                {isPartner 
+                  ? ` Book online in 60 seconds — pickup via our partner network across serviceable pincodes with flat pricing and live tracking to 19,000+ destinations across India.`
+                  : ` Book online in 60 seconds — our verified executive picks up from your home, office, or hostel room with flat pricing and live tracking to 19,000+ pincodes.`
+                }
               </p>
 
               {/* Quick Checklist */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-200 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Free Doorstep Pickup</span>
+                  <span>{pickupClaim}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-200 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -191,14 +204,23 @@ export default function BestCourierClient({ city }) {
                 </div>
               </div>
 
+              {/* Partner Network Disclosure */}
+              {isPartner && (
+                <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3.5 py-2 rounded-xl">
+                  <MapPin className="w-4 h-4 shrink-0 text-amber-400" />
+                  <span>Pickup via our partner network across serviceable pincodes.</span>
+                  <a href="#pincode-checker" className="underline font-semibold hover:text-white ml-auto">Check Pincode</a>
+                </div>
+              )}
+
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                 <Button 
                   onClick={() => setIsBookNowOpen(true)}
                   size="lg"
                   className="bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-base px-8 py-6 rounded-2xl shadow-xl shadow-orange-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] group flex items-center justify-center gap-2"
                 >
-                  <span>Book Doorstep Pickup</span>
+                  <span>{pickupCtaText}</span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
 
@@ -225,8 +247,14 @@ export default function BestCourierClient({ city }) {
                 </a>
               </div>
 
+              {/* Pickup Terms Visibly Displayed Near CTA */}
+              <div className="text-[11px] text-slate-400 pt-1">
+                <span className="font-semibold text-slate-300">Pickup Terms: </span>
+                {pickupTerms}
+              </div>
+
               {/* Trust Subtext */}
-              <p className="text-xs text-slate-400 flex items-center gap-1.5 pt-1">
+              <p className="text-xs text-slate-400 flex items-center gap-1.5 pt-0.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>100% Insured • Free Cancellation • No Prepayment Required for Pickup</span>
               </p>
@@ -986,7 +1014,7 @@ export default function BestCourierClient({ city }) {
               size="lg"
               className="w-full sm:w-auto bg-slate-950 hover:bg-black text-white font-bold text-base px-8 py-6 rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95"
             >
-              Book Doorstep Pickup Now
+              {pickupCtaText} Now
             </Button>
 
             <a
@@ -998,7 +1026,18 @@ export default function BestCourierClient({ city }) {
             </a>
           </div>
 
-          <p className="text-xs text-orange-100 font-medium">
+          {isPartner && (
+            <p className="text-xs text-orange-200">
+              Doorstep pickup in {city.city} via our partner network across serviceable pincodes.
+            </p>
+          )}
+
+          <div className="text-[11px] text-orange-200/90 max-w-lg mx-auto">
+            <span className="font-semibold text-white">Pickup Terms: </span>
+            {pickupTerms}
+          </div>
+
+          <p className="text-xs text-orange-100 font-medium pt-1">
             No advance payment needed • Pay securely via UPI, Card, or Cash upon pickup
           </p>
         </div>

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import BestCourierClient from "./BestCourierClient";
 import cities from "@/src/data/cities";
+import { priorityCities } from "@/src/data/seoPages";
 
 export async function generateStaticParams() {
   return cities.map((city) => ({
@@ -14,24 +15,52 @@ export async function generateMetadata({ params }) {
   
   if (!city) return {};
 
-  const title = `Best Courier Service in ${city.city} Near Me | Top Rated Delivery`;
-  const description = `Looking for the best courier service near you in ${city.city}? EngineersParcel provides fast doorstep pickup, affordable parcel delivery, and shifting across ${city.areas}, ${city.state}. Rated 4.8/5. Book now!`;
+  const seoConfig = priorityCities.find((c) => c.slug === citySlug);
+  const freePickup = seoConfig?.freePickup || false;
+  const pickupClaim = freePickup ? "Free Doorstep Pickup" : "Doorstep Pickup Booking";
+
+  let title = `Courier Service in ${city.city} | ${pickupClaim}`;
+  if (title.length > 60) {
+    title = `Courier in ${city.city} | ${pickupClaim}`;
+  }
+
+  // City-tailored meta description strictly under 155 chars with real local neighborhoods and CTA
+  let description;
+  if (city.slug === "dhanbad") {
+    description = `Book courier service in Dhanbad with ${freePickup ? "free doorstep pickup" : "doorstep pickup"}. Express delivery across Saraidhela, Bank More & Katras. Fast tracking. Book now!`;
+  } else if (city.slug === "bokaro") {
+    description = `Reliable courier service in Bokaro. Fast doorstep pickup across Sector 4, Sector 9, Chas & City Centre. Real-time parcel tracking. Book today!`;
+  } else if (city.slug === "giridih") {
+    description = `Trusted courier service in Giridih. Doorstep pickup across Bada Chowk, Makatpur, Pachamba & Station Road with live tracking. Book your delivery today!`;
+  } else if (city.slug === "hazaribagh") {
+    description = `Fast courier service in Hazaribagh. Doorstep parcel pickup across Korrah, Matwari, Babu Gaon & Canary Hill Road. Safe intercity shipping. Book now!`;
+  } else if (city.slug === "ranchi") {
+    description = `Best courier service in Ranchi. Doorstep pickup across Lalpur, Doranda, Harmu, Kanke & Morabadi with live tracking. Safe all-India delivery. Book now!`;
+  } else if (city.slug === "jamshedpur") {
+    description = `Express courier service in Jamshedpur. Doorstep parcel pickup across Bistupur, Sakchi, Telco, Kadma & NIT campus. Reliable live tracking. Book now!`;
+  } else if (city.slug === "asansol") {
+    description = `Top courier service in Asansol. Doorstep pickup across Burnpur, Ushagram, Court Area & Sen Raleigh Road. Fast intercity delivery with live tracking!`;
+  } else if (city.slug === "durgapur") {
+    description = `Express courier service in Durgapur. Doorstep pickup across City Centre, Benachity, Bidhannagar & NIT campus with 24/7 tracking. Book your parcel now!`;
+  } else {
+    description = `Reliable courier service in ${city.city}, ${city.state}. Fast doorstep pickup, express delivery across India, and real-time tracking. Book now!`;
+  }
 
   return {
-    title,
+    title: {
+      absolute: title,
+    },
     description,
     keywords: [
-      `best courier service near me`,
-      `courier service near me in ${city.city}`,
-      `best courier service in ${city.city}`,
-      `parcel delivery near me ${city.city}`,
-      `doorstep courier pickup near me`,
-      `same day courier near me in ${city.city}`,
+      `courier service near me`,
+      `courier service in ${city.city}`,
+      `parcel delivery in ${city.city}`,
+      `doorstep courier pickup ${city.city}`,
+      `same day courier ${city.city}`,
       `top courier service ${city.city}`,
       `best parcel delivery ${city.city}`,
       `reliable courier near me`,
       `trusted courier service ${city.city}`,
-      `#1 courier service ${city.city}`,
     ].join(', '),
     
     openGraph: {
@@ -46,7 +75,7 @@ export async function generateMetadata({ params }) {
           url: '/Delivery-boy.png',
           width: 1200,
           height: 630,
-          alt: `Best Courier Service in ${city.city} Near Me`,
+          alt: `Courier Service in ${city.city}`,
         },
       ],
     },
@@ -84,6 +113,21 @@ export default async function Page({ params }) {
     notFound();
   }
 
+  const seoConfig = priorityCities.find((c) => c.slug === citySlug) || {
+    freePickup: false,
+    pickupModel: "partner",
+    pickupPincodes: [],
+    pickupTAT: "TODO",
+    pickupTerms: "TODO",
+    isReady: false,
+  };
+
+  const cityWithSeo = {
+    ...city,
+    seoConfig,
+  };
+
+
   const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
@@ -92,8 +136,8 @@ export default async function Page({ params }) {
     address: {
       '@type': 'PostalAddress',
       streetAddress: '4th Floor, I2H Building, IIT (ISM)',
-      addressLocality: city.city,
-      addressRegion: city.state,
+      addressLocality: 'Dhanbad',
+      addressRegion: 'Jharkhand',
       postalCode: '826004',
       addressCountry: 'IN',
     },
@@ -187,7 +231,7 @@ export default async function Page({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <BestCourierClient city={city} />
+      <BestCourierClient city={cityWithSeo} />
     </>
   );
-}
+}

@@ -10,13 +10,30 @@ const nextConfig = {
   
 
   
-  // Rewrites for clean URLs
-  async rewrites() {
+  // 301 Permanent Redirects for URL canonicalization
+  async redirects() {
     return [
       {
         source: '/courier-service-in-:city',
-        destination: '/courier/:city',
+        destination: '/best-courier-service-in-:city',
+        statusCode: 301,
       },
+      {
+        source: '/courier/:city',
+        destination: '/best-courier-service-in-:city',
+        statusCode: 301,
+      },
+      {
+        source: '/best-courier-service-in/:city',
+        destination: '/best-courier-service-in-:city',
+        statusCode: 301,
+      },
+    ];
+  },
+
+  // Rewrites for clean hyphenated URLs
+  async rewrites() {
+    return [
       {
         source: '/best-courier-service-in-:city',
         destination: '/best-courier-service-in/:city',
