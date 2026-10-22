@@ -20,7 +20,7 @@ export const metadata = {
     template: "%s | EngineersParcel",
   },
   description:
-    "Send courier & parcel anywhere in India across 19,000+ pincodes. EngineersParcel provides doorstep pickup, transparent prices, OneBox heavy luggage (₹799 up to 30kg), student campus parcel delivery, and live tracking.",
+    "Send courier & parcel anywhere in India with EngineersParcel. Transparent prices, OneBox heavy luggage (₹799 up to 30kg), student campus parcel delivery, and live tracking.",
   keywords: [
     "pan india courier service",
     "best courier service in india",
@@ -49,9 +49,6 @@ export const metadata = {
   authors: [{ name: "EngineersParcel", url: baseUrl }],
   creator: "EngineersParcel",
   publisher: "EngineersParcel",
-  alternates: {
-    canonical: "/",
-  },
   other: {
     "geo.region": "IN",
     "geo.placename": "India",
@@ -76,7 +73,7 @@ export const metadata = {
   openGraph: {
     title: "EngineersParcel | Smart Courier & Logistics Platform",
     description:
-      "India’s next-gen courier and logistics platform offering parcel delivery, campus logistics, shifting services, and real-time tracking across 19,000+ pincodes.",
+      "India’s next-gen courier and logistics platform offering parcel delivery, campus logistics, shifting services, and real-time tracking across India.",
     url: baseUrl,
     siteName: "EngineersParcel",
     images: [

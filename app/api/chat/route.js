@@ -10,29 +10,29 @@ Your goal is to assist customers politely, quickly, and accurately with shipping
 COMPANY KNOWLEDGE:
 - Company Name: EngineersParcel (Tagline: "Making Life Easy")
 - Headquarters: Police Line Rd, IIT (ISM), Sardar Patel Nagar, Dhanbad, Jharkhand - 826004
-- Founded by engineers from IIT (ISM) Dhanbad (Raj Chatterjee - Tech Head, Subham Sawarnkar - Strategy Head).
-- Coverage: Pan-India across 19,000+ pincodes with doorstep pickup and live tracking.
-- Contact: Phone/WhatsApp: +91 95258 01506 | Email: info.engineersparcel@gmail.com
+- Founded by engineers from IIT (ISM) Dhanbad.
+- Coverage: Pan-India delivery across serviceable pincodes with live tracking. Pickup availability depends on the pincode (check pincode at https://engineersparcel.in/pincode-checker).
+- Contact: Phone/WhatsApp: +91 95258 01506 | Email: info@engineersparcel.in
 - Main Website: https://engineersparcel.in
 
 SERVICES & EXACT PRICING:
 1. OneBox (For 10+ kg heavy shipments - pack anything that fits, zero volumetric weight confusion!):
    - Alpha Box: ₹799 flat rate (Dimensions: 42 × 42 × 27 cm, Capacity: Up to 30 kg). Ideal for clothes, books, essentials.
    - Nova Box: ₹1,599 flat rate (Dimensions: 60 × 35 × 40 cm, Capacity: Up to 60 kg). Ideal for heavy luggage, bulky belongings.
-   - Doorstep pickup included. Free sturdy box provided!
+   - Pickup availability depends on pincode. Sturdy box provided for OneBox shipments.
 
 2. Campus Parcel (Dedicated Student Logistics across India):
-   - Direct hostel room pickup! Students don't need to carry luggage down stairs or go to courier offices.
+   - Hostel pickup where serviceable.
    - SPECIAL RATES for IIT ISM Dhanbad:
      * Alpha Box: ₹599 (up to 30kg)
      * Nova Box: ₹1,149 (up to 75kg)
    - Other partner campuses: SNMMCH Dhanbad (Alpha ₹799, Nova ₹1599), BIT Mesra, NIT Jamshedpur, NIT Durgapur, etc.
 
 3. Standard Courier:
-   - For envelopes, small packets, and documents across 19,000+ pincodes in India.
+   - For envelopes, small packets, and documents across serviceable pincodes in India. Pickup availability depends on pincode.
 
 4. City Parcel:
-   - Same-day hyper-local express delivery within Dhanbad.
+   - Hyper-local package and document delivery within Dhanbad.
 
 RULES & BEHAVIOR:
 - Respond in the language the user speaks (English, Hindi, or Hinglish).
@@ -141,7 +141,7 @@ async function executeTool(name, args) {
         return { 
           serviceable: true, 
           pincode, 
-          note: "Standard delivery coverage via our Pan-India network (19,000+ pincodes)." 
+          note: "Standard delivery coverage via our Pan-India network." 
         };
       }
       const data = await res.json();
@@ -176,7 +176,7 @@ async function executeTool(name, args) {
       return {
         service: "General Courier",
         baseRate: "Starting at ₹150 for document/small parcel",
-        doorstepPickup: "Available across 19,000+ pincodes",
+        pickupAvailability: "Depends on pincode (verify at https://engineersparcel.in/pincode-checker)",
       };
     }
   } catch (err) {
@@ -215,31 +215,31 @@ function generateFallbackResponse(userMessage) {
   if (text.includes("pincode") || text.includes("deliver") || text.includes("area") || text.includes("service")) {
     const pinMatch = text.match(/\b\d{6}\b/);
     if (pinMatch) {
-      return `📍 **Pincode ${pinMatch[0]}** is covered under our Pan-India network (19,000+ pincodes)! We provide free doorstep pickup and safe transit. Would you like to book a parcel or calculate pricing?`;
+      return `📍 **Pincode ${pinMatch[0]}** is covered under our Pan-India network! Pickup availability depends on your pincode. Verify serviceability using our [Pincode Checker](https://engineersparcel.in/pincode-checker). Would you like to check rates or calculate pricing?`;
     }
-    return `📍 We deliver across **19,000+ pincodes Pan-India**! Share your 6-digit pincode or use our [Pincode Checker](https://engineersparcel.in/pincode-checker) to verify delivery speed.`;
+    return `📍 We deliver across India! Pickup availability depends on your pincode — please check our [Pincode Checker](https://engineersparcel.in/pincode-checker) to verify serviceability for your 6-digit pincode.`;
   }
 
   if (text.includes("campus") || text.includes("hostel") || text.includes("ism") || text.includes("student") || text.includes("college")) {
-    return `🎓 **Campus Parcel Service (India's #1 Campus Logistics):**\n\n` +
-      `• **Hostel Room Pickup:** We pick up right from your room — no dragging heavy luggage down stairs!\n` +
+    return `🎓 **Campus Parcel Service (Dedicated Student Logistics):**\n\n` +
+      `• **Hostel Pickup:** Available in serviceable campus areas.\n` +
       `• **IIT ISM Special Rates:** Alpha Box @ **₹599** (30kg) | Nova Box @ **₹1,149** (75kg)\n` +
-      `• Free sturdy packaging boxes provided upfront.\n\n` +
+      `• Sturdy packaging boxes provided upfront for OneBox shipments.\n\n` +
       `Ready to book? Visit [Campus Parcel Booking](https://engineersparcel.in/campus-parcel) or tap to chat with us on WhatsApp!`;
   }
 
   if (text.includes("contact") || text.includes("human") || text.includes("support") || text.includes("phone") || text.includes("call") || text.includes("whatsapp")) {
     return `📞 **Reach EngineersParcel Support:**\n\n` +
       `• **Phone / WhatsApp:** [+91 95258 01506](tel:+919525801506)\n` +
-      `• **Email:** [info.engineersparcel@gmail.com](mailto:info.engineersparcel@gmail.com)\n` +
+      `• **Email:** [info@engineersparcel.in](mailto:info@engineersparcel.in)\n` +
       `• **HQ:** Police Line Rd, IIT (ISM), Dhanbad, Jharkhand\n\n` +
-      `Our team is available Monday to Saturday, 9:00 AM – 8:00 PM!`;
+      `Feel free to message us on WhatsApp or call our support line!`;
   }
 
   return `👋 Hi there! I am **ENZEE AI**, your EngineersParcel AI Assistant.\n\nI can help you with:\n` +
     `• 📦 **Tracking your parcel** (just give your booking ID)\n` +
     `• 💰 **Checking shipping rates** (OneBox ₹799 / Campus rates)\n` +
-    `• 📍 **Pincode serviceability** (19,000+ pincodes)\n` +
+    `• 📍 **Pincode serviceability** (Pan-India delivery)\n` +
     `• 🎓 **Hostel & campus luggage shifting**\n\nWhat can I help you ship today?`;
 }
 

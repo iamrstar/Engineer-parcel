@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "EngineersParcel collaborates with industry-leading courier and freight networks across India to deliver seamless multi-carrier logistics and optimal shipping routes.",
   alternates: {
-    canonical: "/our-partners",
+    canonical: "https://engineersparcel.in/our-partners",
   },
   openGraph: {
     title: "Logistics Partners & Network | EngineersParcel",

@@ -1,15 +1,17 @@
 export const metadata = {
-  title: "Track Parcel & Courier Status Online",
+  title: {
+    absolute: "Track Parcel Online | Live Tracking | EngineersParcel",
+  },
   description:
-    "Track your EngineersParcel shipment live. Enter your Tracking ID / AWB number to check real-time courier location, shipment transit history, and estimated delivery date.",
+    "Track your EngineersParcel shipment live in real time. Enter your Tracking ID or mobile number to view journey updates, or book your next parcel pickup.",
   alternates: {
-    canonical: "/track-order",
+    canonical: "https://engineersparcel.in/track-order",
   },
   openGraph: {
-    title: "Live Parcel Tracking | EngineersParcel",
+    title: "Track Parcel Online | Live Courier Tracking | EngineersParcel",
     description:
-      "Instant real-time tracking for your courier shipments. Know exactly where your package is at every step.",
-    url: "/track-order",
+      "Track your EngineersParcel shipment live in real time. Enter your Tracking ID or mobile number to view journey updates, or book your next parcel pickup.",
+    url: "https://engineersparcel.in/track-order",
   },
 };
 

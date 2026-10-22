@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Book parcel delivery online with free doorstep pickup. Transparent rates, fast delivery across India, instant online payment via Razorpay, and live SMS/WhatsApp updates.",
   alternates: {
-    canonical: "/booking",
+    canonical: "https://engineersparcel.in/booking",
   },
   openGraph: {
     title: "Book Courier Online | Doorstep Pickup - EngineersParcel",

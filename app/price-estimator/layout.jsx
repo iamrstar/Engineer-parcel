@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Calculate parcel shipping charges instantly. Get accurate courier rates across India by weight, dimensions, and destination pincode with no hidden fees.",
   alternates: {
-    canonical: "/price-estimator",
+    canonical: "https://engineersparcel.in/price-estimator",
   },
   openGraph: {
     title: "Instant Courier Price Estimator | EngineersParcel",

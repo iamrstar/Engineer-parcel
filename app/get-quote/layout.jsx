@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Request an instant quote for parcel delivery, commercial freight, student luggage shifting, or home relocation. Custom pricing tailored to your logistics requirements.",
   alternates: {
-    canonical: "/get-quote",
+    canonical: "https://engineersparcel.in/get-quote",
   },
   openGraph: {
     title: "Instant Logistics & Courier Quote | EngineersParcel",

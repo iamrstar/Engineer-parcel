@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from "react"
 import useSWR from "swr"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Package, Truck, Building2, MapPin, CheckCircle2, Check, Search, ArrowLeft, ArrowRight, Clock, ShieldCheck } from "lucide-react"
+import { Package, Truck, Building2, MapPin, CheckCircle2, Check, Search, ArrowLeft, ArrowRight, Clock, ShieldCheck, Calculator, MessageCircle } from "lucide-react"
 
 const PRIMARY = "#eb5a0c"
 const API = process.env.NEXT_PUBLIC_API_URL
@@ -516,6 +517,67 @@ function TrackContent() {
             </CardContent>
           </Card>
         )}
+
+        {/* ══════════ NEXT PARCEL? BOOK PICKUP CTA ══════════ */}
+        <section className="mt-14 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-950 to-orange-950 border border-white/10 p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 max-w-3xl mx-auto text-center space-y-5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold tracking-wide border border-orange-500/30">
+              <Package className="w-3.5 h-3.5" />
+              <span>NEED TO SEND ANOTHER PARCEL?</span>
+            </div>
+            
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              Next parcel? Book pickup in under 60 seconds.
+            </h2>
+            
+            <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
+              Fast, dependable courier service across India. Doorstep pickup where serviceable, transparent pricing, and live WhatsApp tracking.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+              <Button
+                asChild
+                size="lg"
+                className="w-full sm:w-auto bg-orange-600 hover:bg-orange-500 text-white font-bold text-sm px-7 py-6 rounded-2xl shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Link href="/booking?source=Track%20Order">
+                  <span>Book Pickup Now</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border-white/20 hover:border-white/40 font-semibold text-sm px-6 py-6 rounded-2xl backdrop-blur-md transition-all flex items-center justify-center gap-2"
+              >
+                <Link href="/price-estimator?source=Track%20Order">
+                  <Calculator className="w-4 h-4 text-orange-400" />
+                  <span>Check Shipping Rates</span>
+                </Link>
+              </Button>
+
+              <a
+                href={`https://wa.me/919525801506?text=${encodeURIComponent("Hi EngineersParcel, I want to book a pickup for my next parcel (Source: Track Order)")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-sm font-semibold transition-all"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp Desk</span>
+              </a>
+            </div>
+
+            <p className="text-xs text-slate-400 pt-1">
+              Zero advance payment needed • Check pincode serviceability at{" "}
+              <Link href="/pincode-checker" className="text-orange-400 underline hover:text-orange-300">
+                /pincode-checker
+              </Link>
+            </p>
+          </div>
+        </section>
       </div>
     </main>
   )

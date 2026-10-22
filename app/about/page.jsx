@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { BUSINESS_INFO } from "@/src/data/business";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,8 +64,8 @@ export default function AboutPage() {
                   <Package className="w-5 h-5" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Total Volume</p>
-                  <p className="text-xl font-black text-gray-900">7000+tons</p>
+                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Customer Rating</p>
+                  <p className="text-xl font-black text-gray-900">{BUSINESS_INFO.ratingText} Google</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white shadow-xl shadow-gray-200/50 border border-gray-100">
@@ -72,8 +73,8 @@ export default function AboutPage() {
                   <Users className="w-5 h-5" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Pincodes</p>
-                  <p className="text-xl font-black text-gray-900">19,000+</p>
+                  <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Delivery Reach</p>
+                  <p className="text-xl font-black text-gray-900">Pan-India</p>
                 </div>
               </div>
             </div>
@@ -119,7 +120,7 @@ export default function AboutPage() {
               {
                 year: "2024",
                 title: "National Reach",
-                desc: "Scaled to cover 19,000+ pincodes across Tier-2 and Tier-3 cities, handling over 7,000kg+ volume monthly.",
+                desc: "Expanded delivery reach across Tier-2 and Tier-3 cities through integrated national logistics network partners.",
                 icon: <Globe className="w-6 h-6 text-white" />
               },
               {

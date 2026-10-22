@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const INITIAL_MESSAGE = {
   role: "assistant",
-  content: `👋 **Hi! I am ENZEE AI**, your EngineersParcel AI Assistant.\n\nI can help you with:\n• 📦 **Live tracking** for your active parcel\n• 💰 **Instant shipping rates** (OneBox Alpha ₹799 / Nova ₹1599)\n• 🎓 **Hostel & campus shifting** (IIT ISM rates ₹599 & ₹1149)\n• 📍 **Pincode serviceability** across 19,000+ codes\n\nHow can I help you today?`,
+  content: `👋 **Hi! I am ENZEE AI**, your EngineersParcel AI Assistant.\n\nI can help you with:\n• 📦 **Live tracking** for your active parcel\n• 💰 **Instant shipping rates** (OneBox Alpha ₹799 / Nova ₹1599)\n• 🎓 **Hostel & campus shifting** (IIT ISM rates ₹599 & ₹1149)\n• 📍 **Pincode serviceability** across India\n\nHow can I help you today?`,
 };
 
 const SUGGESTIONS = [

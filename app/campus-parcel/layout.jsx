@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Specialized campus courier service built by students for students. Door-to-hostel parcel delivery, semester luggage shipping, and safe bicycle relocation at student-friendly rates.",
   alternates: {
-    canonical: "/campus-parcel",
+    canonical: "https://engineersparcel.in/campus-parcel",
   },
   openGraph: {
     title: "Campus Parcel & Student Logistics | EngineersParcel",

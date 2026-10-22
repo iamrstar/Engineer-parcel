@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Review the terms and conditions for booking courier, parcel delivery, freight, and luggage shifting services with Engineers Parcel Pvt. Ltd.",
   alternates: {
-    canonical: "/terms",
+    canonical: "https://engineersparcel.in/terms",
   },
   robots: {
     index: true,
