@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Learn about EngineersParcel, founded at IIT (ISM) Dhanbad. Redefining Indian logistics with 7000+ tons handled, 19,000+ serviceable pincodes, and engineer-driven courier solutions.",
   alternates: {
-    canonical: "/about",
+    canonical: "https://engineersparcel.in/about",
   },
   openGraph: {
     title: "About EngineersParcel | Born at IIT Dhanbad, Built for India",

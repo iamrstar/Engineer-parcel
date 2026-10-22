@@ -49,9 +49,6 @@ export const metadata = {
   authors: [{ name: "EngineersParcel", url: baseUrl }],
   creator: "EngineersParcel",
   publisher: "EngineersParcel",
-  alternates: {
-    canonical: "/",
-  },
   other: {
     "geo.region": "IN",
     "geo.placename": "India",

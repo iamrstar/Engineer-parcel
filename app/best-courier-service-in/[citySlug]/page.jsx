@@ -91,8 +91,10 @@ export default async function Page({ params }) {
     description: `Top-rated courier service in ${city.city}, ${city.state}. Doorstep pickup across ${city.areas}.`,
     address: {
       '@type': 'PostalAddress',
+      streetAddress: '4th Floor, I2H Building, IIT (ISM)',
       addressLocality: city.city,
       addressRegion: city.state,
+      postalCode: '826004',
       addressCountry: 'IN',
     },
     areaServed: {
@@ -101,12 +103,27 @@ export default async function Page({ params }) {
     },
     serviceType: 'Courier and Parcel Delivery Service',
     priceRange: '₹₹',
-    telephone: '+91-9525801506',
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '1250',
-    },
+    telephone: ['+91-9708815717', '+91-9525801506'],
+    email: 'info@engineersparcel.in',
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://engineersparcel.in',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: `Courier Service in ${city.city}`,
+        item: `https://engineersparcel.in/best-courier-service-in-${city.slug}`,
+      },
+    ],
   };
 
   const faqSchema = {
@@ -115,18 +132,42 @@ export default async function Page({ params }) {
     mainEntity: [
       {
         '@type': 'Question',
-        name: `Which is the best courier service near me in ${city.city}?`,
+        name: `How do I book a courier pickup in ${city.city}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `EngineersParcel is rated the best courier service in ${city.city}, offering quick doorstep parcel pickup across ${city.areas}, affordable rates, and express delivery to 19,000+ pincodes in India.`,
+          text: `Booking takes under 60 seconds! Click Book Doorstep Pickup, enter your address in ${city.city}, select package type (or OneBox), and an executive will arrive directly at your doorstep.`,
         },
       },
       {
         '@type': 'Question',
-        name: `How do I book a doorstep courier pickup in ${city.city}?`,
+        name: `What are the courier charges for shipping from ${city.city}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `You can book online at EngineersParcel. Enter your pickup address in ${city.city}, select package weight, and an executive will arrive at your door for instant parcel collection.`,
+          text: `OneBox Alpha starts at ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg) with zero volumetric calculation tricks. Standard envelopes match or beat market courier rates.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Do you provide packing boxes and tape in ${city.city}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Yes! When you book our OneBox or campus luggage shifting service, our executive brings a free, heavy-duty 7-ply corrugated box and tape directly to your home or hostel room.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Do you pick up from college hostel rooms in ${city.city}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Absolutely! We specialize in student logistics and pick up directly from your hostel room floor so you never have to lug heavy bags down stairs.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `How can I track my shipment once picked up from ${city.city}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `You receive an instant SMS and WhatsApp confirmation with your live Tracking ID upon pickup. You can track your parcel 24/7 on engineersparcel.in/track-order.`,
         },
       },
     ],
@@ -137,6 +178,10 @@ export default async function Page({ params }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <script
         type="application/ld+json"

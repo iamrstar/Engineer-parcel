@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Check if EngineersParcel delivers to your pincode. We serve 19,000+ Indian pincodes across metros, Tier-2, and Tier-3 cities with doorstep pickup and express courier delivery.",
   alternates: {
-    canonical: "/pincode-checker",
+    canonical: "https://engineersparcel.in/pincode-checker",
   },
   openGraph: {
     title: "Check Delivery Pincode Availability | EngineersParcel",

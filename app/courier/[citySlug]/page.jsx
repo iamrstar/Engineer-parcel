@@ -59,14 +59,14 @@ export async function generateMetadata({ params }) {
     },
     
     alternates: {
-      canonical: `https://engineersparcel.in/courier-service-in-${city.slug}`,
+      canonical: `https://engineersparcel.in/best-courier-service-in-${city.slug}`,
     },
     
     robots: {
-      index: true,
+      index: false,
       follow: true,
       googleBot: {
-        index: true,
+        index: false,
         follow: true,
         'max-video-preview': -1,
         'max-image-preview': 'large',
@@ -92,8 +92,10 @@ export default async function Page({ params }) {
     description: `Fast and reliable courier service in ${city.city}, ${city.state}`,
     address: {
       '@type': 'PostalAddress',
+      streetAddress: '4th Floor, I2H Building, IIT (ISM)',
       addressLocality: city.city,
       addressRegion: city.state,
+      postalCode: '826004',
       addressCountry: 'IN',
     },
     areaServed: {
@@ -101,7 +103,9 @@ export default async function Page({ params }) {
       name: city.city,
     },
     serviceType: 'Courier Service',
-    priceRange: '$$',
+    priceRange: '₹₹',
+    telephone: ['+91-9708815717', '+91-9525801506'],
+    email: 'info@engineersparcel.in',
   };
 
   return (

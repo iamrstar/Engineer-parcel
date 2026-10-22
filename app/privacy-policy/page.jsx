@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Learn how EngineersParcel protects and handles your personal information, booking details, and payment transactions securely.",
   alternates: {
-    canonical: "/privacy-policy",
+    canonical: "https://engineersparcel.in/privacy-policy",
   },
   robots: {
     index: true,

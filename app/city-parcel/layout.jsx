@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Fast, reliable intra-city parcel and document delivery service in Dhanbad and regional hubs. Doorstep pickup and guaranteed same-day delivery with live rider tracking.",
   alternates: {
-    canonical: "/city-parcel",
+    canonical: "https://engineersparcel.in/city-parcel",
   },
   openGraph: {
     title: "Same-Day City Parcel Delivery | EngineersParcel",

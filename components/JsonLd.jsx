@@ -13,14 +13,14 @@ export default function JsonLd() {
     image: `${baseUrl}/og-image.png`,
     description:
       'Engineers Parcel is the best rated courier service in Dhanbad and across India with free doorstep parcel pickup, affordable shipping across 19,000+ pincodes, and real-time live tracking.',
-    telephone: '+91-9525801506',
-    email: 'info.engineersparcel@gmail.com',
+    telephone: ['+91-9708815717', '+91-9525801506'],
+    email: 'info@engineersparcel.in',
     priceRange: '₹₹',
     currenciesAccepted: 'INR',
     paymentAccepted: 'Cash, Credit Card, UPI, Net Banking, Razorpay',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Police Line Rd, IIT (ISM), Sardar Patel Nagar',
+      streetAddress: '4th Floor, I2H Building, IIT (ISM)',
       addressLocality: 'Dhanbad',
       addressRegion: 'Jharkhand',
       postalCode: '826004',
@@ -32,13 +32,6 @@ export default function JsonLd() {
       longitude: '86.4412',
     },
     hasMap: 'https://maps.google.com/?q=Engineers+Parcel+Dhanbad',
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.7',
-      reviewCount: '111',
-      bestRating: '5',
-      worstRating: '1',
-    },
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',

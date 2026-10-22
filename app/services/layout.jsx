@@ -3,7 +3,7 @@ export const metadata = {
   description:
     "Explore EngineersParcel services: Domestic courier, same-day city delivery in Dhanbad, campus luggage shifting, packers & movers, and B2B freight with real-time tracking.",
   alternates: {
-    canonical: "/services",
+    canonical: "https://engineersparcel.in/services",
   },
   openGraph: {
     title: "Logistics & Courier Services | EngineersParcel",
