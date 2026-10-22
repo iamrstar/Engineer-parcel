@@ -107,7 +107,7 @@ export default function ServicesPage() {
           icon={<Package className="w-8 h-8" />}
           title="National Courier"
           subtitle="Fast, Safe, and Smarter."
-          desc="Our AI-driven courier network ensures your documents and packages are delivered across 19,000+ pin codes with unshakeable reliability."
+          desc="Our integrated courier network ensures your documents and packages are delivered pan-India with dependable transit and live tracking."
           features={[
             "Express transit for critical shipments",
             "End-to-end automated hub tracking",

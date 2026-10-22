@@ -6,13 +6,13 @@ export default function JsonLd() {
     '@type': 'LocalBusiness',
     '@id': `${baseUrl}/#localbusiness`,
     name: 'Engineers Parcel',
-    legalName: 'Engineers Parcel Pvt. Ltd.',
+    legalName: 'SRQ Engineers Parcel and Haul Private Limited',
     alternateName: 'EngineersParcel Courier & Logistics',
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     image: `${baseUrl}/og-image.png`,
     description:
-      'Engineers Parcel is the best rated courier service in Dhanbad and across India with free doorstep parcel pickup, affordable shipping across 19,000+ pincodes, and real-time live tracking.',
+      'Engineers Parcel provides reliable courier and logistics solutions in Dhanbad and across India with affordable shipping and real-time live tracking.',
     telephone: ['+91-9708815717', '+91-9525801506'],
     email: 'info@engineersparcel.in',
     priceRange: '₹₹',
@@ -32,21 +32,6 @@ export default function JsonLd() {
       longitude: '86.4412',
     },
     hasMap: 'https://maps.google.com/?q=Engineers+Parcel+Dhanbad',
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday',
-        ],
-        opens: '09:00',
-        closes: '20:00',
-      },
-    ],
     areaServed: [
       {
         '@type': 'Country',
@@ -77,23 +62,6 @@ export default function JsonLd() {
         name: 'Delhi',
       },
     ],
-    founders: [
-      {
-        '@type': 'Person',
-        name: 'Raj Chatterjee',
-        jobTitle: 'Technology Head',
-      },
-      {
-        '@type': 'Person',
-        name: 'Subham Sawarnkar',
-        jobTitle: 'Co-Founder & Strategy Head',
-      },
-    ],
-    sameAs: [
-      'https://www.linkedin.com/company/engineersparcel',
-      'https://www.instagram.com/engineersparcel',
-      'https://twitter.com/engineersparcel',
-    ],
   };
 
   const serviceSchema = {
@@ -101,9 +69,8 @@ export default function JsonLd() {
     '@type': 'DeliveryService',
     name: 'EngineersParcel Courier & Logistics Services',
     provider: {
-      '@type': 'Organization',
-      name: 'EngineersParcel',
-      url: baseUrl,
+      '@type': 'LocalBusiness',
+      '@id': `${baseUrl}/#localbusiness`,
     },
     areaServed: {
       '@type': 'Country',
@@ -111,22 +78,22 @@ export default function JsonLd() {
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'Courier & Logistics Solutions Near You',
+      name: 'Courier & Logistics Solutions',
       itemListElement: [
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Doorstep Courier Pickup & Delivery Near Me',
-            description: 'Free doorstep parcel collection and fast delivery across 19,000+ pincodes in India.',
+            name: 'Doorstep Courier Pickup & Delivery',
+            description: 'Doorstep parcel collection and delivery across India.',
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Same-Day City Parcel Service Near Me',
-            description: 'Intra-city express courier service for urgent parcels, food, and documents.',
+            name: 'City Parcel Delivery',
+            description: 'Intra-city parcel service for packages and documents.',
           },
         },
         {
@@ -134,58 +101,19 @@ export default function JsonLd() {
           itemOffered: {
             '@type': 'Service',
             name: 'Campus Logistics & Student Luggage Shifting',
-            description: 'Hostel-to-home luggage, cycles, and book delivery built specifically for university students.',
+            description: 'Luggage, cycles, and book delivery built for university students.',
           },
         },
         {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Service',
-            name: 'Packers & Movers Shifting Services Near Me',
-            description: 'Affordable, secure household and office relocation with verified moving specialists.',
+            name: 'Packers & Movers Shifting Services',
+            description: 'Household and office relocation services.',
           },
         },
       ],
     },
-  };
-
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'Which is the best courier service near me with doorstep pickup?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'EngineersParcel is recognized as one of the best courier services near you, offering free doorstep parcel pickup, affordable per-kg rates, and coverage across 19,000+ Indian pincodes with live tracking.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How do I send a parcel from home near me?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Simply visit engineersparcel.in/booking, enter your pickup address and destination pincode, select the package weight, and an EngineersParcel pickup executive will collect the package from your doorstep.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Does EngineersParcel provide same-day courier service near me?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes! We provide same-day local city delivery in Dhanbad and select cities, alongside express 1-3 day intercity courier service across India.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Can college students ship luggage from their hostel room?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes, EngineersParcel specializes in campus logistics, picking up luggage, cartons, and bicycles directly from college hostel rooms and delivering them safely to home addresses across India.',
-        },
-      },
-    ],
   };
 
   const websiteSchema = {

@@ -8,7 +8,7 @@ export const metadata = {
   openGraph: {
     title: "Logistics & Courier Services | EngineersParcel",
     description:
-      "Doorstep parcel pickup, express delivery, student logistics, and shifting solutions across 19,000+ pincodes in India.",
+      "Doorstep parcel pickup, express delivery, student logistics, and shifting solutions across India.",
     url: "/services",
   },
 };

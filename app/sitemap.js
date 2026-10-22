@@ -2,9 +2,8 @@ import cities from "@/src/data/cities";
 
 export default function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://engineersparcel.in';
-  const now = new Date();
 
-  // Core static pages with tailored priorities and frequencies
+  // Core indexable public pages (no noindex or auth routes)
   const staticPages = [
     { route: '', priority: 1.0, changeFrequency: 'daily' },
     { route: '/services', priority: 0.9, changeFrequency: 'weekly' },
@@ -23,26 +22,16 @@ export default function sitemap() {
     { route: '/privacy-policy', priority: 0.4, changeFrequency: 'yearly' },
   ].map(({ route, priority, changeFrequency }) => ({
     url: `${baseUrl}${route}`,
-    lastModified: now,
     changeFrequency,
     priority,
   }));
 
-  // Dynamic city courier service pages
-  const cityPages = (cities || []).map(city => ({
-    url: `${baseUrl}/courier-service-in-${city.slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: 0.85,
-  }));
-
-  // Best courier service in city pages
-  const bestCourierPages = (cities || []).map(city => ({
+  // Canonical city landing pages (clean hyphenated URLs only; no /courier/ or /courier-service-in- URLs)
+  const bestCourierPages = (cities || []).map((city) => ({
     url: `${baseUrl}/best-courier-service-in-${city.slug}`,
-    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.85,
   }));
 
-  return [...staticPages, ...cityPages, ...bestCourierPages];
+  return [...staticPages, ...bestCourierPages];
 }

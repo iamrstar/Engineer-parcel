@@ -13,28 +13,36 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BookNowModal from "@/components/BookNowModal";
+import { BUSINESS_INFO } from "@/src/data/business";
 
-export default function BestCourierClient({ city }) {
+export default function BestCourierClient({ city, faqList }) {
   const [isBookNowOpen, setIsBookNowOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("pincode"); // 'pincode' | 'onebox'
   const [pincodeInput, setPincodeInput] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState(null); // null | { loading, result, error }
   const [expandedFaq, setExpandedFaq] = useState(0);
 
+  const isDhanbad = city.slug === "dhanbad";
   const seoConfig = city.seoConfig || {};
   const isFreePickup = Boolean(seoConfig.freePickup);
-  const isPartner = seoConfig.pickupModel === "partner";
-  const pickupClaim = isFreePickup ? "Free Doorstep Pickup" : "Doorstep Pickup Booking";
-  const pickupCtaText = isFreePickup ? "Book Free Pickup" : "Book Doorstep Pickup";
-  const pickupTerms = seoConfig.pickupTerms && seoConfig.pickupTerms !== "TODO"
-    ? seoConfig.pickupTerms
-    : "Doorstep collection subject to serviceable pincode verification and standard booking guidelines.";
+  const isPartner = seoConfig.pickupModel === "partner" || !isDhanbad;
+
+  const headlineSub = isDhanbad 
+    ? "Doorstep Pickup & Pan-India Delivery" 
+    : "Online Courier Booking & All-India Delivery";
+
+  const checklistClaim = isDhanbad 
+    ? (isFreePickup ? "Free Doorstep Pickup" : "Doorstep Pickup Booking")
+    : "Partner Network Pickup";
+
+  const pickupCtaText = isDhanbad
+    ? (isFreePickup ? "Book Free Pickup" : "Book Doorstep Pickup")
+    : "Get a Quote Online";
 
   // Parse localities from comma separated string
   const localityList = city.areas 
     ? city.areas.split(",").map((a) => a.trim()).filter(Boolean)
     : ["City Centre", "Main Market", "Station Road", "College Campus"];
-
 
   const handleCheckPincode = async (codeToCheck) => {
     const code = codeToCheck || pincodeInput;
@@ -64,7 +72,7 @@ export default function BestCourierClient({ city }) {
           },
         });
       } else {
-        // Fallback: 19,000+ pincodes are serviceable across India
+        // Fallback: nationwide coverage across India
         setPincodeStatus({
           loading: false,
           result: {
@@ -91,28 +99,46 @@ export default function BestCourierClient({ city }) {
     }
   };
 
-  const faqs = [
-    {
-      q: `How do I book a courier pickup in ${city.city}?`,
-      a: `Booking takes under 60 seconds! Click "Book Doorstep Pickup" on this page, enter your address in ${city.city}, select package type (or OneBox), and choose your preferred pickup slot. Our verified delivery executive will arrive directly at your doorstep.`,
-    },
-    {
-      q: `What are the courier charges for shipping from ${city.city}?`,
-      a: `We offer India's most transparent pricing. For heavy personal luggage, our OneBox Alpha starts at just ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg) with zero volumetric calculation tricks. For standard documents and smaller parcels, rates match or beat standard market courier charges.`,
-    },
-    {
-      q: `Do you provide packing boxes and tape in ${city.city}?`,
-      a: `Yes! When you book our OneBox or campus luggage shifting service, our executive brings a free, heavy-duty 7-ply corrugated box and industrial adhesive tape directly to your home or hostel room.`,
-    },
-    {
-      q: `Do you pick up from college hostel rooms in ${city.city}?`,
-      a: `Absolutely! We specialize in student logistics. If you are studying at ${city.city} (such as ${localityList.find(l => l.toLowerCase().includes("campus") || l.toLowerCase().includes("iit") || l.toLowerCase().includes("nit")) || "local colleges"}), our executives climb directly to your hostel room floor so you never have to lug heavy bags down stairs.`,
-    },
-    {
-      q: `How can I track my shipment once picked up from ${city.city}?`,
-      a: `You receive an instant SMS and WhatsApp confirmation with your live Tracking ID upon pickup. You can track your parcel 24/7 on engineersparcel.in/track-order or simply ask our AI Assistant (ENZEE AI) right on our website!`,
-    },
-  ];
+  const defaultFaqs = isDhanbad
+    ? [
+        {
+          q: `How do I book a courier pickup in Dhanbad?`,
+          a: `Booking takes under 60 seconds online. Enter your pickup address in Dhanbad, select package type or OneBox, and our executive will arrive at your doorstep.`,
+        },
+        {
+          q: `What are the courier charges for shipping from Dhanbad?`,
+          a: `We offer transparent flat rates. OneBox Alpha starts at ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg). Standard parcels and documents match standard courier rates.`,
+        },
+        {
+          q: `Do you pick up from student hostels in IIT (ISM) Dhanbad?`,
+          a: `Yes! We provide campus logistics and pick up directly from hostel rooms at IIT (ISM) Dhanbad so students do not need to carry luggage down stairs.`,
+        },
+        {
+          q: `How can I track my shipment once picked up from Dhanbad?`,
+          a: `You receive an instant confirmation with your tracking ID upon pickup. You can track your parcel journey 24/7 on engineersparcel.in/track-order.`,
+        },
+      ]
+    : [
+        {
+          q: `How do I send a parcel from ${city.city}?`,
+          a: `Booking takes under 60 seconds online. We coordinate parcel pickup via our partner network across serviceable pincodes in ${city.city}.`,
+        },
+        {
+          q: `What are the courier charges for shipping from ${city.city}?`,
+          a: `We offer competitive rates for parcels and interstate box shipments across India. Use our online price estimator to get an instant quote.`,
+        },
+        {
+          q: `How do I check if my pincode in ${city.city} is serviceable?`,
+          a: `Enter your 6-digit pincode in our online Pincode Checker at engineersparcel.in/pincode-checker to verify serviceability before booking.`,
+        },
+        {
+          q: `How can I track my shipment from ${city.city}?`,
+          a: `You receive a tracking ID with live journey updates on WhatsApp and 24/7 tracking at engineersparcel.in/track-order.`,
+        },
+      ];
+
+  const faqs = faqList || defaultFaqs;
+
 
   return (
     <div className="relative min-h-screen bg-white text-slate-900 selection:bg-orange-500 selection:text-white">
@@ -127,11 +153,13 @@ export default function BestCourierClient({ city }) {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span className="font-semibold text-white">Live in {city.city}, {city.state}:</span>
-            <span className="text-slate-300 hidden sm:inline">Pickup Executives Active Now • 2-Hour Window Guarantee</span>
+            <span className="text-slate-300 hidden sm:inline">
+              {isDhanbad ? "Pickup Active • IIT ISM Campus Hub" : "Fast Booking • Delivery Across India"}
+            </span>
           </div>
           <div className="flex items-center gap-4 text-slate-400">
             <span className="flex items-center gap-1 font-medium text-amber-400">
-              <Star className="w-3.5 h-3.5 fill-amber-400" /> 4.8/5 on Google Reviews
+              <Star className="w-3.5 h-3.5 fill-amber-400" /> {BUSINESS_INFO.rating}/5 on Google Reviews
             </span>
             <a 
               href="tel:+919525801506" 
@@ -165,7 +193,7 @@ export default function BestCourierClient({ city }) {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-                <span>#1 Rated Courier & Luggage Service in {city.city}</span>
+                <span>Courier & Luggage Delivery Service</span>
               </div>
 
               {/* Main Headline */}
@@ -175,16 +203,15 @@ export default function BestCourierClient({ city }) {
                   {city.city}
                 </span>
                 <span className="block text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-300 mt-2">
-                  {pickupClaim} & Pan-India Delivery
+                  {headlineSub}
                 </span>
               </h1>
 
               {/* Subtitle */}
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed">
-                Skip carrying heavy luggage to crowded courier counters in {city.city}. 
-                {isPartner 
-                  ? ` Book online in 60 seconds — pickup via our partner network across serviceable pincodes with flat pricing and live tracking to 19,000+ destinations across India.`
-                  : ` Book online in 60 seconds — our verified executive picks up from your home, office, or hostel room with flat pricing and live tracking to 19,000+ pincodes.`
+                {isDhanbad 
+                  ? "Skip carrying heavy luggage to crowded courier counters in Dhanbad. Book online in 60 seconds — our verified executive picks up from your home, office, or hostel room with flat pricing and live tracking across India."
+                  : `Courier from ${city.city} with pickup via our partner network, live WhatsApp tracking and all-India delivery. Get a quote today.`
                 }
               </p>
 
@@ -192,7 +219,7 @@ export default function BestCourierClient({ city }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-200 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>{pickupClaim}</span>
+                  <span>{checklistClaim}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-200 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -209,7 +236,7 @@ export default function BestCourierClient({ city }) {
                 <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3.5 py-2 rounded-xl">
                   <MapPin className="w-4 h-4 shrink-0 text-amber-400" />
                   <span>Pickup via our partner network across serviceable pincodes.</span>
-                  <a href="#pincode-checker" className="underline font-semibold hover:text-white ml-auto">Check Pincode</a>
+                  <Link href="/pincode-checker" className="underline font-semibold hover:text-white ml-auto">Check Pincode</Link>
                 </div>
               )}
 
@@ -237,7 +264,7 @@ export default function BestCourierClient({ city }) {
                 </Button>
 
                 <a
-                  href="https://wa.me/919525801506?text=Hi%20EngineersParcel,%20I%20want%20to%20book%20a%20courier%20pickup%20in%20"
+                  href={`https://wa.me/919525801506?text=${encodeURIComponent(`Hi EngineersParcel, I want to book a courier pickup in ${city.city} (Source: City Page)`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-sm font-semibold transition-all"
@@ -248,15 +275,23 @@ export default function BestCourierClient({ city }) {
               </div>
 
               {/* Pickup Terms Visibly Displayed Near CTA */}
-              <div className="text-[11px] text-slate-400 pt-1">
-                <span className="font-semibold text-slate-300">Pickup Terms: </span>
-                {pickupTerms}
+              <div className="text-xs text-slate-400 pt-1 flex items-center gap-1.5 flex-wrap">
+                {seoConfig.pickupTerms && seoConfig.pickupTerms !== "TODO" ? (
+                  <span><strong className="text-slate-300">Pickup Terms:</strong> {seoConfig.pickupTerms}</span>
+                ) : (
+                  <>
+                    <span>Pickup availability depends on your pincode.</span>
+                    <Link href="/pincode-checker" className="text-orange-400 underline font-medium hover:text-orange-300">
+                      Check Pincode
+                    </Link>
+                  </>
+                )}
               </div>
 
               {/* Trust Subtext */}
               <p className="text-xs text-slate-400 flex items-center gap-1.5 pt-0.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>100% Insured • Free Cancellation • No Prepayment Required for Pickup</span>
+                <span>100% Insured • Free Cancellation • No Prepayment Required for Booking</span>
               </p>
             </motion.div>
 
@@ -449,7 +484,16 @@ export default function BestCourierClient({ city }) {
 
                     <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-[11px] text-orange-300 flex items-center gap-2">
                       <GraduationCap className="w-4 h-4 shrink-0 text-orange-400" />
-                      <span>Free heavy-duty corrugated box + Doorstep hostel/home collection included.</span>
+                      <span>{isDhanbad ? "Heavy-duty corrugated box + Doorstep collection in Dhanbad." : "All-India flat rate parcel delivery via partner network."}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs px-1">
+                      <Link href={`/price-estimator?source=city-${city.slug}`} className="text-orange-400 hover:text-orange-300 underline font-medium flex items-center gap-1">
+                        <Calculator className="w-3.5 h-3.5" /> Price Estimator
+                      </Link>
+                      <Link href={`/get-quote?source=city-${city.slug}`} className="text-slate-300 hover:text-white underline font-medium flex items-center gap-1">
+                        Get Custom Quote →
+                      </Link>
                     </div>
 
                     <Button
@@ -471,35 +515,35 @@ export default function BestCourierClient({ city }) {
       <section className="relative z-20 -mt-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl shadow-slate-900/10 border border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-orange-600 font-black text-3xl sm:text-4xl">
-              <span>1,250</span><span className="text-orange-500">+</span>
+            <div className="flex items-center justify-center gap-1.5 text-orange-600 font-black text-2xl sm:text-3xl">
+              <span>IIT (ISM)</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-slate-700">Parcels Handled in {city.city}</p>
-            <p className="text-[11px] text-slate-400 font-medium">Verified local deliveries</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-700">Incubated Venture</p>
+            <p className="text-[11px] text-slate-400 font-medium">IIT (ISM) Dhanbad Centre for Innovation</p>
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-slate-900 font-black text-3xl sm:text-4xl">
-              <span>19,000</span><span className="text-orange-500">+</span>
+            <div className="flex items-center justify-center gap-1.5 text-slate-900 font-black text-2xl sm:text-3xl">
+              <span>All-India</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-slate-700">Pincodes Connected</p>
-            <p className="text-[11px] text-slate-400 font-medium">Pan-India express reach</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-700">Delivery Reach</p>
+            <p className="text-[11px] text-slate-400 font-medium">Metros & Tier 2/3 cities nationwide</p>
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-slate-900 font-black text-3xl sm:text-4xl">
-              <span>4.8</span><span className="text-amber-500 text-2xl">★</span>
+            <div className="flex items-center justify-center gap-1.5 text-slate-900 font-black text-2xl sm:text-3xl">
+              <span>{BUSINESS_INFO.rating}</span><span className="text-amber-500 text-xl">★</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-slate-700">Customer Rating</p>
-            <p className="text-[11px] text-slate-400 font-medium">Over 1,000+ happy reviews</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-700">Google Rating</p>
+            <p className="text-[11px] text-slate-400 font-medium">{BUSINESS_INFO.reviewsLabel}</p>
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center justify-center gap-1.5 text-emerald-600 font-black text-3xl sm:text-4xl">
-              <span>&lt; 2</span><span className="text-emerald-500 text-2xl font-bold">Hrs</span>
+            <div className="flex items-center justify-center gap-1.5 text-emerald-600 font-black text-2xl sm:text-3xl">
+              <span>Live</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-slate-700">Pickup Turnaround</p>
-            <p className="text-[11px] text-slate-400 font-medium">Fastest in {city.city}</p>
+            <p className="text-xs sm:text-sm font-semibold text-slate-700">WhatsApp Tracking</p>
+            <p className="text-[11px] text-slate-400 font-medium">Real-time parcel status alerts</p>
           </div>
         </div>
       </section>
@@ -544,17 +588,17 @@ export default function BestCourierClient({ city }) {
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-orange-100/60 text-xs text-orange-950 font-medium">
-                  📦 <strong>Dimensions:</strong> 42 × 42 × 27 cm • Heavy-duty 7-ply corrugated box provided free!
+                  📦 <strong>Dimensions:</strong> 42 × 42 × 27 cm • {isDhanbad ? "Heavy-duty 7-ply corrugated box provided!" : "Standard box shipping guidelines"}
                 </div>
 
                 <ul className="space-y-3 text-sm text-slate-700">
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Free doorstep pickup from any address in {city.city}</span>
+                    <span>{isFreePickup ? "Free doorstep pickup from your address" : (isDhanbad ? "Doorstep pickup in Dhanbad" : "Pickup coordinated via partner network")}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Direct hostel room pickup (campus friendly)</span>
+                    <span>{isDhanbad ? "Direct hostel room pickup at IIT (ISM)" : "Convenient doorstep collection"}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -598,13 +642,13 @@ export default function BestCourierClient({ city }) {
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-100 text-xs text-slate-800 font-medium">
-                  📦 <strong>Dimensions:</strong> 60 × 35 × 40 cm • Industrial strength reinforced packaging!
+                  📦 <strong>Dimensions:</strong> 60 × 35 × 40 cm • {isDhanbad ? "Reinforced packaging provided!" : "Heavy parcel specifications"}
                 </div>
 
                 <ul className="space-y-3 text-sm text-slate-700">
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Free doorstep pickup across {city.city} & suburbs</span>
+                    <span>{isFreePickup ? "Free doorstep pickup across suburbs" : (isDhanbad ? "Doorstep pickup across Dhanbad" : "Pickup coordinated via partner network")}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -612,7 +656,7 @@ export default function BestCourierClient({ city }) {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Direct doorstep delivery to 19,000+ pincodes in India</span>
+                    <span>Direct doorstep delivery across India</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -831,7 +875,10 @@ export default function BestCourierClient({ city }) {
               <ul className="space-y-4 text-sm text-slate-200">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Free Doorstep Pickup:</strong> Executive arrives directly at your door in {city.city}.</span>
+                  <span>
+                    <strong>{isDhanbad ? "Doorstep Pickup:" : "Pickup Support:"}</strong>{" "}
+                    {isDhanbad ? "Executive arrives directly at your door in Dhanbad." : "Pickup coordinated via partner network across serviceable pincodes."}
+                  </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
@@ -839,7 +886,10 @@ export default function BestCourierClient({ city }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Free Sturdy Boxes:</strong> Heavy-duty corrugated boxes and tape brought to you.</span>
+                  <span>
+                    <strong>{isDhanbad ? "Sturdy Packaging:" : "Secure Packaging:"}</strong>{" "}
+                    {isDhanbad ? "Heavy-duty corrugated boxes and tape brought to you." : "Guidelines and support for safe transit packaging."}
+                  </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
@@ -847,7 +897,10 @@ export default function BestCourierClient({ city }) {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Direct Hostel Room Pickup:</strong> Full student campus assistance.</span>
+                  <span>
+                    <strong>{isDhanbad ? "Direct Hostel Room Pickup:" : "Student Friendly:"}</strong>{" "}
+                    {isDhanbad ? "Full campus assistance at IIT (ISM) Dhanbad." : "Luggage and book parcel shipping across India."}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -865,7 +918,7 @@ export default function BestCourierClient({ city }) {
               ))}
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900">
-              Trusted by 1000+ Customers in {city.city}
+              What Our Customers Say
             </h2>
             <p className="text-slate-600 text-base">
               Real feedback from students, working professionals, and families who shipped with us.
@@ -1005,7 +1058,10 @@ export default function BestCourierClient({ city }) {
           </h2>
 
           <p className="text-base sm:text-lg text-orange-100 max-w-xl mx-auto leading-relaxed">
-            Schedule your pickup in under 60 seconds. Our verified executive brings free boxes, seals, and live tracking to your door.
+            {isDhanbad 
+              ? "Schedule your pickup in under 60 seconds. Our verified executive brings sturdy boxes, seals, and live tracking to your door."
+              : "Book your parcel in under 60 seconds. Safe shipping, verified partner pickup, and live WhatsApp tracking across India."
+            }
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
@@ -1028,13 +1084,21 @@ export default function BestCourierClient({ city }) {
 
           {isPartner && (
             <p className="text-xs text-orange-200">
-              Doorstep pickup in {city.city} via our partner network across serviceable pincodes.
+              Pickup in {city.city} via our partner network across serviceable pincodes.
             </p>
           )}
 
-          <div className="text-[11px] text-orange-200/90 max-w-lg mx-auto">
-            <span className="font-semibold text-white">Pickup Terms: </span>
-            {pickupTerms}
+          <div className="text-xs text-orange-100 max-w-lg mx-auto flex items-center justify-center gap-1.5 pt-1 flex-wrap">
+            {seoConfig.pickupTerms && seoConfig.pickupTerms !== "TODO" ? (
+              <span><strong>Pickup Terms:</strong> {seoConfig.pickupTerms}</span>
+            ) : (
+              <>
+                <span>Pickup availability depends on your pincode.</span>
+                <Link href="/pincode-checker" className="text-white underline font-semibold hover:text-orange-100">
+                  Check Pincode
+                </Link>
+              </>
+            )}
           </div>
 
           <p className="text-xs text-orange-100 font-medium pt-1">

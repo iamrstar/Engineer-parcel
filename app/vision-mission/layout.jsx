@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Vision & Mission - Driving Indian Logistics Forward | EngineersParcel",
   description:
-    "Learn about our vision and mission at EngineersParcel: To provide accessible, transparent, and technology-driven logistics solutions across 19,000+ pincodes in India.",
+    "Learn about our vision and mission at EngineersParcel: To provide accessible, transparent, and technology-driven logistics solutions across India.",
   alternates: {
     canonical: "https://engineersparcel.in/vision-mission",
   },

@@ -15,36 +15,23 @@ export async function generateMetadata({ params }) {
   
   if (!city) return {};
 
-  const seoConfig = priorityCities.find((c) => c.slug === citySlug);
-  const freePickup = seoConfig?.freePickup || false;
-  const pickupClaim = freePickup ? "Free Doorstep Pickup" : "Doorstep Pickup Booking";
+  const isDhanbad = city.slug === "dhanbad";
 
-  let title = `Courier Service in ${city.city} | ${pickupClaim}`;
+  // Titles: restore "Best Courier Service in {City}" as lead phrase. Max 60 chars.
+  // Dhanbad: "Best Courier Service in Dhanbad | Doorstep Pickup" (49 chars)
+  // Other 7 & partner cities: "Best Courier Service in {City} | Get a Quote Online" (<= 60 chars)
+  let title = isDhanbad 
+    ? "Best Courier Service in Dhanbad | Doorstep Pickup"
+    : `Best Courier Service in ${city.city} | Get a Quote Online`;
+
   if (title.length > 60) {
-    title = `Courier in ${city.city} | ${pickupClaim}`;
+    title = `Best Courier in ${city.city} | Get a Quote Online`;
   }
 
-  // City-tailored meta description strictly under 155 chars with real local neighborhoods and CTA
-  let description;
-  if (city.slug === "dhanbad") {
-    description = `Book courier service in Dhanbad with ${freePickup ? "free doorstep pickup" : "doorstep pickup"}. Express delivery across Saraidhela, Bank More & Katras. Fast tracking. Book now!`;
-  } else if (city.slug === "bokaro") {
-    description = `Reliable courier service in Bokaro. Fast doorstep pickup across Sector 4, Sector 9, Chas & City Centre. Real-time parcel tracking. Book today!`;
-  } else if (city.slug === "giridih") {
-    description = `Trusted courier service in Giridih. Doorstep pickup across Bada Chowk, Makatpur, Pachamba & Station Road with live tracking. Book your delivery today!`;
-  } else if (city.slug === "hazaribagh") {
-    description = `Fast courier service in Hazaribagh. Doorstep parcel pickup across Korrah, Matwari, Babu Gaon & Canary Hill Road. Safe intercity shipping. Book now!`;
-  } else if (city.slug === "ranchi") {
-    description = `Best courier service in Ranchi. Doorstep pickup across Lalpur, Doranda, Harmu, Kanke & Morabadi with live tracking. Safe all-India delivery. Book now!`;
-  } else if (city.slug === "jamshedpur") {
-    description = `Express courier service in Jamshedpur. Doorstep parcel pickup across Bistupur, Sakchi, Telco, Kadma & NIT campus. Reliable live tracking. Book now!`;
-  } else if (city.slug === "asansol") {
-    description = `Top courier service in Asansol. Doorstep pickup across Burnpur, Ushagram, Court Area & Sen Raleigh Road. Fast intercity delivery with live tracking!`;
-  } else if (city.slug === "durgapur") {
-    description = `Express courier service in Durgapur. Doorstep pickup across City Centre, Benachity, Bidhannagar & NIT campus with 24/7 tracking. Book your parcel now!`;
-  } else {
-    description = `Reliable courier service in ${city.city}, ${city.state}. Fast doorstep pickup, express delivery across India, and real-time tracking. Book now!`;
-  }
+  // Meta descriptions: max 150 chars, no "Fast"/"Express" claims. Locality lists only for Dhanbad.
+  const description = isDhanbad
+    ? "Courier service in Dhanbad with doorstep pickup across Saraidhela, Bank More, Hirapur and Katras. Live WhatsApp tracking. Get a quote today."
+    : `Courier from ${city.city} with pickup via our partner network, live WhatsApp tracking and all-India delivery. Get a quote today.`;
 
   return {
     title: {
@@ -55,12 +42,10 @@ export async function generateMetadata({ params }) {
       `courier service near me`,
       `courier service in ${city.city}`,
       `parcel delivery in ${city.city}`,
-      `doorstep courier pickup ${city.city}`,
-      `same day courier ${city.city}`,
-      `top courier service ${city.city}`,
-      `best parcel delivery ${city.city}`,
-      `reliable courier near me`,
-      `trusted courier service ${city.city}`,
+      `best courier service in ${city.city}`,
+      `parcel pickup ${city.city}`,
+      `courier booking ${city.city}`,
+      `reliable courier ${city.city}`,
     ].join(', '),
     
     openGraph: {
@@ -75,7 +60,7 @@ export async function generateMetadata({ params }) {
           url: '/Delivery-boy.png',
           width: 1200,
           height: 630,
-          alt: `Courier Service in ${city.city}`,
+          alt: `Best Courier Service in ${city.city}`,
         },
       ],
     },
@@ -113,9 +98,10 @@ export default async function Page({ params }) {
     notFound();
   }
 
+  const isDhanbad = city.slug === "dhanbad";
   const seoConfig = priorityCities.find((c) => c.slug === citySlug) || {
     freePickup: false,
-    pickupModel: "partner",
+    pickupModel: isDhanbad ? "own" : "partner",
     pickupPincodes: [],
     pickupTAT: "TODO",
     pickupTerms: "TODO",
@@ -127,28 +113,21 @@ export default async function Page({ params }) {
     seoConfig,
   };
 
-
-  const localBusinessSchema = {
+  // Item 7: City pages: replace per-city LocalBusiness with a Service node referencing global LocalBusiness
+  const serviceSchema = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: `EngineersParcel - Best Courier Service in ${city.city}`,
-    description: `Top-rated courier service in ${city.city}, ${city.state}. Doorstep pickup across ${city.areas}.`,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: '4th Floor, I2H Building, IIT (ISM)',
-      addressLocality: 'Dhanbad',
-      addressRegion: 'Jharkhand',
-      postalCode: '826004',
-      addressCountry: 'IN',
+    '@type': 'Service',
+    name: `Courier Service in ${city.city}`,
+    description: `Courier and parcel delivery service in ${city.city}, ${city.state}.`,
+    provider: {
+      '@type': 'LocalBusiness',
+      '@id': 'https://engineersparcel.in/#localbusiness',
     },
     areaServed: {
       '@type': 'City',
       name: city.city,
     },
     serviceType: 'Courier and Parcel Delivery Service',
-    priceRange: '₹₹',
-    telephone: ['+91-9708815717', '+91-9525801506'],
-    email: 'info@engineersparcel.in',
   };
 
   const breadcrumbSchema = {
@@ -170,58 +149,63 @@ export default async function Page({ params }) {
     ],
   };
 
+  // Item 8: FAQ schema text must match visible on-page FAQ text and not claim hostel pickup / free box for partner cities
+  const faqList = isDhanbad
+    ? [
+        {
+          q: `How do I book a courier pickup in Dhanbad?`,
+          a: `Booking takes under 60 seconds online. Enter your pickup address in Dhanbad, select package type or OneBox, and our executive will arrive at your doorstep.`,
+        },
+        {
+          q: `What are the courier charges for shipping from Dhanbad?`,
+          a: `We offer transparent flat rates. OneBox Alpha starts at ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg). Standard parcels and documents match standard courier rates.`,
+        },
+        {
+          q: `Do you pick up from student hostels in IIT (ISM) Dhanbad?`,
+          a: `Yes! We provide campus logistics and pick up directly from hostel rooms at IIT (ISM) Dhanbad so students do not need to carry luggage down stairs.`,
+        },
+        {
+          q: `How can I track my shipment once picked up from Dhanbad?`,
+          a: `You receive an instant confirmation with your tracking ID upon pickup. You can track your parcel journey 24/7 on engineersparcel.in/track-order.`,
+        },
+      ]
+    : [
+        {
+          q: `How do I send a parcel from ${city.city}?`,
+          a: `Booking takes under 60 seconds online. We coordinate parcel pickup via our partner network across serviceable pincodes in ${city.city}.`,
+        },
+        {
+          q: `What are the courier charges for shipping from ${city.city}?`,
+          a: `We offer competitive rates for parcels and interstate box shipments across India. Use our online price estimator to get an instant quote.`,
+        },
+        {
+          q: `How do I check if my pincode in ${city.city} is serviceable?`,
+          a: `Enter your 6-digit pincode in our online Pincode Checker at engineersparcel.in/pincode-checker to verify serviceability before booking.`,
+        },
+        {
+          q: `How can I track my shipment from ${city.city}?`,
+          a: `You receive a tracking ID with live journey updates on WhatsApp and 24/7 tracking at engineersparcel.in/track-order.`,
+        },
+      ];
+
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: `How do I book a courier pickup in ${city.city}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Booking takes under 60 seconds! Click Book Doorstep Pickup, enter your address in ${city.city}, select package type (or OneBox), and an executive will arrive directly at your doorstep.`,
-        },
+    mainEntity: faqList.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
       },
-      {
-        '@type': 'Question',
-        name: `What are the courier charges for shipping from ${city.city}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `OneBox Alpha starts at ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg) with zero volumetric calculation tricks. Standard envelopes match or beat market courier rates.`,
-        },
-      },
-      {
-        '@type': 'Question',
-        name: `Do you provide packing boxes and tape in ${city.city}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Yes! When you book our OneBox or campus luggage shifting service, our executive brings a free, heavy-duty 7-ply corrugated box and tape directly to your home or hostel room.`,
-        },
-      },
-      {
-        '@type': 'Question',
-        name: `Do you pick up from college hostel rooms in ${city.city}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Absolutely! We specialize in student logistics and pick up directly from your hostel room floor so you never have to lug heavy bags down stairs.`,
-        },
-      },
-      {
-        '@type': 'Question',
-        name: `How can I track my shipment once picked up from ${city.city}?`,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `You receive an instant SMS and WhatsApp confirmation with your live Tracking ID upon pickup. You can track your parcel 24/7 on engineersparcel.in/track-order.`,
-        },
-      },
-    ],
+    })),
   };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
       />
       <script
         type="application/ld+json"
@@ -231,7 +215,7 @@ export default async function Page({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <BestCourierClient city={cityWithSeo} />
+      <BestCourierClient city={cityWithSeo} faqList={faqList} />
     </>
   );
-}
+}

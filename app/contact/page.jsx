@@ -222,7 +222,7 @@ export default function ContactPage() {
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">What areas do you service?</h3>
               <p className="text-gray-600">
-                We deliver to over 19,000 pin codes across India and offer international shipping to 200+ countries.
+                We deliver across India through our partner carrier networks and provide international shipping to major global destinations.
               </p>
             </div>
 
