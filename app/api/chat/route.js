@@ -19,7 +19,7 @@ SERVICES & EXACT PRICING:
 1. OneBox (For 10+ kg heavy shipments - pack anything that fits, zero volumetric weight confusion!):
    - Alpha Box: ₹799 flat rate (Dimensions: 42 × 42 × 27 cm, Capacity: Up to 30 kg). Ideal for clothes, books, essentials.
    - Nova Box: ₹1,599 flat rate (Dimensions: 60 × 35 × 40 cm, Capacity: Up to 60 kg). Ideal for heavy luggage, bulky belongings.
-   - Pickup availability depends on pincode. Sturdy box provided for OneBox shipments.
+   - BOX SUPPLY AVAILABILITY: Physical box delivery facility is exclusively available for Dhanbad pincodes (826001, 826004, 826005, 828127, etc.). For all other pincodes across India, BYOB (Bring Your Own Box) applies: customers pack in their own sturdy carton/box, and Engineers Parcel picks it up from their doorstep at the flat rate!
 
 2. Campus Parcel (Dedicated Student Logistics across India):
    - Hostel pickup where serviceable.
@@ -169,6 +169,7 @@ async function executeTool(name, args) {
           service: "OneBox Flat Rate",
           alphaBox: { name: "Alpha Box", price: 799, capacity: "Up to 30 kg", dimensions: "42 × 42 × 27 cm" },
           novaBox: { name: "Nova Box", price: 1599, capacity: "Up to 60 kg", dimensions: "60 × 35 × 40 cm" },
+          boxFacility: "Empty box supply is available in Dhanbad pincodes (826001, 826004, 826005, 828127, etc.). For all other pincodes, BYOB (Bring Your Own Box) applies.",
           guarantee: "Zero volumetric weight calculation. If it fits, it ships at the flat rate!",
         };
       }
@@ -204,7 +205,7 @@ function generateFallbackResponse(userMessage) {
       `📦 **OneBox (Pan-India Doorstep Delivery):**\n` +
       `• **Alpha Box:** **₹799** (Up to 30 kg — 42 × 42 × 27 cm)\n` +
       `• **Nova Box:** **₹1,599** (Up to 60 kg — 60 × 35 × 40 cm)\n` +
-      `*No weighing tape or volumetric math needed! Pack whatever fits up to the weight limit.*\n\n` +
+      `*Box supply available in Dhanbad (826001, 826004, etc.). Other pincodes use BYOB (Bring Your Own Box) with doorstep pickup!*\n\n` +
       `🎓 **IIT ISM Dhanbad Campus Special:**\n` +
       `• **Alpha Box:** **₹599** (Up to 30 kg)\n` +
       `• **Nova Box:** **₹1,149** (Up to 75 kg)\n` +

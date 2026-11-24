@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import AnimatedBox3D from "@/components/AnimatedBox3D"
+import { isDhanbadPincode, DHANBAD_PINCODES_EXAMPLES } from "@/src/data/business"
 
 import Maintenance from "@/components/Maintenance"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
@@ -176,6 +177,9 @@ export default function CityParcelPage() {
         phone: "",
         email: "",
         hostelAddress: "",
+        pickupPincode: "826004",
+        pickupCity: "Dhanbad",
+        pickupState: "Jharkhand",
         destPincode: "",
         destCity: "",
         destState: "",
@@ -186,7 +190,7 @@ export default function CityParcelPage() {
         packagingType: null, // null | 'own' | 'preferred'
         packagingDate: "",
         packagingSlot: "",
-        pickupType: "self", // 'self' (Hub) or 'delivered' (Doorstep)
+        pickupType: "delivered", // 'self' (Hub) or 'delivered' (Doorstep)
         pickupDate: "",
         pickupSlot: "Morning (9 AM - 12 PM)",
         itemValue: "",
@@ -196,6 +200,57 @@ export default function CityParcelPage() {
     const [deliveryDays, setDeliveryDays] = useState("")
     const [edlValue, setEdlValue] = useState(0)
     const [showEdlWarning, setShowEdlWarning] = useState(false)
+
+    // ─── Dhanbad vs Non-Dhanbad (BYOB) Calculation ───
+    const isDhanbadPickup = useMemo(() => {
+        return isDhanbadPincode(formData.pickupPincode, formData.pickupCity)
+    }, [formData.pickupPincode, formData.pickupCity])
+
+    // For non-Dhanbad pincodes, physical box delivery is not available -> auto-enforce BYOB ('own')
+    useEffect(() => {
+        if (!isDhanbadPickup) {
+            setFormData(prev => ({
+                ...prev,
+                packagingType: 'own',
+                pickupType: 'delivered',
+            }))
+        }
+    }, [isDhanbadPickup])
+
+    // Auto-resolve city/state for pickup pincode
+    useEffect(() => {
+        const pin = String(formData.pickupPincode || "").trim()
+        if (!/^\d{6}$/.test(pin)) return
+
+        if (isDhanbadPincode(pin)) {
+            setFormData(prev => ({
+                ...prev,
+                pickupCity: "Dhanbad",
+                pickupState: "Jharkhand",
+            }))
+            return
+        }
+
+        const fetchPickupLoc = async () => {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/pincode/check/${pin}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.data?.city) {
+                        setFormData(prev => ({
+                            ...prev,
+                            pickupCity: data.data.city || prev.pickupCity,
+                            pickupState: data.data.state || prev.pickupState,
+                        }))
+                    }
+                }
+            } catch {
+                // Keep existing user values on fetch error
+            }
+        }
+        const debounce = setTimeout(fetchPickupLoc, 400)
+        return () => clearTimeout(debounce)
+    }, [formData.pickupPincode])
 
     // ─── Pincode Check State ───
     const [pincodeStatus, setPincodeStatus] = useState(null) // null | "checking" | "serviceable" | "not-serviceable"
@@ -425,12 +480,14 @@ export default function CityParcelPage() {
 
     // ─── Form Validation ───
     const isFormValid = () => {
+        const pickupPincodeValid = formData.pickupPincode && /^\d{6}$/.test(String(formData.pickupPincode).trim());
         const basicInfoValid = 
             formData.name &&
             formData.phone &&
             /^\d{10}$/.test(formData.phone) &&
             formData.email &&
             formData.hostelAddress &&
+            pickupPincodeValid &&
             formData.destPincode &&
             pincodeStatus === "serviceable" &&
             formData.destAddress &&
@@ -440,7 +497,7 @@ export default function CityParcelPage() {
             (formData.itemValue && Number(formData.itemValue) > 0 && Number(formData.itemValue) <= 49000);
 
         const packagingValid = 
-            formData.packagingType && (formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot));
+            !isDhanbadPickup || formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot);
 
         const pickupValid = 
             formData.pickupType && formData.pickupDate && formData.pickupSlot;
@@ -504,9 +561,9 @@ export default function CityParcelPage() {
                                 email: formData.email,
                                 address: formData.hostelAddress,
                                 landmark: "", 
-                                pincode: "826004", 
-                                city: "Dhanbad",
-                                state: "Jharkhand",
+                                pincode: formData.pickupPincode || "826004", 
+                                city: isDhanbadPickup ? "Dhanbad" : (formData.pickupCity || "Other"),
+                                state: formData.pickupState || "Jharkhand",
                             },
                             receiverDetails: {
                                 name: formData.receiverName,
@@ -531,9 +588,9 @@ export default function CityParcelPage() {
                                 optInsurance: formData.optInsurance,
                                 insuranceCharges: pricingSummary.insurance
                             },
-                            boxDeliveryType: formData.packagingType === 'preferred' ? 'delivered' : 'self',
-                            boxDeliveryDate: formData.packagingDate,
-                            boxDeliverySlot: formData.packagingSlot,
+                            boxDeliveryType: isDhanbadPickup && formData.packagingType === 'preferred' ? 'delivered' : 'self',
+                            boxDeliveryDate: isDhanbadPickup ? formData.packagingDate : "",
+                            boxDeliverySlot: isDhanbadPickup ? formData.packagingSlot : "",
                             pickupMethod: formData.pickupType === 'delivered' ? 'doorstep' : 'hub',
                             pickupDate: formData.pickupDate,
                             pickupSlot: formData.pickupSlot,
@@ -545,7 +602,7 @@ export default function CityParcelPage() {
                                 tax: pricingSummary.tax,
                                 totalAmount: pricingSummary.total,
                             },
-                            notes: `OneBox Booking — ${fullItemSummary}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
+                            notes: `OneBox Booking (${isDhanbadPickup ? "Dhanbad Box Delivery" : "BYOB - Bring Your Own Box"}) — ${fullItemSummary}. Razorpay Payment ID: ${response.razorpay_payment_id}`,
                         }
 
                         // 4. Verify payment AND confirm booking in ONE call
@@ -768,9 +825,69 @@ export default function CityParcelPage() {
 
                                 <Card className="glass shadow-2xl overflow-hidden border-0">
                                     <CardContent className="p-8 space-y-6">
+                                        {/* Pickup Pincode (From Where) */}
                                         <div className="space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="text-gray-700 font-bold flex items-center gap-2">
+                                                    <MapPin className="w-4 h-4 text-orange-600" /> Pickup Pincode (From)
+                                                </Label>
+                                                {/^\d{6}$/.test(String(formData.pickupPincode).trim()) && (
+                                                    isDhanbadPickup ? (
+                                                        <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                            <Package className="w-3 h-3" /> Box Delivery Available
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                            <Package className="w-3 h-3" /> BYOB Active
+                                                        </span>
+                                                    )
+                                                )}
+                                            </div>
+                                            <Input
+                                                name="pickupPincode"
+                                                value={formData.pickupPincode}
+                                                onChange={handleChange}
+                                                placeholder="e.g. 826004"
+                                                maxLength={6}
+                                                className="h-14 text-xl tracking-[0.2em] font-black text-center border-2 border-gray-100 focus:border-orange-500 bg-white"
+                                            />
+
+                                            {/* Dynamic Pickup Pincode Status */}
+                                            {/^\d{6}$/.test(String(formData.pickupPincode).trim()) && (
+                                                isDhanbadPickup ? (
+                                                    <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-start gap-3 shadow-sm">
+                                                        <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0">
+                                                            <CheckCircle className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="text-xs">
+                                                            <p className="font-black text-green-900">Dhanbad Pincode: Box Delivery Available!</p>
+                                                            <p className="text-green-700 font-medium mt-0.5">
+                                                                We deliver empty 7-ply heavy-duty OneBoxes directly to your address or campus hub in Dhanbad ({formData.pickupPincode}).
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 flex items-start gap-3 shadow-sm">
+                                                        <div className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0">
+                                                            <AlertTriangle className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="text-xs">
+                                                            <p className="font-black text-amber-950">
+                                                                BYOB (Bring Your Own Box) Active for {formData.pickupCity || "your location"}
+                                                            </p>
+                                                            <p className="text-amber-800 font-medium mt-0.5 leading-relaxed">
+                                                                Box supply facility is available only for Dhanbad pincodes ({DHANBAD_PINCODES_EXAMPLES.join(", ")}, etc.). For pincode <strong>{formData.pickupPincode}</strong>, please <strong>Bring Your Own Box (BYOB)</strong> — pack your items in your own sturdy carton/box, and we will pick it up from your doorstep!
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+
+                                        {/* Destination Pincode (To Where) */}
+                                        <div className="space-y-3 pt-2 border-t border-gray-100">
                                             <Label className="text-gray-700 font-bold flex items-center gap-2">
-                                                <MapPin className="w-4 h-4 text-orange-600" /> Destination Pincode
+                                                <MapPin className="w-4 h-4 text-orange-600" /> Destination Pincode (To)
                                             </Label>
                                             <div className="relative">
                                                 <Input
@@ -923,7 +1040,7 @@ export default function CityParcelPage() {
                                                     setStep(1)
                                                 }
                                             }}
-                                            disabled={pincodeStatus !== "serviceable" || (edlValue > 0 && edlStage !== 3)}
+                                            disabled={pincodeStatus !== "serviceable" || !/^\d{6}$/.test(String(formData.pickupPincode).trim()) || (edlValue > 0 && edlStage !== 3)}
                                             className="w-full bg-gradient-premium h-14 text-lg font-black shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:grayscale"
                                         >
                                             {edlValue > 0 && edlStage < 3 ? (
@@ -975,6 +1092,26 @@ export default function CityParcelPage() {
                                     </div>
                                 </div>
 
+                                {/* BYOB Banner when shipping from non-Dhanbad pincodes */}
+                                {!isDhanbadPickup && (
+                                    <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-lg shadow-amber-500/5">
+                                        <div className="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-black text-2xl shadow-md">
+                                            🛍️
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h3 className="font-black text-amber-950 text-lg">Bring Your Own Box (BYOB) Active</h3>
+                                                <span className="text-[10px] bg-amber-200 text-amber-950 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                                    Pickup Pincode: {formData.pickupPincode} {formData.pickupCity ? `• ${formData.pickupCity}` : ""}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs sm:text-sm text-amber-900 leading-relaxed font-medium">
+                                                Empty box supply is available only for Dhanbad pincodes ({DHANBAD_PINCODES_EXAMPLES.join(", ")}, etc.). For your location, please <strong>pack your items in your own sturdy carton or box</strong> matching the weight limit. We will pick up the packed parcel directly from your doorstep!
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* ───── STANDARD BOX SELECTOR ───── */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {BOX_TYPES.map((box) => (
@@ -1003,7 +1140,11 @@ export default function CityParcelPage() {
                                             </div>
                                             <CardContent className="p-6 space-y-5">
                                                 <div className="space-y-1">
-                                                    <p className="text-sm text-gray-700 font-medium leading-relaxed">{box.description}</p>
+                                                    <p className="text-sm text-gray-700 font-medium leading-relaxed">
+                                                        {!isDhanbadPickup 
+                                                            ? `BYOB: Pack in your own sturdy box (up to ${box.id === 'flatbox' ? '30kg' : '60kg'}). Flat ₹${box.price} with doorstep pickup anywhere in India.`
+                                                            : box.description}
+                                                    </p>
                                                     <div className="flex items-center gap-1.5 group/info relative">
                                                         <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider">{box.capacity} (Volumetric)</p>
                                                         <Info className="w-3.5 h-3.5 text-gray-300 hover:text-orange-500 cursor-help transition-colors" />
@@ -1125,10 +1266,23 @@ export default function CityParcelPage() {
                                             <Button 
                                                 id="next-btn"
                                                 onClick={() => {
+                                                    // If non-Dhanbad pickup, box delivery is not available -> enforce BYOB ('own')
+                                                    if (!isDhanbadPickup) {
+                                                        setFormData(prev => ({ ...prev, packagingType: 'own', pickupType: 'delivered' }));
+                                                        const pickupValid = formData.pickupDate && formData.pickupSlot;
+                                                        if (pickupValid) {
+                                                            setStep(2);
+                                                        } else {
+                                                            setShowPickupPopup(true);
+                                                        }
+                                                        return;
+                                                    }
+
+                                                    // Dhanbad pickup flow
                                                     const packagingValid = formData.packagingType && (formData.packagingType === 'own' || (formData.packagingDate && formData.packagingSlot));
                                                     const pickupValid = formData.pickupType && formData.pickupDate && formData.pickupSlot;
                                                     
-                                                    const hasBoxes = quantities.alpha > 0 || quantities.nova > 0;
+                                                    const hasBoxes = (quantities.flatbox || 0) > 0 || (quantities.atlasbox || 0) > 0;
                                                     
                                                     if (packagingValid && pickupValid) {
                                                         setStep(2);
@@ -1215,15 +1369,72 @@ export default function CityParcelPage() {
                                         </div>
 
                                         <div className="space-y-4">
+                                            {/* Pickup Pincode & City */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                                            <MapPin className="w-4 h-4 text-orange-600" /> Pickup Pincode
+                                                        </Label>
+                                                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                                                            isDhanbadPickup ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-900"
+                                                        }`}>
+                                                            {isDhanbadPickup ? "Box Facility Active" : "BYOB Active"}
+                                                        </span>
+                                                    </div>
+                                                    <Input
+                                                        name="pickupPincode"
+                                                        value={formData.pickupPincode}
+                                                        onChange={handleChange}
+                                                        maxLength={6}
+                                                        placeholder="6-digit pickup pincode"
+                                                        className="h-12 border-2 focus:border-orange-500 font-bold"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                                        Pickup City / District
+                                                    </Label>
+                                                    <Input
+                                                        name="pickupCity"
+                                                        value={formData.pickupCity || (isDhanbadPickup ? "Dhanbad" : "")}
+                                                        onChange={handleChange}
+                                                        placeholder="City"
+                                                        className="h-12 border-2 bg-gray-50 focus:border-orange-500 font-bold"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Location notice badge */}
+                                            <div className={`p-3.5 rounded-2xl border text-xs flex items-start gap-3 ${
+                                                isDhanbadPickup ? "bg-green-50 border-green-200 text-green-900" : "bg-amber-50 border-amber-300 text-amber-950"
+                                            }`}>
+                                                {isDhanbadPickup ? (
+                                                    <>
+                                                        <CheckCircle className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <span className="font-black">Dhanbad Hub Area:</span> Empty box delivery and hub drop available in Dhanbad.
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <span className="font-black">Bring Your Own Box (BYOB):</span> Box supply is available only for Dhanbad pincodes ({DHANBAD_PINCODES_EXAMPLES.join(", ")}, etc.). For {formData.pickupCity || "your location"}, pack in your own sturdy carton/box — we will collect from your doorstep!
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                                    <MapPin className="w-4 h-4" /> Pickup Address (Dhanbad)
+                                                    <MapPin className="w-4 h-4" /> {isDhanbadPickup ? "Pickup Address (Dhanbad)" : `Pickup Address (${formData.pickupCity || "Doorstep Collection"})`}
                                                 </Label>
                                                 <Input
                                                     name="hostelAddress"
                                                     value={formData.hostelAddress}
                                                     onChange={handleChange}
-                                                    placeholder="Enter your complete pickup address"
+                                                    placeholder={isDhanbadPickup ? "Hostel name, room no., or complete Dhanbad address" : "House/Flat no., street, landmark for doorstep pickup"}
                                                     className="h-12 border-2 focus:border-orange-500"
                                                 />
                                             </div>
@@ -1645,28 +1856,29 @@ export default function CityParcelPage() {
                                                 </div>
                                                 <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
                                                     <p className="text-[10px] text-orange-400 uppercase tracking-widest font-black mb-1">Packaging & Pickup</p>
-                                                    <p className="font-bold text-orange-900 leading-tight">
-                                                        {formData.packagingType === 'preferred' ? (
-                                                            <span>
-                                                                📦 Preferred Box (<span className="line-through opacity-70">+₹39</span> <span className="text-green-600 font-black">Free</span>)
+                                                    <div className="font-bold text-orange-900 leading-tight">
+                                                        {isDhanbadPickup ? (
+                                                            formData.packagingType === 'preferred' ? (
+                                                                <span>
+                                                                    📦 Preferred Box (<span className="line-through opacity-70">+₹39</span> <span className="text-green-600 font-black">Free</span>)
+                                                                </span>
+                                                            ) : '🛍️ Own Packaging'
+                                                        ) : (
+                                                            <span className="text-amber-900 font-bold">
+                                                                🛍️ BYOB — Bring Your Own Box <span className="text-[10px] bg-amber-200 text-amber-950 px-1.5 py-0.5 rounded font-black ml-1">Own Box</span>
                                                             </span>
-                                                        ) : '🛍️ Own Packaging'}
-                                                    </p>
+                                                        )}
+                                                    </div>
                                                     <p className="font-bold text-orange-800 mt-1">
-                                                        {formData.pickupType === 'self' ? '📍 Drop at Hub' : (
+                                                        {formData.pickupType === 'self' ? '📍 Drop at Dhanbad Hub' : (
                                                             <span>
-                                                                🚚 Doorstep Pickup (<span className="line-through opacity-70">+₹29</span> <span className="text-green-600 font-black">Free</span>)
+                                                                🚚 Doorstep Pickup ({formData.pickupPincode}) (<span className="line-through opacity-70">+₹29</span> <span className="text-green-600 font-black">Free</span>)
                                                             </span>
                                                         )}
                                                     </p>
-                                                    {formData.packagingType && (
-                                                        <p className="text-orange-800 font-bold leading-tight mt-1">
-                                                            {formData.packagingType === 'own' ? '🛍️ Own Packaging' : '📦 Preferred Box'}
-                                                        </p>
-                                                    )}
-                                                    {formData.packagingType && formData.packagingType !== 'own' && (
+                                                    {isDhanbadPickup && formData.packagingType === 'preferred' && (
                                                         <p className="text-xs text-orange-700 font-medium mt-1 italic border-t pt-1 border-orange-200">
-                                                            {edlValue === 0 ? 'Box Delivery (Home): ' : 'Box Delivery (Home): '} {formData.packagingDate} ({formData.packagingSlot})
+                                                            Box Delivery (Home): {formData.packagingDate} ({formData.packagingSlot})
                                                         </p>
                                                     )}
                                                     {formData.pickupType && (
@@ -2034,34 +2246,44 @@ Please confirm my pickup! 🙏`;
                         >
                             <div className="bg-gradient-premium p-6 text-center text-white">
                                 <Truck className="w-10 h-10 mx-auto mb-3" />
-                                <h3 className="text-xl font-black">Step 2: Schedule Final Pickup 🚚</h3>
+                                <h3 className="text-xl font-black">
+                                    {isDhanbadPickup ? "Step 2: Schedule Final Pickup 🚚" : "Schedule Doorstep Pickup (BYOB) 🚚"}
+                                </h3>
                                 <div className="mt-2 mb-1 inline-block bg-white text-blue-600 text-[11px] font-black px-3 py-1.5 rounded-lg shadow-md uppercase tracking-wider">
-                                    Date to hand over your packed boxes
+                                    {isDhanbadPickup ? "Date to hand over your packed boxes" : "Date to hand over your packed carton"}
                                 </div>
                                 <p className="text-orange-50 text-xs mt-1 font-medium">
-                                    How would you like to dispatch your final packed shipment?
+                                    {isDhanbadPickup 
+                                        ? "How would you like to dispatch your final packed shipment?" 
+                                        : "Select your preferred date & time for doorstep pickup"}
                                 </p>
                             </div>
 
                             <div className="p-6 space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div
-                                        onClick={() => setFormData(prev => ({ ...prev, pickupType: 'self' }))}
-                                        className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.pickupType === 'self' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
-                                    >
-                                        <div className="text-3xl mb-2">📍</div>
-                                        <p className="font-black text-gray-900 text-sm">Drop to Hub</p>
-                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">Drop your package to our warehouse.</p>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest"></p>
-                                        <a href="https://maps.app.goo.gl/YourHubLocationLink" target="_blank" rel="noopener noreferrer" className="block text-[8px] mt-1 underline text-orange-600" onClick={(e) => e.stopPropagation()}>View Map</a>
-                                    </div>
+                                <div className={`grid ${isDhanbadPickup ? "grid-cols-2" : "grid-cols-1"} gap-4`}>
+                                    {isDhanbadPickup && (
+                                        <div
+                                            onClick={() => setFormData(prev => ({ ...prev, pickupType: 'self' }))}
+                                            className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.pickupType === 'self' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
+                                        >
+                                            <div className="text-3xl mb-2">📍</div>
+                                            <p className="font-black text-gray-900 text-sm">Drop to Hub</p>
+                                            <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">Drop your package to our Dhanbad warehouse.</p>
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Free</p>
+                                            <a href="https://maps.app.goo.gl/YourHubLocationLink" target="_blank" rel="noopener noreferrer" className="block text-[8px] mt-1 underline text-orange-600" onClick={(e) => e.stopPropagation()}>View Map</a>
+                                        </div>
+                                    )}
                                     <div
                                         onClick={() => setFormData(prev => ({ ...prev, pickupType: 'delivered' }))}
                                         className={`p-5 rounded-2xl border-2 text-center cursor-pointer transition-all ${formData.pickupType === 'delivered' ? "border-orange-500 bg-orange-50 shadow-md" : "border-gray-100 opacity-60 hover:opacity-100"}`}
                                     >
                                         <div className="text-3xl mb-2">🏠</div>
-                                        <p className="font-black text-gray-900 text-sm">Home Pickup</p>
-                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">We'll pick up your packed shipment from your home.</p>
+                                        <p className="font-black text-gray-900 text-sm">Doorstep Pickup</p>
+                                        <p className="text-[9px] text-gray-500 mt-1 mb-2 leading-tight">
+                                            {isDhanbadPickup 
+                                                ? "We'll pick up your packed shipment from your Dhanbad address."
+                                                : "We'll collect your packed carton (BYOB) directly from your doorstep."}
+                                        </p>
                                         <div className="flex flex-col items-center">
                                             <p className="text-[10px] text-gray-400 line-through font-bold uppercase tracking-widest">₹29 fee</p>
                                             <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">Free (Limited Time)</p>
@@ -2111,7 +2333,7 @@ Please confirm my pickup! 🙏`;
                                         variant="outline"
                                         onClick={() => {
                                             setShowPickupPopup(false)
-                                            if (quantities.alpha > 0 || quantities.nova > 0) {
+                                            if (isDhanbadPickup && ((quantities.flatbox || 0) > 0 || (quantities.atlasbox || 0) > 0)) {
                                                 setShowPackagingPopup(true)
                                             }
                                         }}

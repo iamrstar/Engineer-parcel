@@ -21,4 +21,18 @@ export const BUSINESS_INFO = {
   },
 };
 
+export const DHANBAD_PINCODES_EXAMPLES = ["826001", "826004", "826005", "828127"];
+
+/**
+ * Checks if a pincode belongs to Dhanbad district (where physical box supply is active).
+ * Dhanbad pincodes start with 826 and 828 (e.g., 826001, 826004, 826005, 828127).
+ */
+export const isDhanbadPincode = (pincode, city = "") => {
+  if (!pincode) return false;
+  const pin = String(pincode).trim();
+  if (!/^\d{6}$/.test(pin)) return false;
+  if (city && city.toLowerCase().includes("dhanbad")) return true;
+  return pin.startsWith("826") || pin.startsWith("828");
+};
+
 export default BUSINESS_INFO;
