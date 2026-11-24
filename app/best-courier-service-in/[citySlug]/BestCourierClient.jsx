@@ -4,10 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Star, ShieldCheck, Zap, Truck, Package, Clock, MapPin,
-  CheckCircle2, ChevronRight, Phone, ArrowRight, Box, Sparkles,
-  Building2, GraduationCap, ThumbsUp, HelpCircle, ChevronDown,
+import { 
+  Star, ShieldCheck, Zap, Truck, Package, Clock, MapPin, 
+  CheckCircle2, ChevronRight, Phone, ArrowRight, Box, Sparkles, 
+  Building2, GraduationCap, ThumbsUp, HelpCircle, ChevronDown, 
   Check, X, Shield, Award, Users, Calculator, ExternalLink,
   MessageCircle, Search, RefreshCw
 } from "lucide-react";
@@ -27,11 +27,11 @@ export default function BestCourierClient({ city, faqList }) {
   const isFreePickup = Boolean(seoConfig.freePickup);
   const isPartner = seoConfig.pickupModel === "partner" || !isDhanbad;
 
-  const headlineSub = isDhanbad
-    ? "Doorstep Pickup & Pan-India Delivery"
+  const headlineSub = isDhanbad 
+    ? "Doorstep Pickup & Pan-India Delivery" 
     : "Online Courier Booking & All-India Delivery";
 
-  const checklistClaim = isDhanbad
+  const checklistClaim = isDhanbad 
     ? (isFreePickup ? "Free Doorstep Pickup" : "Doorstep Pickup Booking")
     : "Partner Network Pickup";
 
@@ -40,7 +40,7 @@ export default function BestCourierClient({ city, faqList }) {
     : "Get a Quote Online";
 
   // Parse localities from comma separated string
-  const localityList = city.areas
+  const localityList = city.areas 
     ? city.areas.split(",").map((a) => a.trim()).filter(Boolean)
     : ["City Centre", "Main Market", "Station Road", "College Campus"];
 
@@ -101,41 +101,41 @@ export default function BestCourierClient({ city, faqList }) {
 
   const defaultFaqs = isDhanbad
     ? [
-      {
-        q: `How do I book a courier pickup in Dhanbad?`,
-        a: `Booking takes under 60 seconds online. Enter your pickup address in Dhanbad, select package type or OneBox, and our executive will arrive at your doorstep.`,
-      },
-      {
-        q: `What are the courier charges for shipping from Dhanbad?`,
-        a: `We offer transparent flat rates. OneBox Alpha starts at ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg). Standard parcels and documents match standard courier rates.`,
-      },
-      {
-        q: `Do you pick up from student hostels in IIT (ISM) Dhanbad?`,
-        a: `Yes! We provide campus logistics and pick up directly from hostel rooms at IIT (ISM) Dhanbad so students do not need to carry luggage down stairs.`,
-      },
-      {
-        q: `How can I track my shipment once picked up from Dhanbad?`,
-        a: `You receive an instant confirmation with your tracking ID upon pickup. You can track your parcel journey 24/7 on engineersparcel.in/track-order.`,
-      },
-    ]
+        {
+          q: `How do I book a courier pickup in Dhanbad?`,
+          a: `Booking takes under 60 seconds online. Enter your pickup address in Dhanbad, select package type or OneBox, and our executive will arrive at your doorstep.`,
+        },
+        {
+          q: `What are the courier charges for shipping from Dhanbad?`,
+          a: `We offer transparent flat rates. OneBox Alpha starts at ₹799 flat (up to 30kg) and Nova at ₹1,599 flat (up to 60kg). Standard parcels and documents match standard courier rates.`,
+        },
+        {
+          q: `Do you pick up from student hostels in IIT (ISM) Dhanbad?`,
+          a: `Yes! We provide campus logistics and pick up directly from hostel rooms at IIT (ISM) Dhanbad so students do not need to carry luggage down stairs.`,
+        },
+        {
+          q: `How can I track my shipment once picked up from Dhanbad?`,
+          a: `You receive an instant confirmation with your tracking ID upon pickup. You can track your parcel journey 24/7 on engineersparcel.in/track-order.`,
+        },
+      ]
     : [
-      {
-        q: `How do I send a parcel from ${city.city}?`,
-        a: `Booking takes under 60 seconds online. We coordinate parcel pickup via our partner network across serviceable pincodes in ${city.city}.`,
-      },
-      {
-        q: `What are the courier charges for shipping from ${city.city}?`,
-        a: `We offer competitive rates for parcels and interstate box shipments across India. Use our online price estimator to get an instant quote.`,
-      },
-      {
-        q: `How do I check if my pincode in ${city.city} is serviceable?`,
-        a: `Enter your 6-digit pincode in our online Pincode Checker at engineersparcel.in/pincode-checker to verify serviceability before booking.`,
-      },
-      {
-        q: `How can I track my shipment from ${city.city}?`,
-        a: `You receive a tracking ID with live journey updates on WhatsApp and 24/7 tracking at engineersparcel.in/track-order.`,
-      },
-    ];
+        {
+          q: `How do I send a parcel from ${city.city}?`,
+          a: `Booking takes under 60 seconds online. We coordinate parcel pickup via our partner network across serviceable pincodes in ${city.city}.`,
+        },
+        {
+          q: `What are the courier charges for shipping from ${city.city}?`,
+          a: `We offer competitive rates for parcels and interstate box shipments across India. Use our online price estimator to get an instant quote.`,
+        },
+        {
+          q: `How do I check if my pincode in ${city.city} is serviceable?`,
+          a: `Enter your 6-digit pincode in our online Pincode Checker at engineersparcel.in/pincode-checker to verify serviceability before booking.`,
+        },
+        {
+          q: `How can I track my shipment from ${city.city}?`,
+          a: `You receive a tracking ID with live journey updates on WhatsApp and 24/7 tracking at engineersparcel.in/track-order.`,
+        },
+      ];
 
   const faqs = faqList || defaultFaqs;
 
@@ -161,8 +161,8 @@ export default function BestCourierClient({ city, faqList }) {
             <span className="flex items-center gap-1 font-medium text-amber-400">
               <Star className="w-3.5 h-3.5 fill-amber-400" /> {BUSINESS_INFO.rating}/5 on Google Reviews
             </span>
-            <a
-              href="tel:+919525801506"
+            <a 
+              href="tel:+919525801506" 
               className="hidden md:flex items-center gap-1 text-slate-300 hover:text-white transition-colors"
             >
               <Phone className="w-3 h-3 text-orange-400" /> +91 95258 01506
@@ -182,9 +182,9 @@ export default function BestCourierClient({ city, faqList }) {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-
+            
             {/* Left Column: Value Prop */}
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -209,7 +209,7 @@ export default function BestCourierClient({ city, faqList }) {
 
               {/* Subtitle */}
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed">
-                {isDhanbad
+                {isDhanbad 
                   ? "Skip carrying heavy luggage to crowded courier counters in Dhanbad. Book online in 60 seconds — our verified executive picks up from your home, office, or hostel room with flat pricing and live tracking across India."
                   : `Courier from ${city.city} with pickup via our partner network, live WhatsApp tracking and all-India delivery. Get a quote today.`
                 }
@@ -242,7 +242,7 @@ export default function BestCourierClient({ city, faqList }) {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-                <Button
+                <Button 
                   onClick={() => setIsBookNowOpen(true)}
                   size="lg"
                   className="bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-base px-8 py-6 rounded-2xl shadow-xl shadow-orange-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] group flex items-center justify-center gap-2"
@@ -251,9 +251,9 @@ export default function BestCourierClient({ city, faqList }) {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
 
-                <Button
+                <Button 
                   asChild
-                  variant="outline"
+                  variant="outline" 
                   size="lg"
                   className="bg-white/5 hover:bg-white/10 text-white border-white/20 hover:border-white/40 font-semibold text-base px-6 py-6 rounded-2xl backdrop-blur-md transition-all flex items-center justify-center gap-2"
                 >
@@ -296,7 +296,7 @@ export default function BestCourierClient({ city, faqList }) {
             </motion.div>
 
             {/* Right Column: Interactive Pincode & Quick Estimator Card */}
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.15 }}
@@ -322,19 +322,21 @@ export default function BestCourierClient({ city, faqList }) {
                   <div className="flex bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
                     <button
                       onClick={() => setActiveTab("pincode")}
-                      className={`px-3 py-1 rounded-lg font-medium transition-all ${activeTab === "pincode"
-                          ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
+                      className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                        activeTab === "pincode" 
+                          ? "bg-orange-500 text-white shadow-md shadow-orange-500/30" 
                           : "text-slate-400 hover:text-white"
-                        }`}
+                      }`}
                     >
                       Pincode
                     </button>
                     <button
                       onClick={() => setActiveTab("onebox")}
-                      className={`px-3 py-1 rounded-lg font-medium transition-all ${activeTab === "onebox"
-                          ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
+                      className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                        activeTab === "onebox" 
+                          ? "bg-orange-500 text-white shadow-md shadow-orange-500/30" 
                           : "text-slate-400 hover:text-white"
-                        }`}
+                      }`}
                     >
                       Box Rates
                     </button>
@@ -404,7 +406,7 @@ export default function BestCourierClient({ city, faqList }) {
                     )}
 
                     {pincodeStatus?.result && (
-                      <motion.div
+                      <motion.div 
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 space-y-2.5"
@@ -615,7 +617,7 @@ export default function BestCourierClient({ city, faqList }) {
               </div>
 
               <div className="pt-8">
-                <Button
+                <Button 
                   onClick={() => setIsBookNowOpen(true)}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-base py-6 rounded-2xl shadow-lg shadow-orange-600/25 transition-all"
                 >
@@ -669,7 +671,7 @@ export default function BestCourierClient({ city, faqList }) {
               </div>
 
               <div className="pt-8">
-                <Button
+                <Button 
                   onClick={() => setIsBookNowOpen(true)}
                   className="w-full bg-slate-900 hover:bg-black text-white font-bold text-base py-6 rounded-2xl shadow-lg shadow-slate-900/25 transition-all"
                 >
@@ -791,7 +793,7 @@ export default function BestCourierClient({ city, faqList }) {
             </p>
             <div className="flex flex-wrap gap-2.5">
               {localityList.map((area, idx) => (
-                <div
+                <div 
                   key={idx}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-xs sm:text-sm font-semibold text-slate-800 hover:border-orange-500 hover:text-orange-600 transition-all cursor-default"
                 >
@@ -1019,8 +1021,9 @@ export default function BestCourierClient({ city, faqList }) {
                   >
                     <span>{faq.q}</span>
                     <ChevronDown
-                      className={`w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0 ${isOpen ? "rotate-180 text-orange-600" : ""
-                        }`}
+                      className={`w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0 ${
+                        isOpen ? "rotate-180 text-orange-600" : ""
+                      }`}
                     />
                   </button>
                   <AnimatePresence initial={false}>
@@ -1060,7 +1063,7 @@ export default function BestCourierClient({ city, faqList }) {
           </h2>
 
           <p className="text-base sm:text-lg text-orange-100 max-w-xl mx-auto leading-relaxed">
-            {isDhanbad
+            {isDhanbad 
               ? "Schedule your pickup in under 60 seconds. Our verified executive brings sturdy boxes, seals, and live tracking to your door."
               : "Book your parcel in under 60 seconds. Safe shipping, verified partner pickup, and live WhatsApp tracking across India."
             }
