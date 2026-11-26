@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star, Loader2, CheckCircle, XCircle, Sparkles, PhoneCall } from "lucide-react";
+import { ArrowRight, Box, Globe, MapPin, Package, Truck, Search, Shield, Zap, Clock, Star, Loader2, CheckCircle, XCircle, Sparkles, PhoneCall, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
@@ -77,19 +77,25 @@ export default function Home() {
               <div className="flex flex-wrap gap-3 mb-6">
                 <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 text-white shadow-[0_0_15px_rgba(234,88,12,0.3)] text-xs font-bold px-4 py-2 rounded-full relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <Zap className="w-3 h-3 text-orange-500 fill-current" />
-                  FASTEST DELIVERY IN INDIA
+                  <Zap className="w-3.5 h-3.5 text-orange-400 fill-current" />
+                  <span>INDIA&apos;S FASTEST &amp; EASY LOGISTICS BOOKING PLATFORM</span>
+                </div>
+                <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-orange-800 text-xs font-black px-4 py-2 rounded-full">
+                  <Bot className="w-3.5 h-3.5 text-orange-600" />
+                  <span>POWERED BY ENZEE AI</span>
                 </div>
                 <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md border border-gray-200 text-gray-900 text-xs font-bold px-4 py-2 rounded-full shadow-sm">
                   🎓 IIT ISM INCUBATED
                 </div>
               </div>
-              <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight">
-                Logistics <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-400">made easy.</span>
+              <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.08] mb-6 tracking-tight">
+                India&apos;s Fastest &amp; <br />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500">
+                  Easy Logistics Booking.
+                </span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-xl leading-relaxed font-medium">
-                No visiting courier offices. No standing in lines to ask prices. Book online or simply give us a call — we pick up from your doorstep and deliver at market-matching or lower prices.
+                India&apos;s fastest and easiest tech-enabled logistics platform powered by <strong>Enzee AI</strong>. Designed to act as an intelligent assistant for working people and customers alike — offering 60-second online bookings, transparent flat rates, and hassle-free doorstep pickup across India.
               </p>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-center mb-10">
@@ -172,6 +178,20 @@ export default function Home() {
                     <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">Fast Delivery</p>
                     <p className="text-xl font-black text-gray-900">2-5 Days</p>
                   </div>
+                </div>
+              </div>
+
+              {/* Floating Enzee AI Copilot Badge */}
+              <div className="absolute top-1/2 -right-6 z-20 glass p-4 rounded-2xl shadow-2xl border border-white/60 backdrop-blur-xl animate-float [animation-delay:1.5s] hidden sm:flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+                  <Bot className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
+                    <p className="text-[10px] font-black uppercase text-gray-600 tracking-wider">Enzee AI Copilot</p>
+                  </div>
+                  <p className="text-xs font-black text-gray-900">Assisting Customers & Operations</p>
                 </div>
               </div>
 
@@ -310,6 +330,255 @@ export default function Home() {
           >
             Still not sure? <a href="https://wa.me/919693245615" target="_blank" rel="noopener noreferrer" className="text-orange-600 font-bold hover:underline">WhatsApp us</a> and we'll guide you in 30 seconds.
           </motion.p>
+        </div>
+      </section>
+
+      {/* ══════════ ENZEE AI: TECH-ENABLED LOGISTICS PLATFORM ══════════ */}
+      <section className="py-24 bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white relative overflow-hidden border-y border-white/10">
+        {/* Futuristic Grid & Ambient Glow Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(#ea580c_1px,transparent_1px)] [background-size:32px_32px] opacity-15 pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-r from-orange-500/20 via-amber-500/10 to-orange-600/20 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "200px" }}
+              className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest mb-6 backdrop-blur-md shadow-lg shadow-orange-500/20"
+            >
+              <Bot className="w-4 h-4 animate-pulse text-orange-400" />
+              <span>THE BRAIN BEHIND OUR LOGISTICS</span>
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "200px" }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-6"
+            >
+              India&apos;s Tech-Enabled Logistics, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-orange-400 animate-gradient-x">
+                Powered by Enzee AI
+              </span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "200px" }}
+              transition={{ delay: 0.2 }}
+              className="text-base sm:text-xl text-gray-300 font-medium leading-relaxed"
+            >
+              Logistics shouldn&apos;t mean manual delays, weighing confusion, or lost parcels. <strong>Enzee AI</strong> is our proprietary intelligence engine working around the clock as a <strong>dual assistant</strong> — empowering our working logistics workforce on the ground, while making shipping effortless for everyday customers.
+            </motion.p>
+          </div>
+
+          {/* Dual Intelligence Cards: For Customers & For Working People */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch mb-16">
+            {/* CARD 1: FOR CUSTOMERS */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative rounded-[36px] bg-gradient-to-b from-white/10 to-white/5 border border-white/15 p-8 sm:p-10 backdrop-blur-xl shadow-2xl flex flex-col justify-between overflow-hidden group hover:border-orange-500/50 transition-all duration-500"
+            >
+              <div className="absolute top-0 right-0 w-60 h-60 bg-orange-500/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:scale-125 transition-transform duration-700" />
+              
+              <div>
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white shadow-xl shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                      <Sparkles className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-orange-400 tracking-wider">ASSISTING CUSTOMERS</span>
+                      <h3 className="text-2xl font-black text-white">The Smart Customer Experience</h3>
+                    </div>
+                  </div>
+                  <span className="text-xs font-black bg-orange-500/20 text-orange-300 border border-orange-500/40 px-3 py-1 rounded-full uppercase hidden sm:inline-block">
+                    24/7 Live
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-300 font-medium mb-8 leading-relaxed">
+                  No more standing in queues or struggling with measuring tapes. Enzee AI acts as your personal shipping concierge:
+                </p>
+
+                <div className="space-y-5 mb-8">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center shrink-0 mt-0.5 text-orange-400">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Instant Transparent Pricing & Rate AI</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Evaluates weight and parcel dimensions in real-time, auto-recommending OneBox flat rates (₹799 up to 30kg) with zero volumetric calculation surprises.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center shrink-0 mt-0.5 text-orange-400">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Automated Pincode & Route Validator</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Instant serviceability lookup across Indian pincodes, automatically mapping priority transit corridors and remote delivery parameters.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center shrink-0 mt-0.5 text-orange-400">
+                      <Package className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Adaptive Packaging & BYOB Guide</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Instantly verifies whether empty 7-ply box delivery (Dhanbad) or BYOB (Bring Your Own Box) mode applies to your location so you are always prepared.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center shrink-0 mt-0.5 text-orange-400">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Conversational Live Tracking on Web & WhatsApp</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Ask tracking status in natural language or tap to get real-time milestone updates directly on WhatsApp 24/7.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-400 animate-ping" />
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Enzee AI Online</span>
+                </div>
+                <button
+                  onClick={() => {
+                    const btn = document.querySelector('button[aria-label="Open ENZEE AI Assistant"]');
+                    if (btn) btn.click();
+                  }}
+                  className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black text-xs px-6 py-3 rounded-xl transition-all shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2"
+                >
+                  <Bot className="w-4 h-4" />
+                  Ask Enzee AI Anything →
+                </button>
+              </div>
+            </motion.div>
+
+            {/* CARD 2: FOR WORKING PEOPLE & FIELD EXECUTIVES */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative rounded-[36px] bg-gradient-to-b from-white/10 to-white/5 border border-white/15 p-8 sm:p-10 backdrop-blur-xl shadow-2xl flex flex-col justify-between overflow-hidden group hover:border-amber-500/50 transition-all duration-500"
+            >
+              <div className="absolute top-0 right-0 w-60 h-60 bg-amber-500/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:scale-125 transition-transform duration-700" />
+              
+              <div>
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-xl shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                      <Truck className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">EMPOWERING WORKING PEOPLE</span>
+                      <h3 className="text-2xl font-black text-white">The Field Operations Copilot</h3>
+                    </div>
+                  </div>
+                  <span className="text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full uppercase hidden sm:inline-block">
+                    Operational AI
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-300 font-medium mb-8 leading-relaxed">
+                  We believe technology should empower ground workers, not replace them. Enzee AI acts as a smart copilot for our delivery boys and hub executives:
+                </p>
+
+                <div className="space-y-5 mb-8">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 mt-0.5 text-amber-400">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Dynamic Dispatch & Pickup Routing</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Algorithms optimize pickup batches across campus hostels and city sectors, saving delivery executives valuable time, avoiding traffic bottlenecks, and preventing empty runs.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 mt-0.5 text-amber-400">
+                      <Shield className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Automated Address & Landmark Resolution</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Detects ambiguous hostel room numbers, confusing colony names, and PIN mismatches before dispatch, eliminating stressful failed deliveries for field staff.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 mt-0.5 text-amber-400">
+                      <CheckCircle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Paperless Digital Check-ins & Weigh-ins</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Replaces bulky manual ledgers with instant QR scanning, tamper-proof digital seals, and automated booking updates straight from the executive&apos;s mobile device.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 mt-0.5 text-amber-400">
+                      <Star className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm">Real-Time Field SOP & Safety Guidance</h4>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+                        Offers instantaneous handling tips for sensitive luggage, electronics, and heavy shifting, ensuring worker safety and zero package damage.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
+                  <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Built for Ground Precision</span>
+                </div>
+                <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-amber-300">
+                  ⚡ 0 Paperwork • 99.4% On-Time Dispatches
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Bottom Philosophy Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-orange-500/10 border border-orange-500/30 text-center max-w-4xl mx-auto backdrop-blur-md"
+          >
+            <p className="text-sm sm:text-base text-gray-200 font-medium leading-relaxed">
+              🤝 <strong className="text-white font-black">Technology That Respects People:</strong> We believe true logistics innovation doesn&apos;t eliminate human workers — it gives them superpowers. Enzee AI assists our working delivery people and our customers simultaneously, ensuring speed, dignity of labor, and total reliability from doorstep to destination.
+            </p>
+          </motion.div>
         </div>
       </section>
 

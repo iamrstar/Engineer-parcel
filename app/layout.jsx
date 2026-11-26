@@ -16,11 +16,11 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://engineersparcel.in"
 export const metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "EngineersParcel | Best Pan-India Courier Service & Doorstep Parcel Delivery",
+    default: "EngineersParcel | India's Fastest & Easy Logistics Booking Platform",
     template: "%s | EngineersParcel",
   },
   description:
-    "Send courier & parcel anywhere in India with EngineersParcel. Transparent prices, OneBox heavy luggage (₹799 up to 30kg), student campus parcel delivery, and live tracking.",
+    "India's fastest and easy tech-enabled logistics platform powered by Enzee AI. Seamless doorstep parcel booking, OneBox flat rates (₹799 up to 30kg), student campus luggage delivery, and AI-assisted logistics for customers and field teams.",
   keywords: [
     "pan india courier service",
     "best courier service in india",

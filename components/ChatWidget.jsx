@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const INITIAL_MESSAGE = {
   role: "assistant",
-  content: `👋 **Hi! I am ENZEE AI**, your EngineersParcel AI Assistant.\n\nI can help you with:\n• 📦 **Live tracking** for your active parcel\n• 💰 **Instant shipping rates** (OneBox Alpha ₹799 / Nova ₹1599)\n• 🎓 **Hostel & campus shifting** (IIT ISM rates ₹599 & ₹1149)\n• 📍 **Pincode serviceability** across India\n\nHow can I help you today?`,
+  content: `👋 **Hi! I am ENZEE AI**, India's Tech-Enabled Logistics Copilot at EngineersParcel.\n\nI assist customers and field delivery teams 24/7 with:\n• ⚡ **Fast & easy booking assistance**\n• 📦 **Live tracking** for your active parcel\n• 💰 **Instant shipping rates** (OneBox Alpha ₹799 / Nova ₹1599 & BYOB)\n• 🎓 **Hostel & campus shifting** (IIT ISM rates ₹599 & ₹1149)\n• 📍 **Pincode serviceability & packaging guide**\n\nHow can I help you today?`,
 };
 
 const SUGGESTIONS = [
@@ -174,7 +174,7 @@ export default function ChatWidget() {
               </div>
               <div className="text-left hidden sm:block">
                 <p className="text-xs font-black tracking-wide leading-none uppercase">ENZEE AI</p>
-                <p className="text-[10px] text-orange-100 font-medium leading-tight">Instant shipping answers</p>
+                <p className="text-[10px] text-orange-100 font-medium leading-tight">AI Logistics Copilot</p>
               </div>
               <Sparkles className="w-4 h-4 text-yellow-200 animate-pulse" />
             </motion.button>
@@ -212,7 +212,7 @@ export default function ChatWidget() {
                   </div>
                   <p className="text-xs text-gray-400 flex items-center gap-1.5 font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                    EngineersParcel AI Assistant
+                    AI Logistics Copilot • Customers & Working People
                   </p>
                 </div>
               </div>
