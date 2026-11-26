@@ -1,4 +1,4 @@
-import { Target, Eye, Heart, Users, Award, Zap } from "lucide-react";
+import { Target, Eye, Heart, Users, Award, Zap, Cpu, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function VisionMission() {
@@ -28,16 +28,23 @@ export default function VisionMission() {
               <p className="text-lg text-gray-600 mb-4">
                 To become India&apos;s most trusted and innovative logistics partner, connecting every corner of the nation with seamless, technology-driven delivery solutions.
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-4">
                 We envision a future where distance is no barrier to commerce, communication, or connection. Through continuous innovation and unwavering commitment to service excellence, we aim to redefine what&apos;s possible in the logistics industry.
               </p>
+              <div className="p-4 rounded-xl bg-orange-50/80 border border-orange-200">
+                <p className="text-xs font-bold text-orange-700 uppercase tracking-wider mb-1">Vision 2027 Milestone</p>
+                <p className="text-sm text-gray-800 font-medium">
+                  Scaling into a 100% AI-enabled logistics organization powered by Enzee AI, while deploying blockchain-backed tamper-proof chain-of-custody for sensitive information logistics.
+                </p>
+              </div>
             </div>
             <div className="md:w-1/2 bg-orange-50 p-8 rounded-lg border border-orange-100">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Vision Pillars</h3>
               <div className="space-y-4">
+                <VisionPillar icon={<Cpu className="h-5 w-5" />} title="Vision 2027: AI-Enabled Organization" desc="Operating a 100% AI-driven logistics ecosystem powered by Enzee AI" />
+                <VisionPillar icon={<ShieldCheck className="h-5 w-5" />} title="Blockchain Logistics Security" desc="Immutable chain-of-custody for sensitive information & high-security freight" />
                 <VisionPillar icon={<Zap className="h-5 w-5" />} title="Innovation First" desc="Leveraging cutting-edge technology for superior service" />
-                <VisionPillar icon={<Users className="h-5 w-5" />} title="Customer Centric" desc="Building lasting relationships through exceptional experiences" />
-                <VisionPillar icon={<Award className="h-5 w-5" />} title="Market Leadership" desc="Setting industry standards for reliability and speed" />
+                <VisionPillar icon={<Users className="h-5 w-5" />} title="Customer & Worker Centric" desc="Empowering working people and delighting customers with friction-free booking" />
               </div>
             </div>
           </div>
