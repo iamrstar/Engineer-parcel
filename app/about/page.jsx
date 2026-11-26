@@ -340,8 +340,8 @@ export default function AboutPage() {
               <div className="absolute -inset-4 bg-orange-600/10 rounded-[4rem] blur-3xl transition-transform duration-700"></div>
               <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
-                  src="/ai-packer-mover.jpg"
-                  alt="Professional Packers and Movers"
+                  src="/packers-movers-pro.jpg"
+                  alt="Professional Packers and Movers Team"
                   width={800}
                   height={600}
                   className="w-full h-full object-cover"
