@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BookNowModal from "@/components/BookNowModal";
-import { BUSINESS_INFO } from "@/src/data/business";
+import { BUSINESS_INFO, isDhanbadPincode } from "@/src/data/business";
 
 export default function BestCourierClient({ city, faqList }) {
   const [isBookNowOpen, setIsBookNowOpen] = useState(false);
@@ -416,7 +416,7 @@ export default function BestCourierClient({ city, faqList }) {
                             <CheckCircle2 className="w-4 h-4" /> Serviceable in {pincodeStatus.result.city}
                           </span>
                           <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full uppercase">
-                            Doorstep Active
+                            {isDhanbadPincode(pincodeStatus.result.pincode, pincodeStatus.result.city) ? "Box Supply Active" : "BYOB Doorstep Active"}
                           </span>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-emerald-500/20 text-slate-300">
@@ -429,6 +429,11 @@ export default function BestCourierClient({ city, faqList }) {
                             <span className="font-semibold text-white">{pincodeStatus.result.deliveryDays} Business Days</span>
                           </div>
                         </div>
+                        {!isDhanbadPincode(pincodeStatus.result.pincode, pincodeStatus.result.city) && (
+                          <p className="text-[10px] text-amber-300 font-medium bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                            🛍️ <strong>BYOB Notice:</strong> Physical box supply is available in Dhanbad. For {pincodeStatus.result.pincode}, pack in your own sturdy carton — we collect directly from your door!
+                          </p>
+                        )}
                         <Button
                           onClick={() => setIsBookNowOpen(true)}
                           size="sm"
@@ -484,7 +489,7 @@ export default function BestCourierClient({ city, faqList }) {
 
                     <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-[11px] text-orange-300 flex items-center gap-2">
                       <GraduationCap className="w-4 h-4 shrink-0 text-orange-400" />
-                      <span>{isDhanbad ? "Heavy-duty corrugated box + Doorstep collection in Dhanbad." : "All-India flat rate parcel delivery via partner network."}</span>
+                      <span>{isDhanbad ? "Heavy-duty corrugated box + Doorstep collection in Dhanbad." : "BYOB (Bring Your Own Box): Pack in your own carton; we pick up from your doorstep!"}</span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs px-1">
@@ -588,7 +593,7 @@ export default function BestCourierClient({ city, faqList }) {
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-orange-100/60 text-xs text-orange-950 font-medium">
-                  📦 <strong>Dimensions:</strong> 42 × 42 × 27 cm • {isDhanbad ? "Heavy-duty 7-ply corrugated box provided!" : "Standard box shipping guidelines"}
+                  📦 <strong>Dimensions:</strong> 42 × 42 × 27 cm • {isDhanbad ? "Heavy-duty 7-ply corrugated box provided!" : "BYOB: Pack in your own sturdy carton (box supply in Dhanbad only)"}
                 </div>
 
                 <ul className="space-y-3 text-sm text-slate-700">
@@ -598,7 +603,7 @@ export default function BestCourierClient({ city, faqList }) {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>{isDhanbad ? "Direct hostel room pickup at IIT (ISM)" : "Convenient doorstep collection"}</span>
+                    <span>{isDhanbad ? "Direct hostel room pickup at IIT (ISM)" : "BYOB: Pack up to 30kg in your own carton"}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -642,7 +647,7 @@ export default function BestCourierClient({ city, faqList }) {
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-slate-100 text-xs text-slate-800 font-medium">
-                  📦 <strong>Dimensions:</strong> 60 × 35 × 40 cm • {isDhanbad ? "Reinforced packaging provided!" : "Heavy parcel specifications"}
+                  📦 <strong>Dimensions:</strong> 60 × 35 × 40 cm • {isDhanbad ? "Reinforced packaging provided!" : "BYOB: Pack in your own heavy-duty box (box supply in Dhanbad only)"}
                 </div>
 
                 <ul className="space-y-3 text-sm text-slate-700">
@@ -652,7 +657,7 @@ export default function BestCourierClient({ city, faqList }) {
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Heavy baggage handling by trained executives</span>
+                    <span>{isDhanbad ? "Heavy baggage handling by trained executives" : "BYOB: Heavy luggage up to 60kg in your own carton"}</span>
                   </li>
                   <li className="flex items-center gap-2.5">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -729,7 +734,7 @@ export default function BestCourierClient({ city, faqList }) {
               </div>
               <h3 className="font-bold text-lg text-slate-900 mb-2">OneBox Interstate</h3>
               <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                Heavy luggage shipping at flat ₹799 (30kg) and ₹1,599 (60kg). Includes free corrugated box and zero volumetric math.
+                Heavy luggage shipping at flat ₹799 (30kg) and ₹1,599 (60kg). {isDhanbad ? "Includes free heavy-duty corrugated box" : "BYOB (Bring Your Own Box) with doorstep pickup"} and zero volumetric math.
               </p>
               <span className="text-xs font-bold text-blue-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 Explore OneBox <ChevronRight className="w-3.5 h-3.5" />

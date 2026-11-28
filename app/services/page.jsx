@@ -131,8 +131,8 @@ export default function ServicesPage() {
             "High-security IoT barcode tracking",
             "Specialized fragile item handling"
           ]}
-          imgSrc="/shifing.jpg"
-          imgAlt="Shifting and Moving Service"
+          imgSrc="/packers-movers-pro.jpg"
+          imgAlt="Professional Packers and Movers"
           ctaLink="/get-quote"
           ctaText="Get a Moving Quote"
           reverse

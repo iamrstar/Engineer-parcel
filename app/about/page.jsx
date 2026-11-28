@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import {
   Award, Clock, Shield, Truck, Users, MessageCircle,
   IndianRupee, ChartCandlestick,
-  QrCode, ArrowRight, Star, Zap, Globe, Package, User, Phone, MapPin, Heart
+  QrCode, ArrowRight, Star, Zap, Globe, Package, User, Phone, MapPin, Heart,
+  Cpu, Bot, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -131,14 +132,20 @@ export default function AboutPage() {
               },
               {
                 year: "2026",
-                title: "OneBox Launch",
-                desc: "Introduced OneBox (Alpha & Nova segments) — fixed-price, no-questions-asked heavy box shipping that simplified logistics for thousands.",
+                title: "OneBox & Enzee AI Launch",
+                desc: "Introduced OneBox flat-rate heavy parcel shipping alongside Enzee AI to assist customers and field delivery executives in real-time.",
                 icon: <Package className="w-6 h-6 text-white" />
               },
               {
-                year: "What's Next",
+                year: "2027 Vision",
+                title: "AI-Enabled Logistics & Blockchain Security",
+                desc: "Our 2027 vision: Becoming a 100% AI-enabled logistics organization powered by Enzee AI, and engineering blockchain-backed chain-of-custody for ultra-secure handling of sensitive documents and high-security logistics.",
+                icon: <Cpu className="w-6 h-6 text-white" />
+              },
+              {
+                year: "Beyond",
                 title: "Growing with You",
-                desc: "Building a logistics brand that people trust — one honest delivery at a time. More cities, better service, same values.",
+                desc: "Building a logistics brand India trusts — one honest, secure delivery at a time. More cities, better technology, unchanged values.",
                 icon: <Heart className="w-6 h-6 text-white" />
               }
             ].map((item, index) => (
@@ -163,6 +170,69 @@ export default function AboutPage() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ VISION 2027: AI & BLOCKCHAIN ROADMAP ══════════ */}
+      <section className="py-24 relative bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-orange-500 rounded-full blur-[140px]" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600 rounded-full blur-[140px]" />
+        </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-black px-4 py-2 rounded-full uppercase tracking-wider mb-4">
+                <Cpu className="w-3.5 h-3.5" />
+                <span>Our 2027 Engineering Vision</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
+                Vision 2027: <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-amber-300 to-orange-400">AI-Enabled &amp; Blockchain Logistics</span>
+              </h2>
+              <p className="text-base sm:text-lg text-gray-400 leading-relaxed">
+                By 2027, our vision is to become India&apos;s leading AI-enabled logistics organization and pioneer blockchain security for sensitive information logistics.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="p-8 sm:p-10 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl relative group hover:border-orange-500/40 transition-all duration-500"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white mb-6 shadow-lg shadow-orange-500/20">
+                <Bot className="w-7 h-7" />
+              </div>
+              <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">Vision Pillar I</span>
+              <h3 className="text-2xl font-black text-white mt-1 mb-3">100% AI-Enabled Logistics Organization</h3>
+              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
+                Deeply integrating <strong>Enzee AI</strong> across our entire workflow — from predictive order dispatch and smart load pooling to real-time on-ground copilot assistance for working delivery partners, drivers, and campus executives.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="p-8 sm:p-10 rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl relative group hover:border-blue-500/40 transition-all duration-500"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-500/20">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+              <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Vision Pillar II</span>
+              <h3 className="text-2xl font-black text-white mt-1 mb-3">Blockchain for High-Security Logistics</h3>
+              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
+                Engineering immutable blockchain-backed chain-of-custody for <strong>sensitive information logistics</strong> — including official university transcripts, legal affidavits, medical records, and enterprise confidential shipments with tamper-proof cryptographic verification.
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -270,8 +340,8 @@ export default function AboutPage() {
               <div className="absolute -inset-4 bg-orange-600/10 rounded-[4rem] blur-3xl transition-transform duration-700"></div>
               <div className="relative rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
-                  src="/ai-packer-mover.jpg"
-                  alt="Professional Packers and Movers"
+                  src="/packers-movers-pro.jpg"
+                  alt="Professional Packers and Movers Team"
                   width={800}
                   height={600}
                   className="w-full h-full object-cover"
